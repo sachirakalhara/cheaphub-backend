@@ -15,10 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string('fname');
             $table->string('lname');
-            $table->string('display_name');
+            $table->string('display_name')->nullable();
             $table->string('email')->unique();
             $table->string('contact_no')->unique()->nullable();
             $table->string('password');
+            $table->string('profile_photo')->nullable();
             $table->string('verification_code')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->boolean('active')->default(true);

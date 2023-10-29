@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API\Serial;
 
-use App\Models\UserLevel;
 use App\Http\Controllers\Controller;
+use App\Models\Serial\Serial;
 use Illuminate\Http\Request;
 
-class UserLevelController extends Controller
+class SerialController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -35,7 +35,7 @@ class UserLevelController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(UserLevel $userLevel)
+    public function show(Serial $serial)
     {
         //
     }
@@ -43,7 +43,7 @@ class UserLevelController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(UserLevel $userLevel)
+    public function edit(Serial $serial)
     {
         //
     }
@@ -51,7 +51,7 @@ class UserLevelController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, UserLevel $userLevel)
+    public function update(Request $request, Serial $serial)
     {
         //
     }
@@ -59,7 +59,7 @@ class UserLevelController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(UserLevel $userLevel)
+    public function destroy(Serial $serial)
     {
         //
     }

@@ -36,6 +36,12 @@ class UserRepository implements UserRepositoryInterface
         $user->display_name = $request->fname.' '.$request->lname;
         $user->contact_no = $request->contact_no;
 
+        if ($request->hasFile('profile_photo')) {
+            $image = $request->file('profile_photo');
+            $imageName = time() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('uploads'), $imageName);
+            $user->profile_photo = $imageName;
+        }
         if ($user->save()) {
             activity('user')->causedBy($user)->performedOn($user)->log('updated');
             return new UserResource($user);

@@ -31,33 +31,16 @@ class Helper
             'message' => $message], $code);
     }
 
-    public static function imageResponse($request)
+    public static function imageResponse($image)
     {
-        $url = [];
-        foreach ($request['data'] as $data) {
-            if (Storage::disk('s3')->exists($data->path)) {
-                $value = [
-                    'id' => $data->id,
-                    'path' => Storage::disk('s3')->url($data->path)
-                ];
-                array_push($url , $value);
-            }
-        }
-        return [
-            'url' => $url,
-        ];
+//        $path = public_path('uploads/' . $image);
+//        if (file_exists($path)) {
+//            return response()->file($path);
+//        }else{
+//            return null;
+//        }
     }
-    public static function singleImageResponse($request)
-    {
-        $url = null;
-        if ($request != null && Storage::disk('s3')->exists($request)) {
-            $url = Storage::disk('s3')->url($request);
-            return $url;
-        }else{
-            return $url;
-        }
 
-    }
 
     public static function isSuperAdmin()
     {
@@ -67,30 +50,6 @@ class Helper
     public static function superAdmin()
     {
         return User::where('user_level_id',1)->first();
-    }
-
-    public static function disponibility($disponibility)
-    {
-        switch (strtolower($disponibility)) {
-            case 'morning':
-                return ["from" => '00:00:00', "to" => '11:59:00'];
-                break;
-
-            case 'afternoon':
-                return ["from" => '12:00:00', "to" => '16:59:00'];
-                break;
-
-            case 'evening':
-                return ["from" => '17:00:00', "to" => '19:59:00'];
-                break;
-
-            case 'night':
-                return ["from" => '20:00:00', "to" => '23:59:00'];
-                break;
-
-            default:
-                break;
-        }
     }
 
     public static function paginate($items, $perPage = 10, $page = null, $options = [])

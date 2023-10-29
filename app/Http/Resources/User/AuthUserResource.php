@@ -18,34 +18,14 @@ class AuthUserResource extends JsonResource
     {
         return [
             'id'=>$this->id,
-            'first_name'=>$this->fname,
-            'last_name'=>$this->lname,
-            'email'=>$this->email,
-            'email_verified_at'=>$this->email_verified_at,
-            'profile_photo'=>Helper::singleImageResponse($this->profile_photo),
-            'active'=>$this->active,
+            'display_name'=> $this->display_name,
+            'fname'=>$this->fname,
+            'lname'=>$this->lname,
+            'contact_no'=>$this->contact_no,
+            'email'=> $this->email,
             'contact_number'=> $this->contact_no,
-            'latitude' => $this->latitude,
-            'longitude' => $this->longitude,
+            'profile_photo' => $this->profile_photo ? asset('uploads/' . $this->profile_photo) : null,
             'user_level'=>$this->userLevel->scope
-
         ];
-    }
-    public function profilePicCoverUrl(){
-
-        if($this->cover_image) {
-            return asset('storage').$this->cover_image;
-        } else {
-            return '';
-        }
-    }
-
-    public function profilePicUrl(){
-
-        if($this->profile_photo) {
-            return asset('storage').$this->profile_photo;
-        } else {
-            return $this->social_pic_url;
-        }
     }
 }

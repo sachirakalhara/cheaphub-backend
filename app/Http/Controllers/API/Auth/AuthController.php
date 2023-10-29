@@ -48,7 +48,7 @@ class AuthController extends Controller
         $user->assignRole('user');
         if ($user->save()) {
 
-            $this->sendConfirmationMail($user);
+//            $this->sendConfirmationMail($user);
 
             $user->givePermissionTo('role ' . $user->userLevel->scope);
             activity('user')->causedBy($user)->performedOn($user)->log('registered');

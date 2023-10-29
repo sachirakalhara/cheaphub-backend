@@ -4,6 +4,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\Auth\AuthController;
 use App\Http\Controllers\API\User\UserController;
+use App\Http\Controllers\API\Product\ProductController;
+use App\Http\Controllers\API\Category\CategoryController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -27,8 +29,15 @@ Route::get('/v1/confirm-email/{user_id}/{key}', [AuthController::class, 'confirm
 // Protected routes
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::group(['prefix' => 'v1'], function () {
-        Route::group(['prefix' => 'admin','middleware' =>['admin']], function () {
+        Route::group(['prefix' => 'super-admin','middleware' =>['super_admin']], function () {
+            Route::post('/product/create', [ProductController::class, 'store']);
+            Route::put('/product/update', [ProductController::class, 'update']);
+            Route::post('/product/get-all', [ProductController::class, 'index']);
 
+            Route::post('/category/get-all', [CategoryController::class, 'index']);
+            Route::post('/category/create', [CategoryController::class, 'store']);
+            Route::put('/category/update', [CategoryController::class, 'update']);
+            Route::delete('/category/{id}', [CategoryController::class, 'delete']);
 
         });
         Route::post('/user/get-all', [UserController::class, 'index']);

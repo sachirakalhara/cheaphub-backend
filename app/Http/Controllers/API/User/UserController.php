@@ -32,7 +32,9 @@ class UserController extends Controller
             'id' => 'required',
             'fname' => 'required|string',
             'lname' => 'required|string',
-            'contact_no' => 'required|unique:users,contact_no,' . $request->id
+            'contact_no' => 'required|unique:users,contact_no,' . $request->id,
+            'profile_photo' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
+
         ]);
 
         return $this->userRepository->update($request);
