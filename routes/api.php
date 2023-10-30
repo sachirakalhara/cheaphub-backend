@@ -6,6 +6,7 @@ use App\Http\Controllers\API\Auth\AuthController;
 use App\Http\Controllers\API\User\UserController;
 use App\Http\Controllers\API\Product\ProductController;
 use App\Http\Controllers\API\Category\CategoryController;
+use App\Http\Controllers\API\Serial\SerialController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -33,6 +34,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             Route::post('/product/create', [ProductController::class, 'store']);
             Route::put('/product/update', [ProductController::class, 'update']);
             Route::post('/product/get-all', [ProductController::class, 'index']);
+            Route::post('/product/update-product-serial', [ProductController::class, 'updateProductSerial']);
 
             Route::post('/category/get-all', [CategoryController::class, 'index']);
             Route::post('/category/create', [CategoryController::class, 'store']);

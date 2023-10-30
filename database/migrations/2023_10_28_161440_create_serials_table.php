@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('serials', function (Blueprint $table) {
-            $table->bigIncrements();
+            $table->bigIncrements('id');
             $table->unsignedBigInteger('product_id');
-            $table->string('name');
+            $table->text('name');
             $table->string('type');
             $table->boolean('usage')->default(false);
             $table->integer('min_count');

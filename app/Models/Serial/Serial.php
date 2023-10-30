@@ -16,4 +16,10 @@ class Serial extends Model
         'min_count',
         'max_count'
     ];
+
+    public function product()
+    {
+        return $this->belongsTo('App\Models\Product\Product');
+    }
+
 }

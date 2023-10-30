@@ -43,7 +43,8 @@ class ProductController extends Controller
             'name' => 'required|string|unique:products',
             'price' => 'required',
             'gateway_fee' => 'required',
-            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
+            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'serial' => 'required'
         ]);
         return $this->productRepository->store($request);
     }
@@ -78,6 +79,15 @@ class ProductController extends Controller
             'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
         return $this->productRepository->update($request);
+    }
+
+    public function updateProductSerial(Request $request)
+    {
+        $request->validate([
+            'product_id' => 'required',
+            'serial' => 'required',
+        ]);
+        return $this->productRepository->updateProductSerial($request);
     }
 
     /**

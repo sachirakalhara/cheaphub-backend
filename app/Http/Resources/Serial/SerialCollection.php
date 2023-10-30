@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Resources\Product;
+namespace App\Http\Resources\Serial;
 
-use App\Http\Resources\Category\CategoryResource;
+use App\Http\Resources\Product\ProductResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
-class ProductCollection extends ResourceCollection
+class SerialCollection extends ResourceCollection
 {
-    public static $wrap = 'product_list';
+    public static $wrap = 'serial_list';
 
     /**
      * Transform the resource collection into an array.
@@ -18,7 +18,7 @@ class ProductCollection extends ResourceCollection
     public function toArray($request)
     {
         return [
-            'product_list'=> ProductResource::collection($this->collection)
+            'serial_list'=> SerialResource::collection($this->collection)
         ];
     }
 

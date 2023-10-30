@@ -4,12 +4,14 @@ namespace App\Http\Resources\Product;
 
 use App\Helpers\Helper;
 use App\Http\Resources\Category\CategoryResource;
+use App\Http\Resources\Serial\SerialResource;
+use App\Models\Serial\Serial;
 use App\Models\Subscription\Subscription;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ProductResource extends JsonResource
 {
-    public static $wrap = 'company';
+    public static $wrap = 'product';
 
     /**
      * Transform the resource into an array.
@@ -29,7 +31,7 @@ class ProductResource extends JsonResource
             'subscription' => Subscription::find($this->subscription_id),
             'categories' => CategoryResource::collection($this->categories),
             'image' => $this->image ? asset('uploads/' . $this->image) : null,
-
+            'serials' => SerialResource::collection($this->serials)
         ];
     }
 
