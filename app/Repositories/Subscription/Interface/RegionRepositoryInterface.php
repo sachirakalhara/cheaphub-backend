@@ -2,9 +2,12 @@
 
 namespace App\Repositories\Subscription\Interface;
 
-interface SubscriptionRepositoryInterface
+interface RegionRepositoryInterface
 {
     public function all($request);
     public function store($request);
-    public function delete($product_id);
+    public function update($request);
+    public function delete($region_id);
+
+
 }

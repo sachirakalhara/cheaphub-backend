@@ -39,7 +39,6 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'subscription_id' => 'required',
             'name' => 'required|string|unique:products',
             'price' => 'required',
             'gateway_fee' => 'required',
@@ -72,7 +71,6 @@ class ProductController extends Controller
     {
         $request->validate([
             'id' => 'required',
-            'subscription_id' => 'required',
             'name' => 'required|unique:products,name,' . $request->id,
             'price' => 'required',
             'gateway_fee' => 'required',

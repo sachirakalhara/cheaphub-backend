@@ -6,7 +6,9 @@ use App\Http\Controllers\API\Auth\AuthController;
 use App\Http\Controllers\API\User\UserController;
 use App\Http\Controllers\API\Product\ProductController;
 use App\Http\Controllers\API\Category\CategoryController;
-use App\Http\Controllers\API\Serial\SerialController;
+use \App\Http\Controllers\API\Subscription\RegionController;
+use App\Http\Controllers\API\Subscription\MonthController;
+use \App\Http\Controllers\API\Subscription\SubscriptionController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -40,6 +42,19 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             Route::post('/category/create', [CategoryController::class, 'store']);
             Route::put('/category/update', [CategoryController::class, 'update']);
             Route::delete('/category/{id}', [CategoryController::class, 'delete']);
+
+            Route::post('/month/get-all', [MonthController::class, 'index']);
+
+            Route::post('/region/get-all', [RegionController::class, 'index']);
+            Route::post('/region/create', [RegionController::class, 'store']);
+            Route::put('/region/update', [RegionController::class, 'update']);
+            Route::delete('/region/delete/{id}', [RegionController::class, 'delete']);
+
+            Route::post('/subscription/create', [SubscriptionController::class, 'store']);
+            Route::post('/subscription/get-all', [SubscriptionController::class, 'index']);
+            Route::delete('/subscription/delete/{product_id}', [SubscriptionController::class, 'delete']);
+
+
 
         });
         Route::post('/user/get-all', [UserController::class, 'index']);

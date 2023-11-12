@@ -9,6 +9,7 @@ use App\Http\Resources\User\UserCollection;
 use App\Http\Resources\User\UserResource;
 use App\Models\Product\Product;
 use App\Models\Serial\Serial;
+use App\Models\Subscription\Subscription;
 use App\Models\User\User;
 use App\Repositories\Product\Interface\ProductRepositoryInterface;
 use Illuminate\Http\Response;
@@ -36,7 +37,6 @@ class ProductRepository implements ProductRepositoryInterface
     {
         $product = new Product();
         $serial = new Serial();
-        $product->subscription_id = $request->subscription_id;
         $product->name = $request->name;
         $product->description = $request->description;
         $product->price = $request->price;
@@ -119,7 +119,6 @@ class ProductRepository implements ProductRepositoryInterface
     {
         $product = Product::find($request->id);
         $serial = Serial::find($request->serial_id);
-        $product->subscription_id = $request->subscription_id;
         $product->name = $request->name;
         $product->description = $request->description;
         $product->price = $request->price;

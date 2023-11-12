@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('subscriptions', function (Blueprint $table) {
+        Schema::create('region_months', function (Blueprint $table) {
             $table->id();
-            $table->integer('month_number');
-            $table->string('month_name');
+            $table->unsignedBigInteger('month_id')->nullable();
+            $table->unsignedBigInteger('region_id')->nullable();
+            $table->foreign('month_id')->references('id')->on('months');
+            $table->foreign('region_id')->references('id')->on('regions');
             $table->timestamps();
         });
     }
@@ -24,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('subscriptions');
+        Schema::dropIfExists('region_months');
     }
 };

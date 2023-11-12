@@ -4,18 +4,24 @@ namespace App\Http\Controllers\API\Subscription;
 
 use App\Http\Controllers\Controller;
 use App\Models\Subscription\Subscription;
+use App\Repositories\Subscription\Interface\RegionRepositoryInterface;
+use App\Repositories\Subscription\Interface\SubscriptionRepositoryInterface;
 use Illuminate\Http\Request;
 
 class SubscriptionController extends Controller
 {
+    public function __construct(SubscriptionRepositoryInterface $subscriptionRepository)
+    {
+        $this->subscriptionRepository = $subscriptionRepository;
+    }
+
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        return $this->subscriptionRepository->all($request);
     }
-
     /**
      * Show the form for creating a new resource.
      */
@@ -29,7 +35,12 @@ class SubscriptionController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'product_id' => 'required',
+            'type' => 'required',
+            'plan_id' => 'required',
+        ]);
+        return $this->subscriptionRepository->store($request);
     }
 
     /**
@@ -59,8 +70,8 @@ class SubscriptionController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Subscription $subscription)
+    public function delete($product_id)
     {
-        //
+        return $this->subscriptionRepository->delete($product_id);
     }
 }

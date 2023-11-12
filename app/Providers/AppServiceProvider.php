@@ -5,7 +5,11 @@ use App\Repositories\Category\CategoryRepository;
 use App\Repositories\Category\Interface\CategoryRepositoryInterface;
 use App\Repositories\Product\Interface\ProductRepositoryInterface;
 use App\Repositories\Product\ProductRepository;
+use App\Repositories\Subscription\Interface\MonthRepositoryInterface;
+use App\Repositories\Subscription\Interface\RegionRepositoryInterface;
 use App\Repositories\Subscription\Interface\SubscriptionRepositoryInterface;
+use App\Repositories\Subscription\MonthRepository;
+use App\Repositories\Subscription\RegionRepository;
 use App\Repositories\Subscription\SubscriptionRepository;
 use App\Repositories\User\Interface\UserLevelRepositoryInterface;
 use App\Repositories\User\Interface\UserRepositoryInterface;
@@ -25,6 +29,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ProductRepositoryInterface::class, ProductRepository::class);
         $this->app->bind(CategoryRepositoryInterface::class, CategoryRepository::class);
         $this->app->bind(SubscriptionRepositoryInterface::class, SubscriptionRepository::class);
+        $this->app->bind(MonthRepositoryInterface::class, MonthRepository::class);
+        $this->app->bind(RegionRepositoryInterface::class, RegionRepository::class);
+
     }
 
     /**
