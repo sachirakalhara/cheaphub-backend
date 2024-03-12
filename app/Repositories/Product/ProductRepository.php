@@ -5,15 +5,10 @@ namespace App\Repositories\Product;
 use App\Helpers\Helper;
 use App\Http\Resources\Product\ProductCollection;
 use App\Http\Resources\Product\ProductResource;
-use App\Http\Resources\User\UserCollection;
-use App\Http\Resources\User\UserResource;
 use App\Models\Product\Product;
 use App\Models\Serial\Serial;
-use App\Models\Subscription\Subscription;
-use App\Models\User\User;
 use App\Repositories\Product\Interface\ProductRepositoryInterface;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Storage;
 
 class ProductRepository implements ProductRepositoryInterface
 {
@@ -41,6 +36,7 @@ class ProductRepository implements ProductRepositoryInterface
         $product->description = $request->description;
         $product->price = $request->price;
         $product->gateway_fee = $request->gateway_fee;
+        $product->tag_id = $request->tag_id;
 
         if ($request->hasFile('image')) {
             $image = $request->file('image');
@@ -123,6 +119,7 @@ class ProductRepository implements ProductRepositoryInterface
         $product->description = $request->description;
         $product->price = $request->price;
         $product->gateway_fee = $request->gateway_fee;
+        $product->tag_id = $request->tag_id;
 
         if ($request->hasFile('image')) {
             $image = $request->file('image');

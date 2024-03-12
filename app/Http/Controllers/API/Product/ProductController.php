@@ -43,7 +43,9 @@ class ProductController extends Controller
             'price' => 'required',
             'gateway_fee' => 'required',
             'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
-            'serial' => 'required'
+            'serial' => 'required',
+            'tag_id' => 'required'
+            
         ]);
         return $this->productRepository->store($request);
     }
@@ -72,6 +74,7 @@ class ProductController extends Controller
         $request->validate([
             'id' => 'required',
             'name' => 'required|unique:products,name,' . $request->id,
+            'tag_id' => 'required',
             'price' => 'required',
             'gateway_fee' => 'required',
             'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048'

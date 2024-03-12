@@ -3,7 +3,6 @@
 namespace App\Models\Product;
 
 use App\Models\Category\Category;
-use App\Models\Serial\Serial;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
@@ -12,12 +11,18 @@ class Product extends Model
     protected $fillable = [
         'id',
         'subscription_id',
+        'tag_id',
         'name',
         'description',
         'price',
         'gateway_fee',
         'image'
     ];
+
+    public function tag()
+    {
+        return $this->belongsTo('App\Models\Tag\Tag');
+    }
 
     public function categories(): BelongsToMany
     {

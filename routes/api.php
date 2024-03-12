@@ -9,6 +9,8 @@ use App\Http\Controllers\API\Category\CategoryController;
 use \App\Http\Controllers\API\Subscription\RegionController;
 use App\Http\Controllers\API\Subscription\MonthController;
 use \App\Http\Controllers\API\Subscription\SubscriptionController;
+use App\Http\Controllers\API\Tag\TagController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -42,6 +44,11 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             Route::post('/category/create', [CategoryController::class, 'store']);
             Route::put('/category/update', [CategoryController::class, 'update']);
             Route::delete('/category/{id}', [CategoryController::class, 'delete']);
+
+            Route::post('/tag/get-all', [TagController::class, 'index']);
+            Route::post('/tag/create', [TagController::class, 'store']);
+            Route::put('/tag/update', [TagController::class, 'update']);
+            Route::delete('/tag/{id}', [TagController::class, 'delete']);
 
             Route::post('/month/get-all', [MonthController::class, 'index']);
 

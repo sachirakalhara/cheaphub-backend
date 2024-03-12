@@ -11,6 +11,8 @@ use App\Repositories\Subscription\Interface\SubscriptionRepositoryInterface;
 use App\Repositories\Subscription\MonthRepository;
 use App\Repositories\Subscription\RegionRepository;
 use App\Repositories\Subscription\SubscriptionRepository;
+use App\Repositories\Tag\Interface\TagRepositoryInterface;
+use App\Repositories\Tag\TagRepository;
 use App\Repositories\User\Interface\UserLevelRepositoryInterface;
 use App\Repositories\User\Interface\UserRepositoryInterface;
 use App\Repositories\User\UserLevelRepository;
@@ -31,7 +33,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(SubscriptionRepositoryInterface::class, SubscriptionRepository::class);
         $this->app->bind(MonthRepositoryInterface::class, MonthRepository::class);
         $this->app->bind(RegionRepositoryInterface::class, RegionRepository::class);
-
+        $this->app->bind(TagRepositoryInterface::class, TagRepository::class);
+        
     }
 
     /**
