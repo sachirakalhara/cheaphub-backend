@@ -28,6 +28,19 @@ class TagRepository implements TagRepositoryInterface
             return Helper::success(Response::$statusTexts[Response::HTTP_NO_CONTENT], Response::HTTP_NO_CONTENT);
         }
     }
+    
+    public function findById($id)
+    {
+
+        $tag = Tag::find($id);
+
+
+        if ($tag) {
+            return new TagResource($tag);
+        } else {
+            return Helper::success(Response::$statusTexts[Response::HTTP_NO_CONTENT], Response::HTTP_NO_CONTENT);
+        }
+    }
 
     public function store($request)
     {

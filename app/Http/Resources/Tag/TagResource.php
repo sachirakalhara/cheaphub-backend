@@ -17,16 +17,10 @@ class TagResource extends JsonResource
      */
     public function toArray($request)
     {
-        // $products = Product::where('tag_id',$this->id)->get();
-        // Product::whereHas('tag', function ($query) {
-        //         $query->where('id', $this->id);
-        //     })->count();
         return [
             'id'=>$this->id,
             'name'=> $this->name,
             'description'=>$this->description,
-            // 'count' => count($products),
-
             'count' => Product::whereHas('tag', function ($query) {
                 $query->where('id', $this->id);
             })->count()

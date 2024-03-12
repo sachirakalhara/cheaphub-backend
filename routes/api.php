@@ -49,6 +49,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             Route::post('/tag/create', [TagController::class, 'store']);
             Route::put('/tag/update', [TagController::class, 'update']);
             Route::delete('/tag/{id}', [TagController::class, 'delete']);
+            Route::get('/tag/{id}', [TagController::class, 'findById']);
 
             Route::post('/month/get-all', [MonthController::class, 'index']);
 

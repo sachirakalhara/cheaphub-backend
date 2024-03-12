@@ -23,6 +23,14 @@ class TagController extends Controller
         return $this->tagRepository->all($request);
     }
 
+    
+/**
+     * Display a listing of the resource.
+     */
+    public function findById($id)
+    {
+        return $this->tagRepository->findById($id);
+    }
 
     /**
      * Show the form for creating a new resource.
