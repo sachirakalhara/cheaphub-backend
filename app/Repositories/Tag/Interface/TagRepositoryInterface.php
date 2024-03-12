@@ -7,6 +7,6 @@ interface TagRepositoryInterface
     public function all($request);
     public function store($request);
     public function update($request);
-    public function delete($category_id);
+    public function delete($tag_id);
 
 }

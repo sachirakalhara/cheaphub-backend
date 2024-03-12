@@ -5,6 +5,7 @@ namespace App\Repositories\Tag;
 use App\Helpers\Helper;
 use App\Http\Resources\Tag\TagCollection;
 use App\Http\Resources\Tag\TagResource;
+use App\Models\Product\Product;
 use App\Models\Product\ProductCategory;
 use App\Models\Tag\Tag;
 use App\Repositories\Tag\Interface\TagRepositoryInterface;
@@ -56,7 +57,7 @@ class TagRepository implements TagRepositoryInterface
     public function delete($tag_id)
     {
         $tag = Tag::find($tag_id);
-        $productCategory = ProductCategory::where('tag_id',$tag_id)->first();
+        $productCategory = Product::where('tag_id',$tag_id)->first();
         if($productCategory){
             return Helper::error(Response::$statusTexts[Response::HTTP_IM_USED], Response::HTTP_IM_USED);
         }
