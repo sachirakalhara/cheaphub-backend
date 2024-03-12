@@ -30,7 +30,7 @@ Route::get('/v1/confirm-email/{user_id}/{key}', [AuthController::class, 'confirm
 
 
 // Protected routes
-Route::group(['middleware' => ['auth:sanctum']], function () {
+Route::group(['middleware' => ['auth:sanctum','cors']], function () {
     Route::group(['prefix' => 'v1'], function () {
         Route::group(['prefix' => 'super-admin','middleware' =>['super_admin']], function () {
             Route::post('/product/create', [ProductController::class, 'store']);
