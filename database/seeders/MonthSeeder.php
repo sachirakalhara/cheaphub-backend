@@ -16,10 +16,10 @@ class MonthSeeder extends Seeder
     {
 
         for ($i = 1; $i <= 12; $i++) {
-            $timestamp = mktime(0, 0, 0, $i, 1);
-            $monthName = date("F", $timestamp);
+            // $timestamp = mktime(0, 0, 0, $i, 1);
+            // $monthName = date("F", $timestamp);
             DB::table('months')->insert(
-                [ 'month_number'=>$i, 'month_name'=>$monthName]
+                [ 'month_number'=>$i, 'month_name'=>$i.' Month']
             );
         }
     }

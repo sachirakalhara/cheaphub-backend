@@ -39,6 +39,7 @@ class SubscriptionRepository implements SubscriptionRepositoryInterface
 
         $subscription_type_check = Subscription::where('type', '!=',$request->type)
             ->where('product_id',$request->product_id)->first();
+            
         if($subscription_type_check){
             return Helper::error("Subscription type is can't added", Response::HTTP_IM_USED);
         }
@@ -63,7 +64,7 @@ class SubscriptionRepository implements SubscriptionRepositoryInterface
     }
 
     public function delete($product_id){
-        $subscription_list = Subscription::where('product_id',$product_id)->first();
+        $subscription_list = Subscription::where('product_id',$product_id)->get();
         foreach ($subscription_list as $subscription) {
             $subscription->delete();
         }

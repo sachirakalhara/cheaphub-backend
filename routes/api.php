@@ -6,10 +6,12 @@ use App\Http\Controllers\API\Auth\AuthController;
 use App\Http\Controllers\API\User\UserController;
 use App\Http\Controllers\API\Product\ProductController;
 use App\Http\Controllers\API\Category\CategoryController;
+use App\Http\Controllers\API\CoinbasePaymentController;
 use \App\Http\Controllers\API\Subscription\RegionController;
 use App\Http\Controllers\API\Subscription\MonthController;
 use \App\Http\Controllers\API\Subscription\SubscriptionController;
 use App\Http\Controllers\API\Tag\TagController;
+use App\Http\Controllers\CoingateController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,9 +33,14 @@ Route::post('/v1/login', [AuthController::class, 'login']);
 Route::get('/v1/confirm-email/{user_id}/{key}', [AuthController::class, 'confirmMail']);
 
 
+Route::post('/coinbase/payment', [CoinbasePaymentController::class, 'createPayment']);
+Route::post('/coinbase/callback', [CoinbasePaymentController::class, 'paymentCallback']);
+
 // Protected routes
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::group(['prefix' => 'v1'], function () {
+    
+
         Route::group(['prefix' => 'super-admin','middleware' =>['super_admin']], function () {
             Route::post('/product/create', [ProductController::class, 'store']);
             Route::put('/product/update', [ProductController::class, 'update']);

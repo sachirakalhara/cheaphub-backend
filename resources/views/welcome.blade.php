@@ -1,4 +1,13 @@
-<!DOCTYPE html>
+<form method="POST" action="api/coinbase/payment">
+    @csrf
+    <input type="hidden" name="customer_id" value="123">
+    <input type="hidden" name="amount" value="0.001">
+    <button type="submit">Pay with Coinbase</button>
+</form>
+
+
+
+{{-- <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         <meta charset="utf-8">
@@ -137,4 +146,4 @@
             </div>
         </div>
     </body>
-</html>
+</html> --}}
