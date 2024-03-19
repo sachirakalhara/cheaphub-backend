@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('subscriptions', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('product_id');
-            $table->integer('plan_id');
+            $table->integer('month_id');
             $table->string('type');
             $table->foreign('product_id')->references('id')->on('products');
             $table->timestamps();

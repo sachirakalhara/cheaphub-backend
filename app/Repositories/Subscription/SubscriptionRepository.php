@@ -34,7 +34,7 @@ class SubscriptionRepository implements SubscriptionRepositoryInterface
     {
         $subscription = new Subscription();
         $subscription->type = $request->type;
-        $subscription->plan_id = $request->plan_id;
+        $subscription->month_id = $request->month_id;
         $subscription->product_id = $request->product_id;
 
         $subscription_type_check = Subscription::where('type', '!=',$request->type)
@@ -46,7 +46,7 @@ class SubscriptionRepository implements SubscriptionRepositoryInterface
 
         $subscription_duplicate = Subscription::
         where('type',$request->type)->
-        where('plan_id',$request->plan_id)->
+        where('month_id',$request->month_id)->
         where('product_id',$request->product_id)->
         first();
 

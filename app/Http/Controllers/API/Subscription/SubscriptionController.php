@@ -38,7 +38,7 @@ class SubscriptionController extends Controller
         $request->validate([
             'product_id' => 'required',
             'type' => 'required',
-            'plan_id' => 'required',
+            'month_id' => 'required',
         ]);
         return $this->subscriptionRepository->store($request);
     }
