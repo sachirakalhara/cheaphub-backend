@@ -10,7 +10,6 @@ class Product extends Model
 {
     protected $fillable = [
         'id',
-        'subscription_id',
         'tag_id',
         'name',
         'description',

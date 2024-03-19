@@ -28,8 +28,7 @@ class ProductResource extends JsonResource
             'description' => $this->description,
             'price' => $this->price,
             'gateway_fee' => $this->gateway_fee,
-            'subscription_id' => $this->subscription_id,
-            'subscription' => Subscription::find($this->subscription_id),
+            'subscription' => Subscription::where('product_id', $this->id)->get(),
             'categories' => CategoryResource::collection($this->categories),
             'image' => $this->image ? asset('uploads/' . $this->image) : null,
             'serials' => SerialResource::collection($this->serials)
