@@ -10,7 +10,8 @@ class Subscription extends Model
         'id',
         'type',
         'month_id',
-        'product_id'
+        'product_id',
+        'region_id'
     ];
 
     public function month()

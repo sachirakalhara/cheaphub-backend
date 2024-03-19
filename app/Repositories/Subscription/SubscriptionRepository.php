@@ -36,7 +36,8 @@ class SubscriptionRepository implements SubscriptionRepositoryInterface
         $subscription->type = $request->type;
         $subscription->month_id = $request->month_id;
         $subscription->product_id = $request->product_id;
-
+        $subscription->region_id = $request->region_id;
+        
         $subscription_type_check = Subscription::where('type', '!=',$request->type)
             ->where('product_id',$request->product_id)->first();
             

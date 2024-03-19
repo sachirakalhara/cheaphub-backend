@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Subscription;
 
+use App\Models\Subscription\Region;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class SubscriptionResource extends JsonResource
@@ -21,7 +22,7 @@ class SubscriptionResource extends JsonResource
             'id' => $this->id,
             'type' => $this->type,
             'month' => $this->month,
-            'region' => $this->region,
+            'region' => Region::find($this->region_id),
             'product' => $this->product
         ];
     }

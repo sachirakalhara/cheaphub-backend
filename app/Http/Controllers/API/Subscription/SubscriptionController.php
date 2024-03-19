@@ -39,6 +39,7 @@ class SubscriptionController extends Controller
             'product_id' => 'required',
             'type' => 'required',
             'month_id' => 'required',
+            'region_id' => 'required_if:type,region'
         ]);
         return $this->subscriptionRepository->store($request);
     }

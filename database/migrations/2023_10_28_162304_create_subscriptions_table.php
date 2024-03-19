@@ -14,8 +14,11 @@ return new class extends Migration
         Schema::create('subscriptions', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('product_id');
+            $table->unsignedBigInteger('region_id')->nullable();
             $table->integer('month_id');
             $table->string('type');
+            
+            $table->foreign('region_id')->references('id')->on('regions');
             $table->foreign('product_id')->references('id')->on('products');
             $table->timestamps();
         });
