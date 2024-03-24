@@ -11,6 +11,7 @@ use \App\Http\Controllers\API\Subscription\RegionController;
 use App\Http\Controllers\API\Subscription\MonthController;
 use \App\Http\Controllers\API\Subscription\SubscriptionController;
 use App\Http\Controllers\API\Tag\TagController;
+use \App\Http\Controllers\API\Product\Bulk\BulkProductController;
 use App\Http\Controllers\CoingateController;
 
 /*
@@ -39,9 +40,17 @@ Route::post('/coinbase/callback', [CoinbasePaymentController::class, 'paymentCal
 // Protected routes
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::group(['prefix' => 'v1'], function () {
-    
+
 
         Route::group(['prefix' => 'super-admin','middleware' =>['super_admin']], function () {
+            Route::post('/bulk/product/create', [BulkProductController::class, 'store']);
+            Route::put('/bulk/product/update', [BulkProductController::class, 'update']);
+            Route::post('/bulk/product/get-all', [BulkProductController::class, 'index']);
+            Route::get('/bulk/product/{id}', [BulkProductController::class, 'findById']);
+            //slug Url
+            Route::get('/bulk/slug-product/{slug_name}', [BulkProductController::class, 'findBySlug'])->name('api.product.slug');
+
+
             Route::post('/product/create', [ProductController::class, 'store']);
             Route::put('/product/update', [ProductController::class, 'update']);
             Route::post('/product/get-all', [ProductController::class, 'index']);

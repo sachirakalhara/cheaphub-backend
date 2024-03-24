@@ -4,9 +4,9 @@ namespace App\Repositories\Product\Interface;
 
 interface ProductRepositoryInterface
 {
-    public function all($request);
+//    public function all($request);
     public function store($request);
-    public function update($request);
-    public function updateProductSerial($request);
+//    public function update($request);
+//    public function updateProductSerial($request);
 
 }

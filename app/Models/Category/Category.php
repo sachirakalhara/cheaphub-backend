@@ -2,6 +2,7 @@
 
 namespace App\Models\Category;
 
+use App\Models\Product\Bulk\BulkProduct;
 use App\Models\Product\Product;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -13,6 +14,11 @@ class Category extends Model
         'name',
         'description'
     ];
+
+    public function bulkProducts(): BelongsToMany
+    {
+        return $this->belongsToMany(BulkProduct::class, 'bulk_product_categories');
+    }
 
     public function products(): BelongsToMany
     {
