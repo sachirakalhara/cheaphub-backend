@@ -2,7 +2,7 @@
 
 namespace App\Http\Resources\Tag;
 
-use App\Models\Product\Product;
+use App\Models\Product\Contribution\ContributionProduct;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class TagResource extends JsonResource
@@ -21,7 +21,7 @@ class TagResource extends JsonResource
             'id'=>$this->id,
             'name'=> $this->name,
             'description'=>$this->description,
-            'count' => Product::whereHas('tag', function ($query) {
+            'count' => ContributionProduct::whereHas('tag', function ($query) {
                 $query->where('id', $this->id);
             })->count()
 

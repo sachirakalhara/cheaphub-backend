@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('subscriptions', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('product_id');
-            $table->unsignedBigInteger('region_id')->nullable();
-            $table->integer('month_id');
-            $table->string('type');
-            
-            $table->foreign('region_id')->references('id')->on('regions');
-            $table->foreign('product_id')->references('id')->on('products');
+            $table->unsignedBigInteger('contribution_product_id');
+            $table->text('name');
+            $table->text('serial');
+            $table->integer('available_serial_count');
+            $table->integer('refresh_count');
+            $table->double('gateway_fee');
+            $table->foreign('contribution_product_id')->references('id')->on('contribution_products');
             $table->timestamps();
         });
     }

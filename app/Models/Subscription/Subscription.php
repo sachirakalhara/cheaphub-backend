@@ -8,22 +8,24 @@ class Subscription extends Model
 {
     protected $fillable = [
         'id',
-        'type',
-        'month_id',
-        'product_id',
-        'region_id'
+        'name',
+        'contribution_product_id',
+        'serial',
+        'available_serial_count',
+        'gateway_fee',
+        'refresh_count'
     ];
 
-    public function month()
+
+
+    public function contributionProduct()
     {
-        return $this->belongsTo('App\Models\Subscription\Month');
+        return $this->belongsTo('App\Models\Product\Contribution\ContributionProduct');
     }
-    public function region()
+
+    public function packages()
     {
-        return $this->belongsTo('App\Models\Subscription\Region');
+        return $this->hasMany('App\Models\Subscription\Package');
     }
-    public function product()
-    {
-        return $this->belongsTo('App\Models\Product\Product');
-    }
+
 }

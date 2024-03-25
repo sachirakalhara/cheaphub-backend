@@ -29,7 +29,7 @@ class BulkProductResource extends JsonResource
             'categories' => CategoryResource::collection($this->categories),
             'image' => $this->image ? asset('uploads/' . $this->image) : null,
             'visibility' => $this->visibility,
-            'slug_url' => route('api.product.slug', [ 'slug_name' => $this->slug_url]),
+            'slug_url' => route('api.slug-product.slug', [ 'slug_name' => $this->slug_url]),
             'service_info' => $this->service_info,
             'minimum_quantity' => $this->minimum_quantity,
             'maximum_quantity' => $this->maximum_quantity,

@@ -2,12 +2,12 @@
 
 namespace App\Http\Resources\Subscription;
 
-use App\Models\Subscription\Region;
+use App\Models\Subscription\Subscription;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class SubscriptionResource extends JsonResource
+class PackageResource extends JsonResource
 {
-    public static $wrap = 'subscription';
+    public static $wrap = 'package';
 
     /**
      * Transform the resource into an array.
@@ -17,15 +17,15 @@ class SubscriptionResource extends JsonResource
      */
     public function toArray($request)
     {
-
+  
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'serial' => $this->serial,
-            'available_serial_count' => $this->available_serial_count,
-            'gateway_fee' => $this->gateway_fee,
-            'packages' => PackageResource::collection($this->packages),
-
+            'price' => $this->price,
+            'qty' => $this->qty,
+            'expiry_duration' => $this->expiry_duration,
+            'payment_method' => $this->payment_method,
+            'subscription' => Subscription::find($this->subscription_id)
         ];
     }
 

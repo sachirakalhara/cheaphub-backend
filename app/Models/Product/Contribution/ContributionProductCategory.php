@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Models\Product;
+namespace App\Models\Product\Contribution;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ProductCategory extends Model
+class ContributionProductCategory extends Model
 {
     protected $fillable = [
         'id',

@@ -7,7 +7,7 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class SubscriptionCollection extends ResourceCollection
 {
-    public static $wrap = 'serial_list';
+    public static $wrap = 'subscription_list';
 
     /**
      * Transform the resource collection into an array.

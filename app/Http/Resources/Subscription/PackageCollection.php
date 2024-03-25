@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Resources\Month;
+namespace App\Http\Resources\Subscription;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
-class MonthCollection extends ResourceCollection
+class PackageCollection extends ResourceCollection
 {
-    public static $wrap = 'month_list';
+    public static $wrap = 'package_list';
 
     /**
      * Transform the resource collection into an array.
@@ -17,9 +17,8 @@ class MonthCollection extends ResourceCollection
     public function toArray($request)
     {
         return [
-            'month_list'=> MonthResource::collection($this->collection)
+            'package_list'=> PackageResource::collection($this->collection)
         ];
     }
-
 
 }

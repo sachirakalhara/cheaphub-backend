@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\API\Product;
+namespace App\Http\Controllers\API\Product\Contribution;
 
 use App\Http\Controllers\Controller;
-use App\Models\Product\UserProduct;
+use App\Models\Product\Contribution\ContributionProductCategory;
 use Illuminate\Http\Request;
 
-class UserProductController extends Controller
+class ProductCategoryController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -35,7 +35,7 @@ class UserProductController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(UserProduct $userProduct)
+    public function show(ContributionProductCategory $productCategory)
     {
         //
     }
@@ -43,7 +43,7 @@ class UserProductController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(UserProduct $userProduct)
+    public function edit(ContributionProductCategory $productCategory)
     {
         //
     }
@@ -51,7 +51,7 @@ class UserProductController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, UserProduct $userProduct)
+    public function update(Request $request, ContributionProductCategory $productCategory)
     {
         //
     }
@@ -59,7 +59,7 @@ class UserProductController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(UserProduct $userProduct)
+    public function destroy(ContributionProductCategory $productCategory)
     {
         //
     }

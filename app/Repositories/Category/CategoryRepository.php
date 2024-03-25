@@ -5,12 +5,8 @@ namespace App\Repositories\Category;
 use App\Helpers\Helper;
 use App\Http\Resources\Category\CategoryCollection;
 use App\Http\Resources\Category\CategoryResource;
-use App\Http\Resources\User\UserCollection;
-use App\Http\Resources\User\UserResource;
 use App\Models\Category\Category;
-use App\Models\Product\Product;
-use App\Models\Product\ProductCategory;
-use App\Models\User\User;
+use App\Models\Product\Contribution\ContributionProductCategory;
 use App\Repositories\Category\Interface\CategoryRepositoryInterface;
 use Illuminate\Http\Response;
 
@@ -60,7 +56,7 @@ class CategoryRepository implements CategoryRepositoryInterface
     public function delete($category_id)
     {
         $category = Category::find($category_id);
-        $productCategory = ProductCategory::where('category_id',$category_id)->first();
+        $productCategory = ContributionProductCategory::where('category_id',$category_id)->first();
         if($productCategory){
             return Helper::error(Response::$statusTexts[Response::HTTP_IM_USED], Response::HTTP_IM_USED);
         }

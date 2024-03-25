@@ -5,15 +5,10 @@ namespace App\Repositories\Product;
 use App\Helpers\Helper;
 use App\Http\Resources\Product\Bulk\BulkProductCollection;
 use App\Http\Resources\Product\Bulk\BulkProductResource;
-use App\Http\Resources\Product\ProductCollection;
-use App\Http\Resources\Product\ProductResource;
 use App\Models\Product\Bulk\BulkProduct;
-use App\Models\Product\Product;
 use App\Models\Serial\Serial;
 use App\Repositories\Product\Interface\BulkProductRepositoryInterface;
-use App\Repositories\Product\Interface\ProductRepositoryInterface;
 use Illuminate\Http\Response;
-use Illuminate\Support\Str;
 
 class BulkProductRepository implements BulkProductRepositoryInterface
 {

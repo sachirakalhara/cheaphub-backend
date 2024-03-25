@@ -36,10 +36,11 @@ class SubscriptionController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'product_id' => 'required',
-            'type' => 'required',
-            'month_id' => 'required',
-            'region_id' => 'required_if:type,region'
+            'contribution_product_id' => 'required',
+            'name' => 'required|string|unique:subscriptions',
+            'serial' => 'required',
+            'refresh_count' => 'required',
+            'gateway_fee' => 'required'
         ]);
         return $this->subscriptionRepository->store($request);
     }

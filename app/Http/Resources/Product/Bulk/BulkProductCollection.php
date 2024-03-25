@@ -2,7 +2,6 @@
 
 namespace App\Http\Resources\Product\Bulk;
 
-use App\Http\Resources\Product\ProductResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class BulkProductCollection extends ResourceCollection

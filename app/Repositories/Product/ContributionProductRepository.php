@@ -3,40 +3,60 @@
 namespace App\Repositories\Product;
 
 use App\Helpers\Helper;
-use App\Http\Resources\Product\ProductCollection;
-use App\Http\Resources\Product\ProductResource;
-use App\Models\Product\Product;
+use App\Http\Resources\Product\Contribution\ContributionProductCollection;
+use App\Http\Resources\Product\Contribution\ContributionProductResource;
+use App\Models\Product\Contribution\ContributionProduct;
 use App\Models\Serial\Serial;
-use App\Repositories\Product\Interface\ProductRepositoryInterface;
+use App\Repositories\Product\Interface\ContributionProductRepositoryInterface;
 use Illuminate\Http\Response;
 
-class ProductRepository implements ProductRepositoryInterface
+class ContributionProductRepository implements ContributionProductRepositoryInterface
 {
     public function all($request)
     {
 
         if($request->input('all', '') == 1) {
-            $product_list = Product::all();
+            $product_list = ContributionProduct::all();
         } else {
-            $product_list = Product::orderBy('created_at', 'desc')->paginate(10);
+            $product_list = ContributionProduct::orderBy('created_at', 'desc')->paginate(10);
         }
 
         if (count($product_list) > 0) {
-            return new ProductCollection($product_list);
+            return new ContributionProductCollection($product_list);
         } else {
             return Helper::success(Response::$statusTexts[Response::HTTP_NO_CONTENT], Response::HTTP_NO_CONTENT);
         }
     }
 
+    public function findById($id)
+    {
+        $product = ContributionProduct::find($id);
+        if ($product) {
+            return new ContributionProductResource($product);
+        } else {
+            return Helper::success(Response::$statusTexts[Response::HTTP_NO_CONTENT], Response::HTTP_NO_CONTENT);
+        }
+    }
+
+    public function findBySlug($slug)
+    {
+        $product = ContributionProduct::where('slug_url',$slug)->first();
+        if ($product) {
+            return new ContributionProductResource($product);
+        } else {
+            return Helper::success(Response::$statusTexts[Response::HTTP_NO_CONTENT], Response::HTTP_NO_CONTENT);
+        }
+    }
     public function store($request)
     {
-        $product = new Product();
-        $serial = new Serial();
+
+        $product = new ContributionProduct();
         $product->name = $request->name;
         $product->description = $request->description;
-        $product->price = $request->price;
-        $product->gateway_fee = $request->gateway_fee;
         $product->tag_id = $request->tag_id;
+        $product->service_info = $request->service_info;
+        $product->slug_url = $request->slug_url;
+        $product->visibility = $request->visibility;
 
         if ($request->hasFile('image')) {
             $image = $request->file('image');
@@ -45,29 +65,13 @@ class ProductRepository implements ProductRepositoryInterface
             $product->image = $imageName;
         }
 
-        if ($request->hasFile('serial')) {
-            $serialContents = file_get_contents($request->file('serial')->getRealPath());
-
-            $containsPipe = strpos($serialContents, '|') !== false;
-            $serial->name = $serialContents;
-            $serial->min_count = 1;
-            $serial->max_count = 1;
-
-            if ($containsPipe) {
-                $serial->type = 'normal';
-            } else {
-                $serial->type = 'bulk';
-            }
-        }
 
         if ($product->save()) {
-            $serial->product_id = $product->id;
-            $serial->save();
             $categories = json_decode($request->categories);
             $product->categories()->attach($categories);
 
-            activity('product')->causedBy($product)->performedOn($product)->log('created');
-            return new ProductResource($product);
+            activity('contribution_product')->causedBy($product)->performedOn($product)->log('created');
+            return new ContributionProductResource($product);
         } else {
             return Helper::error(Response::$statusTexts[Response::HTTP_NO_CONTENT], Response::HTTP_NO_CONTENT);
         }
@@ -75,7 +79,7 @@ class ProductRepository implements ProductRepositoryInterface
 
     public function updateProductSerial($request)
     {
-        $product = Product::find($request->product_id);
+        $product = ContributionProduct::find($request->product_id);
         $productSerial = $product->serials[0];
         if ( $productSerial->type == 'normal') {
             $serial = Serial::find($productSerial->id);
@@ -106,14 +110,14 @@ class ProductRepository implements ProductRepositoryInterface
 
         if ($serial->save()) {
             activity('serial')->causedBy($serial)->performedOn($serial)->log('updated');
-            return new ProductResource($product);
+            return new ContributionProductResource($product);
         } else {
             return Helper::error(Response::$statusTexts[Response::HTTP_NO_CONTENT], Response::HTTP_NO_CONTENT);
         }
     }
     public function update($request)
     {
-        $product = Product::find($request->id);
+        $product = ContributionProduct::find($request->id);
         $serial = Serial::find($request->serial_id);
         $product->name = $request->name;
         $product->description = $request->description;
@@ -140,7 +144,7 @@ class ProductRepository implements ProductRepositoryInterface
         if ($product->save()) {
 
             activity('product')->causedBy($product)->performedOn($product)->log('updated');
-            return new ProductResource($product);
+            return new ContributionProductResource($product);
         } else {
             return Helper::error(Response::$statusTexts[Response::HTTP_NO_CONTENT], Response::HTTP_NO_CONTENT);
         }

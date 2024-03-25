@@ -102,33 +102,5 @@ class BulkProductController extends Controller
 
         ]);
         return $this->bulkProductRepository->update($request);
-
-
-//        $request->validate([
-//            'id' => 'required',
-//            'name' => 'required|unique:products,name,' . $request->id,
-//            'tag_id' => 'required',
-//            'price' => 'required',
-//            'gateway_fee' => 'required',
-//            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
-//        ]);
-//        return $this->bulkProductRepository->update($request);
     }
-
-    public function updateProductSerial(Request $request)
-    {
-//        $request->validate([
-//            'product_id' => 'required',
-//            'serial' => 'required',
-//        ]);
-//        return $this->bulkProductRepository->updateProductSerial($request);
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-//    public function destroy(BulkProduct $product)
-//    {
-//        //
-//    }
 }

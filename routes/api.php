@@ -1,19 +1,18 @@
 <?php
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\Auth\AuthController;
-use App\Http\Controllers\API\User\UserController;
-use App\Http\Controllers\API\Product\ProductController;
 use App\Http\Controllers\API\Category\CategoryController;
 use App\Http\Controllers\API\CoinbasePaymentController;
-use \App\Http\Controllers\API\Subscription\RegionController;
+use App\Http\Controllers\API\Product\Bulk\BulkProductController;
+use App\Http\Controllers\API\Product\Contribution\ContributionProductController;
 use App\Http\Controllers\API\Subscription\MonthController;
-use \App\Http\Controllers\API\Subscription\SubscriptionController;
+use App\Http\Controllers\API\Subscription\RegionController;
+use App\Http\Controllers\API\Subscription\SubscriptionController;
 use App\Http\Controllers\API\Tag\TagController;
-use \App\Http\Controllers\API\Product\Bulk\BulkProductController;
+use App\Http\Controllers\API\User\UserController;
 use App\Http\Controllers\CoingateController;
-
+use Illuminate\Support\Facades\Route;
+use \App\Http\Controllers\API\Subscription\PackageController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -48,13 +47,23 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             Route::post('/bulk/product/get-all', [BulkProductController::class, 'index']);
             Route::get('/bulk/product/{id}', [BulkProductController::class, 'findById']);
             //slug Url
-            Route::get('/bulk/slug-product/{slug_name}', [BulkProductController::class, 'findBySlug'])->name('api.product.slug');
+            Route::get('/bulk/slug-product/{slug_name}', [BulkProductController::class, 'findBySlug'])->name('api.slug-product.slug');
 
 
-            Route::post('/product/create', [ProductController::class, 'store']);
-            Route::put('/product/update', [ProductController::class, 'update']);
-            Route::post('/product/get-all', [ProductController::class, 'index']);
-            Route::post('/product/update-product-serial', [ProductController::class, 'updateProductSerial']);
+            Route::post('/contribution/product/create', [ContributionProductController::class, 'store']);
+            Route::put('/contribution/product/update', [ContributionProductController::class, 'update']);
+            Route::post('/contribution/product/get-all', [ContributionProductController::class, 'index']);
+            Route::get('/contribution/slug-contribution-product/{slug_name}', [ContributionProductController::class, 'findBySlug'])->name('api.slug-contribution-product.slug');
+            Route::get('/contribution/product/{id}', [ContributionProductController::class, 'findById']);
+
+            Route::post('/subscription/create', [SubscriptionController::class, 'store']);
+            Route::post('/subscription/get-all', [SubscriptionController::class, 'index']);
+            Route::delete('/subscription/delete/{product_id}', [SubscriptionController::class, 'delete']);
+
+            Route::post('/package/create', [PackageController::class, 'store']);
+            Route::post('/package/get-all', [PackageController::class, 'index']);
+            Route::delete('/package/delete/{package_id}', [PackageController::class, 'delete']);
+
 
             Route::post('/category/get-all', [CategoryController::class, 'index']);
             Route::post('/category/create', [CategoryController::class, 'store']);
@@ -74,9 +83,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             Route::put('/region/update', [RegionController::class, 'update']);
             Route::delete('/region/delete/{id}', [RegionController::class, 'delete']);
 
-            Route::post('/subscription/create', [SubscriptionController::class, 'store']);
-            Route::post('/subscription/get-all', [SubscriptionController::class, 'index']);
-            Route::delete('/subscription/delete/{product_id}', [SubscriptionController::class, 'delete']);
+
 
 
 

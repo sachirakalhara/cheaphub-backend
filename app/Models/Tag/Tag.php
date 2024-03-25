@@ -11,9 +11,9 @@ class Tag extends Model
         'name',
         'description'
     ];
-    
+
     public function products()
     {
-        return $this->hasMany('App\Models\Product\Product');
+        return $this->hasMany('App\Models\Product\Contribution\ContributionProduct');
     }
 }

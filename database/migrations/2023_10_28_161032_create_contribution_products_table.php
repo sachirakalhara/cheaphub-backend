@@ -11,15 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('products', function (Blueprint $table) {
+        Schema::create('contribution_products', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('tag_id');
             $table->foreign('tag_id')->references('id')->on('tags');
             $table->string('name');
             $table->text('description')->nullable();
-            $table->double('price');
-            $table->double('gateway_fee');
-            $table->text('image')->nullable();
+            $table->text('image');
+            $table->text('service_info')->nullable();
+            $table->text('slug_url');
+            $table->text('visibility')->nullable();
             $table->timestamps();
         });
     }
@@ -29,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('products');
+        Schema::dropIfExists('contribution_products');
     }
 };
