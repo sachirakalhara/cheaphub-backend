@@ -40,7 +40,6 @@ class SubscriptionRepository implements SubscriptionRepositoryInterface
         $subscription->serial = $request->serial;
         $subscription->available_serial_count = count(array_filter(explode("\n", $request->serial), 'trim'));
         $subscription->gateway_fee = $request->gateway_fee;
-        $subscription->refresh_count = $request->refresh_count;
 
         if ($subscription->save()) {
 

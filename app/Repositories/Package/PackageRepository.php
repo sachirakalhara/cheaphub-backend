@@ -39,8 +39,8 @@ class PackageRepository implements PackageRepositoryInterface
         $package->subscription_id = $request->subscription_id;
         $package->price = $request->price;
         $package->payment_method = $request->payment_method;
-        $package->qty = $request->qty;
         $package->expiry_duration = $request->expiry_duration;
+        $package->replace_count = $request->replace_count;
 
         if ($package->save()) {
             activity('package')->causedBy($package)->performedOn($package)->log('created');

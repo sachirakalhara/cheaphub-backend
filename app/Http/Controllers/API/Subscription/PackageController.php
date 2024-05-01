@@ -40,7 +40,7 @@ class PackageController extends Controller
             'name' => 'required|string|unique:subscriptions',
             'price' => 'required',
             'payment_method' => 'required',
-            'qty' => 'required',
+            'replace_count' => 'required',
             'expiry_duration' => 'required'
         ]);
         return $this->packageRepository->store($request);

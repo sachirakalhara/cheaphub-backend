@@ -39,7 +39,6 @@ class SubscriptionController extends Controller
             'contribution_product_id' => 'required',
             'name' => 'required|string|unique:subscriptions',
             'serial' => 'required',
-            'refresh_count' => 'required',
             'gateway_fee' => 'required'
         ]);
         return $this->subscriptionRepository->store($request);

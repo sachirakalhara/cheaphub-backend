@@ -17,8 +17,8 @@ return new class extends Migration
             $table->string('name');
             $table->double('price');
             $table->text('payment_method');
-            $table->integer('qty');
             $table->integer('expiry_duration');
+            $table->integer('replace_count');
             $table->foreign('subscription_id')->references('id')->on('subscriptions');
             $table->timestamps();
         });

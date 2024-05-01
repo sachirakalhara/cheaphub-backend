@@ -5,14 +5,12 @@ use App\Http\Controllers\API\Category\CategoryController;
 use App\Http\Controllers\API\CoinbasePaymentController;
 use App\Http\Controllers\API\Product\Bulk\BulkProductController;
 use App\Http\Controllers\API\Product\Contribution\ContributionProductController;
-use App\Http\Controllers\API\Subscription\MonthController;
-use App\Http\Controllers\API\Subscription\RegionController;
+use App\Http\Controllers\API\Subscription\PackageController;
 use App\Http\Controllers\API\Subscription\SubscriptionController;
 use App\Http\Controllers\API\Tag\TagController;
 use App\Http\Controllers\API\User\UserController;
-use App\Http\Controllers\CoingateController;
 use Illuminate\Support\Facades\Route;
-use \App\Http\Controllers\API\Subscription\PackageController;
+use App\Http\Controllers\API\MarxPaymentController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -35,6 +33,10 @@ Route::get('/v1/confirm-email/{user_id}/{key}', [AuthController::class, 'confirm
 
 Route::post('/coinbase/payment', [CoinbasePaymentController::class, 'createPayment']);
 Route::post('/coinbase/callback', [CoinbasePaymentController::class, 'paymentCallback']);
+
+Route::post('payment',[MarxPaymentController::class, 'createPayment']);
+Route::get('cancel',[MarxPaymentController::class, 'cancel']);
+Route::get('payment/success', [MarxPaymentController::class, 'success']);
 
 // Protected routes
 Route::group(['middleware' => ['auth:sanctum']], function () {
@@ -75,17 +77,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             Route::put('/tag/update', [TagController::class, 'update']);
             Route::delete('/tag/{id}', [TagController::class, 'delete']);
             Route::get('/tag/{id}', [TagController::class, 'findById']);
-
-            Route::post('/month/get-all', [MonthController::class, 'index']);
-
-            Route::post('/region/get-all', [RegionController::class, 'index']);
-            Route::post('/region/create', [RegionController::class, 'store']);
-            Route::put('/region/update', [RegionController::class, 'update']);
-            Route::delete('/region/delete/{id}', [RegionController::class, 'delete']);
-
-
-
-
 
         });
         Route::post('/user/get-all', [UserController::class, 'index']);

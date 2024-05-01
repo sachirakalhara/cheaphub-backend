@@ -12,8 +12,7 @@ class Subscription extends Model
         'contribution_product_id',
         'serial',
         'available_serial_count',
-        'gateway_fee',
-        'refresh_count'
+        'gateway_fee'
     ];
 
 

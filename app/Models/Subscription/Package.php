@@ -12,8 +12,9 @@ class Package extends Model
         'name',
         'price',
         'payment_method',
-        'qty',
-        'expiry_duration'
+        'expiry_duration',
+        'replace_count'
+
     ];
 
     public function subscription()
