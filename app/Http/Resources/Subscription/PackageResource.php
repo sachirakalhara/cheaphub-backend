@@ -22,6 +22,7 @@ class PackageResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'price' => $this->price,
+            'replace_count' => $this->replace_count,
             'expiry_duration' => $this->expiry_duration,
             'payment_method' => $this->payment_method,
             'subscription' => Subscription::find($this->subscription_id)
