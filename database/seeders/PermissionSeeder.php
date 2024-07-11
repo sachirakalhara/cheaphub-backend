@@ -16,7 +16,7 @@ class PermissionSeeder extends Seeder
         DB::table('permissions')->insert([
 
             [ 'name'=>'role super_admin', 'guard_name'=>'web'],
-            [ 'name'=>'role user', 'guard_name'=>'web'],
+            [ 'name'=>'role customer', 'guard_name'=>'web'],
 
         ]);
     }

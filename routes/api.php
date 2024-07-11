@@ -19,9 +19,12 @@ Route::get('/v1/confirm-email/{user_id}/{key}', [AuthController::class, 'confirm
 
 Route::post('/coinbase/payment', [CoinbasePaymentController::class, 'createPayment']);
 Route::post('/coinbase/callback', [CoinbasePaymentController::class, 'paymentCallback']);
-Route::post('payment',[MarxPaymentController::class, 'createPayment']);
-Route::get('cancel',[MarxPaymentController::class, 'cancel']);
-Route::get('payment/success', [MarxPaymentController::class, 'success']);
+
+
+
+// Route::post('payment',[MarxPaymentController::class, 'createPayment']);
+// Route::get('cancel',[MarxPaymentController::class, 'cancel']);
+// Route::get('payment/success', [MarxPaymentController::class, 'success']);
 
 //public & Auth Related API
 Route::post('/v1/bulk/product/get-all', [BulkProductController::class, 'index']);
@@ -45,7 +48,6 @@ Route::get('/v1/contribution/product/{id}', [ContributionProductController::clas
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::group(['prefix' => 'v1'], function () {
         Route::group(['prefix' => 'admin'], function () {
-
             Route::group(['prefix' => 'super-admin','middleware' =>['super_admin']], function () {
                 Route::post('/bulk/product/create', [BulkProductController::class, 'store']);
                 Route::put('/bulk/product/update', [BulkProductController::class, 'update']);
@@ -70,6 +72,17 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
             });
         });
+
+        Route::group(['prefix' => 'customer'], function () {
+            Route::post('/marxpay/payment', [MarxPaymentController::class, 'makePayment']);
+            Route::post('/marxpay/callback', [MarxPaymentController::class, 'paymentCallback'])->name('marxpay.callback');
+
+
+
+
+        });
+
+        
     Route::post('/user/get-all', [UserController::class, 'index']);
         Route::post('/user/update', [UserController::class, 'update']);
 

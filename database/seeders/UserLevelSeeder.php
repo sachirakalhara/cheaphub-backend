@@ -15,7 +15,7 @@ class UserLevelSeeder extends Seeder
     {
         DB::table('user_levels')->insert([
             ['scope' => 'super_admin'],
-            ['scope' => 'user']
+            ['scope' => 'customer']
         ]);
     }
 }

@@ -5,6 +5,8 @@ use App\Repositories\Category\CategoryRepository;
 use App\Repositories\Category\Interface\CategoryRepositoryInterface;
 use App\Repositories\Package\Interface\PackageRepositoryInterface;
 use App\Repositories\Package\PackageRepository;
+use App\Repositories\Payment\Interface\MarxPaymentRepositoryInterface;
+use App\Repositories\Payment\MarxPaymentRepository;
 use App\Repositories\Product\BulkProductRepository;
 use App\Repositories\Product\Interface\BulkProductRepositoryInterface;
 use App\Repositories\Product\Interface\ContributionProductRepositoryInterface;
@@ -34,6 +36,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(SubscriptionRepositoryInterface::class, SubscriptionRepository::class);
         $this->app->bind(TagRepositoryInterface::class, TagRepository::class);
         $this->app->bind(PackageRepositoryInterface::class, PackageRepository::class);
+        $this->app->bind(MarxPaymentRepositoryInterface::class, MarxPaymentRepository::class);
+        
     }
 
     /**

@@ -3,30 +3,35 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Models\MarxPayment;
+use App\Repositories\Payment\Interface\MarxPaymentRepositoryInterface;
 use Illuminate\Http\Request;
 
 class MarxPaymentController extends Controller
 {
-    public function processPayment(Request $request)
+    private $marxPaymentRepository;
+
+    public function __construct(MarxPaymentRepositoryInterface $marxPaymentRepository)
     {
-        // Initialize Marx IPG with credentials
-        $ipg = new IPG(
-            config('marx_ipg.api_key'),
-            config('marx_ipg.api_secret'),
-            config('marx_ipg.api_url')
-        );
+        $this->marxPaymentRepository = $marxPaymentRepository;
+    }
 
-        // Process payment
-        $response = $ipg->processPayment($request->all());
+    /**
+     * Display a listing of the resource.
+     */
+    public function makePayment(Request $request)
+    {
+        $request->validate([
+            'amount' => 'required|numeric|min:0.01',
+            'currency' => 'required|string|size:3', // e.g., USD
+            'description' => 'required|string|max:255',
+            'email' => 'required',
+        ]);
 
-        // Handle response
-        if ($response->success) {
-            // Payment successful
-            return redirect()->back()->with('success', 'Payment successful');
-        } else {
-            // Payment failed
-            return redirect()->back()->with('error', 'Payment failed: ' . $response->message);
-        }
+        return $this->marxPaymentRepository->makePayment($request);
+    }
+
+    public function paymentCallback(Request $request)
+    {
+        return $this->marxPaymentRepository->paymentCallback($request);
     }
 }
