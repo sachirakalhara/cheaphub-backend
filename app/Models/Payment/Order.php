@@ -15,6 +15,8 @@ class Order extends Model
         'description',
         'payment_status',
         'transaction_id',
+        'user_id',
         'amount_paid',
+        'is_wallet'
     ];
 }

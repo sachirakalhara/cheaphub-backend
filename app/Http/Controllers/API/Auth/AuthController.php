@@ -44,8 +44,8 @@ class AuthController extends Controller
         $user->verification_code = Str::random(60) . uniqid() . time();
         $user->email = $request->email;
         $user->password = bcrypt($request->password);
-        $user->user_level_id = $this->userLevelRepository->findByScope('user')->first()->id;
-        $user->assignRole('user');
+        $user->user_level_id = $this->userLevelRepository->findByScope('customer')->first()->id;
+        $user->assignRole('customer');
         if ($user->save()) {
 
 //            $this->sendConfirmationMail($user);

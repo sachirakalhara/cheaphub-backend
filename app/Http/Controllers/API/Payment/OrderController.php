@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API\Payment;
 
-use App\Models\Order;
+use App\Http\Controllers\Controller;
+use App\Models\Payment\Order;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller

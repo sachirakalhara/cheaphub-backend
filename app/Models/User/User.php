@@ -2,6 +2,7 @@
 
 namespace App\Models\User;
 
+use App\Models\Payment\Wallet;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -63,6 +64,11 @@ class User extends Authenticatable
     public function userLevel()
     {
         return $this->belongsTo('App\Models\User\UserLevel');
+    }
+
+    public function wallet()
+    {
+        return $this->hasOne(Wallet::class);
     }
 
 }

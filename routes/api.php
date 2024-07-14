@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\Auth\AuthController;
+use App\Http\Controllers\API\Cart\CartController;
 use App\Http\Controllers\API\Category\CategoryController;
 use App\Http\Controllers\API\CoinbasePaymentController;
 use App\Http\Controllers\API\Product\Bulk\BulkProductController;
@@ -11,7 +12,7 @@ use App\Http\Controllers\API\Tag\TagController;
 use App\Http\Controllers\API\User\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\MarxPaymentController;
-
+use App\Http\Controllers\API\Payment\WalletController;
 
 Route::post('/v1/register', [AuthController::class, 'register']);
 Route::post('/v1/login', [AuthController::class, 'login']);
@@ -76,8 +77,12 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::group(['prefix' => 'customer'], function () {
             Route::post('/marxpay/payment', [MarxPaymentController::class, 'makePayment']);
             Route::post('/marxpay/callback', [MarxPaymentController::class, 'paymentCallback'])->name('marxpay.callback');
+            
+            Route::get('/wallet/show', [WalletController::class, 'show']);
 
-
+            Route::post('/cart', [CartController::class, 'addToCart']);
+            Route::get('/cart', [CartController::class, 'getCart']);
+            Route::delete('/cart/{id}', [CartController::class, 'removeFromCart']);
 
 
         });

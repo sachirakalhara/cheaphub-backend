@@ -6,7 +6,7 @@ use App\Helpers\Helper;
 use App\Repositories\Payment\Interface\MarxPaymentRepositoryInterface;
 use Illuminate\Http\Response;
 use App\Models\Payment\Order;
-
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 class MarxPaymentRepository implements MarxPaymentRepositoryInterface
@@ -21,6 +21,7 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             'currency' => $request->input('currency'),
             'description' => $request->input('description'),
             'payment_status' => 'pending',
+            'is_wallet' => $request->input('is_wallet'),
         ]);
 
         // Create the payload
@@ -31,6 +32,8 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             'redirect_url' => route('marxpay.callback'), // Callback route
             'customer_email' => $request->input('email'), // Example additional field
             'order_id' => $order->id, // Send the order ID with the payment request
+            'is_wallet' => $request->input('is_wallet'),
+
             // Include other necessary data as required by MarxPay
         ];
 
@@ -70,20 +73,29 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
         $amount = $request->input('amount');
         $currency = $request->input('currency');
         $orderId = $request->input('order_id'); // Assuming you sent an order ID with the payment request
-
+        $is_wallet = $request->input('is_wallet');
         try {
             // Find the order by ID
             $order = Order::findOrFail($orderId);
 
             // Verify the payment status and update the order record
             if ($status === 'success') {
+                $user = Auth::user();
+
                 $order->update([
                     'payment_status' => 'paid',
                     'transaction_id' => $transactionId,
                     'amount_paid' => $amount,
                     'currency' => $currency,
+                    'user_id' => $user->id,
                 ]);
 
+                if($is_wallet){
+                    $wallet = $user->wallet;
+                    $wallet->balance += $request->input('amount');
+                    $wallet->save();
+                }
+               
                 // Notify the user or perform additional actions as needed
             } else {
                 $order->update([

@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('wallets', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('user_id');
+            $table->decimal('balance', 10, 2)->default(0.00);
+            $table->string('currency', 3)->default('USD'); // Default currency is USD
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
         });
     }

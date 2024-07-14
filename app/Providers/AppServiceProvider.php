@@ -1,12 +1,17 @@
 <?php
 
 namespace App\Providers;
+
+use App\Repositories\Cart\CartRepository;
+use App\Repositories\Cart\Interface\CartRepositoryInterface;
 use App\Repositories\Category\CategoryRepository;
 use App\Repositories\Category\Interface\CategoryRepositoryInterface;
 use App\Repositories\Package\Interface\PackageRepositoryInterface;
 use App\Repositories\Package\PackageRepository;
 use App\Repositories\Payment\Interface\MarxPaymentRepositoryInterface;
+use App\Repositories\Payment\Interface\WalletRepositoryInterface;
 use App\Repositories\Payment\MarxPaymentRepository;
+use App\Repositories\Payment\WalletRepository;
 use App\Repositories\Product\BulkProductRepository;
 use App\Repositories\Product\Interface\BulkProductRepositoryInterface;
 use App\Repositories\Product\Interface\ContributionProductRepositoryInterface;
@@ -37,6 +42,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(TagRepositoryInterface::class, TagRepository::class);
         $this->app->bind(PackageRepositoryInterface::class, PackageRepository::class);
         $this->app->bind(MarxPaymentRepositoryInterface::class, MarxPaymentRepository::class);
+        $this->app->bind(WalletRepositoryInterface::class, WalletRepository::class);
+        $this->app->bind(CartRepositoryInterface::class, CartRepository::class);
         
     }
 
