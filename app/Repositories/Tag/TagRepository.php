@@ -3,8 +3,10 @@
 namespace App\Repositories\Tag;
 
 use App\Helpers\Helper;
+use App\Http\Resources\Category\CategoryCollection;
 use App\Http\Resources\Tag\TagCollection;
 use App\Http\Resources\Tag\TagResource;
+use App\Models\Category\Category;
 use App\Models\Product\Contribution\ContributionProduct;
 use App\Models\Tag\Tag;
 use App\Repositories\Tag\Interface\TagRepositoryInterface;
@@ -78,6 +80,28 @@ class TagRepository implements TagRepositoryInterface
             return Helper::success(Response::$statusTexts[Response::HTTP_OK], Response::HTTP_OK);
         } else {
             return Helper::error(Response::$statusTexts[Response::HTTP_NO_CONTENT], Response::HTTP_NO_CONTENT);
+        }
+    }
+
+    public function filter($request)
+    {
+        $query = Tag::query();
+
+        if ($request->filled('tag_name')) {
+            $query->where('name', 'like', '%' . $request->tag_name . '%');
+        }
+
+
+        if ($request->input('all', false)) {
+            $tag_list = $query->get();
+        } else {
+            $tag_list = Helper::paginate($query);
+        }
+
+        if ($tag_list->isNotEmpty()) {
+            return new TagCollection($tag_list);
+        } else {
+            return Helper::success(Response::$statusTexts[Response::HTTP_NO_CONTENT], Response::HTTP_NO_CONTENT);
         }
     }
 

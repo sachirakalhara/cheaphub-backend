@@ -24,6 +24,11 @@ class CategoryController extends Controller
         return $this->categoryRepository->all($request);
     }
 
+    public function filter(Request $request)
+    {
+        return $this->categoryRepository->filter($request);
+    }
+
 
     /**
      * Show the form for creating a new resource.

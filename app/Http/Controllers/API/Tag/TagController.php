@@ -22,8 +22,12 @@ class TagController extends Controller
     {
         return $this->tagRepository->all($request);
     }
+    public function filter(Request $request)
+    {
+        return $this->tagRepository->filter($request);
+    }
 
-    
+
 /**
      * Display a listing of the resource.
      */

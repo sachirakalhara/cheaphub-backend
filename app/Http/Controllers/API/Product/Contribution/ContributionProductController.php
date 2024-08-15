@@ -24,6 +24,12 @@ class ContributionProductController extends Controller
     {
         return $this->productRepository->all($request);
     }
+    public function filter(Request $request)
+    {
+        return $this->productRepository->filter($request);
+    }
+
+
 
     /**
      * Show the form for creating a new resource.

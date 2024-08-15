@@ -36,6 +36,11 @@ class BulkProductController extends Controller
         return $this->bulkProductRepository->findBySlug($slug);
     }
 
+    public function filter(Request $request)
+    {
+        return $this->bulkProductRepository->filter($request);
+    }
+
 
     /**
      * Show the form for creating a new resource.

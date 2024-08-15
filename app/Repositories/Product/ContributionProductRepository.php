@@ -38,6 +38,35 @@ class ContributionProductRepository implements ContributionProductRepositoryInte
         }
     }
 
+    public function filter($request)
+    {
+        $query = ContributionProduct::query();
+
+        if ($request->filled('products_name')) {
+            $query->where('name', 'like', '%' . $request->products_name . '%');
+        }
+
+        if ($request->filled('product_category_id')) {
+            $query->whereHas('categories', function ($q) use ($request) {
+                $q->where('categories.id', $request->product_category_id); // Specify the table name
+            });
+        }
+
+
+        if ($request->input('all', false)) {
+            $product_list = $query->get();
+        } else {
+            $product_list = Helper::paginate($query);
+        }
+
+        if ($product_list->isNotEmpty()) {
+            return new ContributionProductCollection($product_list);
+        } else {
+            return Helper::success(Response::$statusTexts[Response::HTTP_NO_CONTENT], Response::HTTP_NO_CONTENT);
+        }
+    }
+
+
     public function findBySlug($slug)
     {
         $product = ContributionProduct::where('slug_url',$slug)->first();

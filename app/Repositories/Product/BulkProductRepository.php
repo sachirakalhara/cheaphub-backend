@@ -3,8 +3,10 @@
 namespace App\Repositories\Product;
 
 use App\Helpers\Helper;
+use App\Http\Resources\Employer\EmployerCollection;
 use App\Http\Resources\Product\Bulk\BulkProductCollection;
 use App\Http\Resources\Product\Bulk\BulkProductResource;
+use App\Models\Employer\Employer;
 use App\Models\Product\Bulk\BulkProduct;
 use App\Models\Serial\Serial;
 use App\Repositories\Product\Interface\BulkProductRepositoryInterface;
@@ -22,6 +24,34 @@ class BulkProductRepository implements BulkProductRepositoryInterface
         }
 
         if (count($product_list) > 0) {
+            return new BulkProductCollection($product_list);
+        } else {
+            return Helper::success(Response::$statusTexts[Response::HTTP_NO_CONTENT], Response::HTTP_NO_CONTENT);
+        }
+    }
+
+    public function filter($request)
+    {
+        $query = BulkProduct::query();
+
+        if ($request->filled('products_name')) {
+            $query->where('name', 'like', '%' . $request->products_name . '%');
+        }
+
+        if ($request->filled('product_category_id')) {
+            $query->whereHas('categories', function ($q) use ($request) {
+                $q->where('categories.id', $request->product_category_id); // Specify the table name
+            });
+        }
+
+
+        if ($request->input('all', false)) {
+            $product_list = $query->get();
+        } else {
+            $product_list = Helper::paginate($query);
+        }
+
+        if ($product_list->isNotEmpty()) {
             return new BulkProductCollection($product_list);
         } else {
             return Helper::success(Response::$statusTexts[Response::HTTP_NO_CONTENT], Response::HTTP_NO_CONTENT);
