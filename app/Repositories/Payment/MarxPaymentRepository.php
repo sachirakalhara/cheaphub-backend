@@ -6,109 +6,170 @@ use App\Helpers\Helper;
 use App\Repositories\Payment\Interface\MarxPaymentRepositoryInterface;
 use Illuminate\Http\Response;
 use App\Models\Payment\Order;
+use App\Models\Payment\Wallet;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 class MarxPaymentRepository implements MarxPaymentRepositoryInterface
 {
     
-    public function makePayment($request)
+    public function makePayment($data)
     {
+        $user = Auth::user();
 
-         // Create a new order
-         $order = Order::create([
-            'amount' => $request->input('amount'),
-            'currency' => $request->input('currency'),
-            'description' => $request->input('description'),
+        // Create new order with pending status
+        $order = Order::create([
+            'amount' => $data['amount'],
+            'currency' => $data['currency'],
+            'description' => $data['description'] ?? '',
             'payment_status' => 'pending',
-            'is_wallet' => $request->input('is_wallet'),
+            'is_wallet' => $data['is_wallet'] ?? false,
+            'user_id' => $user->id
         ]);
 
-        // Create the payload
-        $payload = [
-            'amount' => $request->input('amount'),
-            'currency' => $request->input('currency'),
-            'description' => $request->input('description'),
-            'redirect_url' => route('marxpay.callback'), // Callback route
-            'customer_email' => $request->input('email'), // Example additional field
-            'order_id' => $order->id, // Send the order ID with the payment request
-            'is_wallet' => $request->input('is_wallet'),
+        // Fetch credentials from .env
+        $currencyConfig = [
+            'LKR' => [
+                'user_secret' => env('MARXPAY_LKR_USER_SECRET'),
+                'url' => env('MARXPAY_LKR_URL'),
+            ],
+            'USD' => [
+                'user_secret' => env('MARXPAY_USD_USER_SECRET'),
+                'url' => env('MARXPAY_USD_URL'),
+            ],
+        ];
 
-            // Include other necessary data as required by MarxPay
+        if (!isset($currencyConfig[$data['currency']])) {
+            $order->update(['payment_status' => 'failed']);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Unsupported currency.',
+            ], 400);
+        }
+
+        // Prepare API payload
+        $marxArgs = [
+            'merchantRID' => $order->id,
+            'amount' => floatval($data['amount']),
+            'returnUrl' => route('marxpay.callback'),
+            'validTimeLimit' => 30,
+            'customerMail' => $data['email'],
+            'customerMobile' => $data['tel'],
+            'mode' => "WEB",
+            'currency' => $data['currency'],
+            'orderSummary' => $data['description'],
+            'customerReference' => $user->id . " " . $data['email'],
         ];
 
         try {
-            // Send the request to MarxPay API
-            $response = Http::post('https://api.marxpay.com/payments', $payload);
+            $response = Http::withHeaders([
+                'user_secret' => $currencyConfig[$data['currency']]['user_secret'],
+                'Content-Type' => 'application/json',
+            ])->post($currencyConfig[$data['currency']]['url'], $marxArgs);
 
-            if ($response->successful()) {
+            $result = $response->json();
+            Log::info('MarxPay Response:', $result);
+
+            if ($response->successful() && isset($result['data']['payUrl'])) {
+                $order->update(['payment_status' => 'paid']);
                 return response()->json([
                     'status' => 'success',
-                    'payment_url' => $response->json()['payment_url'], // Assuming the API returns a payment URL
+                    'redirect_url' => $result['data']['payUrl'],
                 ]);
-            } else {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Payment initiation failed.',
-                    'details' => $response->json(),
-                ], 400);
-            }
+            }                
+
+            $order->update(['payment_status' => 'failed']);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Payment initiation failed.',
+                'details' => $result,
+            ], 400);
         } catch (\Exception $e) {
             Log::error('Payment initiation error: ' . $e->getMessage());
             return response()->json([
                 'status' => 'error',
-                'message' => 'An error occurred while initiating the payment.',
+                'message' => 'An error occurred while processing the payment.',
             ], 500);
         }
     }
 
-    public function paymentCallback($request)
+    public function paymentCallback($data)
     {
-        // Log the callback request for debugging
-        Log::info('Payment callback received: ', $request->all());
+        Log::info('Received payment callback request');
 
-        // Retrieve the necessary data from the callback request
-        $transactionId = $request->input('transaction_id');
-        $status = $request->input('status');
-        $amount = $request->input('amount');
-        $currency = $request->input('currency');
-        $orderId = $request->input('order_id'); // Assuming you sent an order ID with the payment request
-        $is_wallet = $request->input('is_wallet');
         try {
-            // Find the order by ID
-            $order = Order::findOrFail($orderId);
+            $mur = $data['mur'];
+            $tr = $data['tr'];
+            $currency = $data['currency'];
 
-            // Verify the payment status and update the order record
-            if ($status === 'success') {
-                $user = Auth::user();
+            // Fetch credentials from .env
+            $currencyConfig = [
+                'LKR' => [
+                    'user_secret' => env('MARXPAY_LKR_USER_SECRET'),
+                    'url' => env('MARXPAY_LKR_URL') . "/{$tr}",
+                ],
+                'USD' => [
+                    'user_secret' => env('MARXPAY_USD_USER_SECRET'),
+                    'url' => env('MARXPAY_USD_URL') . "/{$tr}",
+                ],
+            ];
 
-                $order->update([
-                    'payment_status' => 'paid',
-                    'transaction_id' => $transactionId,
-                    'amount_paid' => $amount,
-                    'currency' => $currency,
-                    'user_id' => $user->id,
-                ]);
-
-                if($is_wallet){
-                    $wallet = $user->wallet;
-                    $wallet->balance += $request->input('amount');
-                    $wallet->save();
-                }
-               
-                // Notify the user or perform additional actions as needed
-            } else {
-                $order->update([
-                    'payment_status' => 'failed',
-                ]);
-
-                // Handle the payment failure, notify the user, etc.
+            if (!isset($currencyConfig[$currency])) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Invalid currency type',
+                ], 400);
             }
 
-            return response()->json(['status' => 'ok']);
+            // Prepare API request
+            $marxArgs = ['merchantRID' => $mur];
+
+            $response = Http::withHeaders([
+                'user_secret' => $currencyConfig[$currency]['user_secret'],
+                'Content-Type' => 'application/json',
+            ])->put($currencyConfig[$currency]['url'], $marxArgs);
+
+            $result = $response->json();
+            Log::info('Payment callback response', ['response' => $result]);
+
+            if (isset($result['data']['summaryResult']) && $result['data']['summaryResult'] === "SUCCESS") {
+                $gatewayResponse = $result['data']['gatewayResponse'];
+                $orderId = $gatewayResponse['order']['id'];
+                $amountPaid = $gatewayResponse['order']['totalCapturedAmount'];
+
+                $order = Order::find($orderId);
+                if ($order) {
+                    $order->update([
+                        'payment_status' => 'paid',
+                        'transaction_id' => $tr,
+                        'amount_paid' => $amountPaid,
+                    ]);
+                }
+
+                return response()->json([
+                    'status' => 'success',
+                    'summaryResult' => 'SUCCESS',
+                    'order_id' => $orderId,
+                    'amount_paid' => $amountPaid,
+                ]);
+            }
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Payment failed or invalid response',
+            ], 500);
+
         } catch (\Exception $e) {
-            Log::error('Payment callback handling error: ' . $e->getMessage());
-            return response()->json(['status' => 'error', 'message' => 'An error occurred while processing the payment callback.'], 500);
+            Log::error('Payment callback error: ' . $e->getMessage());
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred while processing the payment callback.',
+                'error' => $e->getMessage(),
+            ], 500);
         }
     }
+
+
 }

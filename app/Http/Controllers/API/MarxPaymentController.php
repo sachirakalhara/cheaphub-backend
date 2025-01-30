@@ -20,11 +20,14 @@ class MarxPaymentController extends Controller
      */
     public function makePayment(Request $request)
     {
-        $request->validate([
-            'amount' => 'required|numeric|min:0.01',
-            'currency' => 'required|string|size:3', // e.g., USD
-            'description' => 'required|string|max:255',
-            'email' => 'required',
+        // Validate required fields
+        $request = $request->validate([
+            'email' => 'required|email',
+            'tel' => 'required|string',
+            'amount' => 'required|numeric|min:1',
+            'currency' => 'required|string',
+            'description' => 'nullable|string',
+            'is_wallet' => 'nullable|boolean',
         ]);
 
         return $this->marxPaymentRepository->makePayment($request);
@@ -32,6 +35,12 @@ class MarxPaymentController extends Controller
 
     public function paymentCallback(Request $request)
     {
+
+        $validation = $request->validate([
+            'mur' => 'required|string',
+            'tr' => 'required|string',
+            'currency' => 'required|string'
+        ]);
         return $this->marxPaymentRepository->paymentCallback($request);
     }
 }

@@ -19,9 +19,7 @@ Route::post('/v1/login', [AuthController::class, 'login']);
 Route::get('/v1/confirm-email/{user_id}/{key}', [AuthController::class, 'confirmMail']);
 
 Route::post('/coinbase/payment', [CoinbasePaymentController::class, 'createPayment']);
-Route::post('/coinbase/callback', [CoinbasePaymentController::class, 'paymentCallback']);
-
-
+Route::post('/coinbase/callback', [CoinbasePaymentController::class, 'paymentCallback'])->name('coinbase.callback');
 
 // Route::post('payment',[MarxPaymentController::class, 'createPayment']);
 // Route::get('cancel',[MarxPaymentController::class, 'cancel']);
