@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 
 class SubscriptionController extends Controller
 {
+    private $subscriptionRepository;
+
     public function __construct(SubscriptionRepositoryInterface $subscriptionRepository)
     {
         $this->subscriptionRepository = $subscriptionRepository;
@@ -37,7 +39,7 @@ class SubscriptionController extends Controller
     {
         $request->validate([
             'contribution_product_id' => 'required',
-            'name' => 'required|string|unique:subscriptions',
+            'name' => 'required|string',
             'serial' => 'required',
             'gateway_fee' => 'required'
         ]);

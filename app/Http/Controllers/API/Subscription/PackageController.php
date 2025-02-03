@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 
 class PackageController extends Controller
 {
+    private $packageRepository;
+
     public function __construct(PackageRepositoryInterface $packageRepository)
     {
         $this->packageRepository = $packageRepository;
