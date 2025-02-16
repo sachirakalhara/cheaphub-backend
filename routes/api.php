@@ -78,7 +78,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
         Route::group(['prefix' => 'customer'], function () {
             Route::post('/marxpay/payment', [MarxPaymentController::class, 'makePayment']);
-            Route::post('/marxpay/callback', [MarxPaymentController::class, 'paymentCallback'])->name('marxpay.callback');
+            // Route::post('/marxpay/callback', [MarxPaymentController::class, 'paymentCallback'])->name('marxpay.callback');
+            Route::get('/marxpay/callback', [MarxPaymentController::class, 'paymentCallback'])->name('marxpay.callback');
 
             Route::get('/wallet/show', [WalletController::class, 'show']);
 
