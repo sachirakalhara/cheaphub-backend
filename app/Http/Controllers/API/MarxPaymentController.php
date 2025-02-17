@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Repositories\Payment\Interface\MarxPaymentRepositoryInterface;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class MarxPaymentController extends Controller
 {
@@ -35,6 +36,7 @@ class MarxPaymentController extends Controller
 
     public function paymentCallback(Request $request)
     {
+        Log::info('1111111111111111111');
 
         $validation = $request->validate([
             'mur' => 'required|string',
