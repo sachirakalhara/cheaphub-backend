@@ -72,7 +72,7 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             Log::info('MarxPay Response:', $result);
 
             if ($response->successful() && isset($result['data']['payUrl'])) {
-                $order->update(['payment_status' => 'paid']);
+                $order->update(['payment_status' => 'pending']);
                 return response()->json([
                     'status' => 'success',
                     'redirect_url' => $result['data']['payUrl'],
@@ -100,7 +100,6 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
         try {
             $mur = $data['mur'];
             $tr = $data['tr'];
-            Log::info('2222222222222222222222');
 
             // Fetch credentials from .env
             $currencyConfig = [
@@ -124,7 +123,9 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
 
             // Prepare API request
             $marxArgs = ['merchantRID' => $mur];
-
+            Log::info('2222222222222222222222');
+            Log::info('marxArgs-',$marxArgs);
+            Log::info('currencyConfig-',$currencyConfig);
             $response = Http::withHeaders([
                 'user_secret' => $currencyConfig['LKR']['user_secret'],
                 'Content-Type' => 'application/json',
