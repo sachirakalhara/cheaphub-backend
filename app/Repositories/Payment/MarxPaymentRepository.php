@@ -97,7 +97,6 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
     public function paymentCallback($data)
     {
         Log::info('Received payment callback request');
-        Log::info($data);
 
         try {
             $mur = $data['mur'];

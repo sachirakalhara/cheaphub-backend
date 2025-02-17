@@ -37,7 +37,7 @@ class MarxPaymentController extends Controller
     public function paymentCallback(Request $request)
     {
         Log::info('1111111111111111111');
-        Log::info($request);
+        Log::info('Incoming request', ['request' => $request->toArray()]);
         return $this->marxPaymentRepository->paymentCallback($request);
     }
 }
