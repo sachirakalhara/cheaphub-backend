@@ -101,6 +101,7 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             $mur = $data['mur'];
             $tr = $data['tr'];
 
+            // Fetch credentials from .env
             $currencyConfig = [
                 'LKR' => [
                     'user_secret' => env('MARXPAY_LKR_USER_SECRET'),
@@ -120,18 +121,15 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             //     ], 400);
             // }
 
+            // Prepare API request
             $marxArgs = ['merchantRID' => $mur];
-
             Log::info('2222222222222222222222');
             Log::info('marxArgs-',$marxArgs);
             Log::info('currencyConfig-',$currencyConfig);
-            Log::info('user_secret-',$currencyConfig['LKR']['user_secret']);
-            Log::info('url-',$currencyConfig['LKR']['url']);
-            
             $response = Http::withHeaders([
-                'user_secret' => $currencyConfig['LKR']['user_secret'],
+                'user_secret' => $currencyConfig['USD']['user_secret'],
                 'Content-Type' => 'application/json',
-            ])->put($currencyConfig['LKR']['url'], $marxArgs);
+            ])->put($currencyConfig['USD']['url'], $marxArgs);
 
             $result = $response->json();
             Log::info('Payment callback response', ['response' => $result]);
