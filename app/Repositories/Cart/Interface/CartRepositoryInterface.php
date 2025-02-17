@@ -7,5 +7,6 @@ interface CartRepositoryInterface
     public function addToCart($request);
     public function getCart();
     public function removeFromCart($id);
+    public function clearCart();
 
 }

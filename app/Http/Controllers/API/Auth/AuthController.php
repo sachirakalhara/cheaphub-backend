@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API\Auth;
 
+use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\User\AuthUserResource;
 use App\Models\User\PasswordReset;
@@ -11,9 +12,10 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Mail\MailQueue;
+use App\Models\Payment\Wallet;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Response;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Permission;
 
@@ -47,6 +49,14 @@ class AuthController extends Controller
         $user->user_level_id = $this->userLevelRepository->findByScope('customer')->first()->id;
         $user->assignRole('customer');
         if ($user->save()) {
+        
+            $wallet = new Wallet();
+            $wallet->user_id = $user->id;
+            $wallet->currency = 'USD';
+            $wallet->balance = 0;
+            $wallet->save();
+
+    
 
 //            $this->sendConfirmationMail($user);
 

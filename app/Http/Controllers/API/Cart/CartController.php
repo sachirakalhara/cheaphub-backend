@@ -36,6 +36,12 @@ class CartController extends Controller
     public function removeFromCart($id)
     {
         return $this->cartRepository->removeFromCart($id);
-
     }
+
+    public function clearCart()
+    {
+        return $this->cartRepository->clearCart();
+    }
+
+    
 }

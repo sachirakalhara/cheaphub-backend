@@ -31,7 +31,7 @@ class MarxPaymentController extends Controller
         ]);
 
         return $this->marxPaymentRepository->makePayment($request);
-    }
+    }    
 
     public function paymentCallback(Request $request)
     {

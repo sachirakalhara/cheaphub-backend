@@ -93,7 +93,7 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             ], 500);
         }
     }
-
+    
     public function paymentCallback($data)
     {
         Log::info('Received payment callback request');
@@ -140,6 +140,15 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
 
                 $order = Order::find($orderId);
                 if ($order) {
+                    if($order->is_wallet == true){
+                        $wallet = Wallet::where('user_id', $order->user_id)->first();
+
+                        if (!$wallet) {
+                            return Helper::error('Wallet not found', Response::HTTP_NOT_FOUND);
+                        }
+                
+                        $wallet->increment('balance', $amountPaid);
+                    }
                     $order->update([
                         'payment_status' => 'paid',
                         'transaction_id' => $tr,

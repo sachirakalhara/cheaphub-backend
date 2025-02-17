@@ -47,8 +47,28 @@ class CartRepository implements CartRepositoryInterface
         }else{
             return Helper::error(Response::$statusTexts[Response::HTTP_NO_CONTENT], Response::HTTP_NO_CONTENT);
         }
-        
-
     }
+
+    public function clearCart(){
+        $userId = Auth::id();
+        
+        // Fetch cart items first
+        $cartItems = Cart::where('user_id', $userId)->get();
+
+        if ($cartItems->isEmpty()) {
+            return response()->json(['message' => 'Cart is already empty'], Response::HTTP_NO_CONTENT);
+        }
+
+        // Delete cart items
+        $deleted = Cart::where('user_id', $userId)->delete();
+
+        if ($deleted) {
+            return response()->json(['message' => 'All products removed from cart'], Response::HTTP_OK);
+        }
+
+        return response()->json(['message' => 'Failed to clear cart'], Response::HTTP_INTERNAL_SERVER_ERROR);
+    }
+    
+    
 
 }

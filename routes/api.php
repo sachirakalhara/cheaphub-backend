@@ -83,10 +83,11 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             // Route::get('/marxpay/callback', [MarxPaymentController::class, 'paymentCallback'])->name('marxpay.callback');
 
             Route::get('/wallet/show', [WalletController::class, 'show']);
-
+             
             Route::post('/cart', [CartController::class, 'addToCart']);
             Route::get('/cart', [CartController::class, 'getCart']);
             Route::delete('/cart/{id}', [CartController::class, 'removeFromCart']);
+            Route::delete('/cart/clear/all', [CartController::class, 'clearCart']);
 
 
         });

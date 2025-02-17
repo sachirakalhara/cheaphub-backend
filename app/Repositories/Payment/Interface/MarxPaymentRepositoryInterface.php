@@ -6,4 +6,5 @@ interface MarxPaymentRepositoryInterface
 {
     public function makePayment($request);
     public function paymentCallback($request);
+    
 }
