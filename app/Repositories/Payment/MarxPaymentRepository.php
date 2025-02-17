@@ -96,12 +96,11 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
     
     public function paymentCallback($data)
     {
-        Log::info('Received payment callback request');
 
         try {
             $mur = $data['mur'];
             $tr = $data['tr'];
-            $currency = $data['currency'];
+            Log::info('2222222222222222222222');
 
             // Fetch credentials from .env
             $currencyConfig = [
@@ -114,8 +113,9 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                     'url' => env('MARXPAY_USD_URL') . "/{$tr}",
                 ],
             ];
+            Log::info('Received payment callback request');
 
-            if (!isset($currencyConfig[$currency])) {
+            if (!isset($currencyConfig['LKR'])) {
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Invalid currency type',
@@ -126,9 +126,9 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             $marxArgs = ['merchantRID' => $mur];
 
             $response = Http::withHeaders([
-                'user_secret' => $currencyConfig[$currency]['user_secret'],
+                'user_secret' => $currencyConfig['LKR']['user_secret'],
                 'Content-Type' => 'application/json',
-            ])->put($currencyConfig[$currency]['url'], $marxArgs);
+            ])->put($currencyConfig['LKR']['url'], $marxArgs);
 
             $result = $response->json();
             Log::info('Payment callback response', ['response' => $result]);
