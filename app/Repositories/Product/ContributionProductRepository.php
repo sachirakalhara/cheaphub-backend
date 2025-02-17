@@ -56,9 +56,8 @@ class ContributionProductRepository implements ContributionProductRepositoryInte
         if ($request->input('all', false)) {
             $product_list = $query->get();
         } else {
-            $product_list = Helper::paginate($query);
+            $product_list = Helper::paginate($query->get());
         }
-
         if ($product_list->isNotEmpty()) {
             return new ContributionProductCollection($product_list);
         } else {
