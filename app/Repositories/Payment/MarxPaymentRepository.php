@@ -114,7 +114,7 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             ];
             Log::info('Received payment callback request');
 
-            if (!isset($currencyConfig['LKR'])) {
+            if (!isset($currencyConfig['USD'])) {
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Invalid currency type',
@@ -127,9 +127,9 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             Log::info('marxArgs-',$marxArgs);
             Log::info('currencyConfig-',$currencyConfig);
             $response = Http::withHeaders([
-                'user_secret' => $currencyConfig['LKR']['user_secret'],
+                'user_secret' => $currencyConfig['USD']['user_secret'],
                 'Content-Type' => 'application/json',
-            ])->put($currencyConfig['LKR']['url'], $marxArgs);
+            ])->put($currencyConfig['USD']['url'], $marxArgs);
 
             $result = $response->json();
             Log::info('Payment callback response', ['response' => $result]);
