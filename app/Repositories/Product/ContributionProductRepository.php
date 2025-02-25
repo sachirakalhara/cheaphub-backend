@@ -9,6 +9,7 @@ use App\Models\Product\Contribution\ContributionProduct;
 use App\Models\Serial\Serial;
 use App\Repositories\Product\Interface\ContributionProductRepositoryInterface;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Storage;
 
 class ContributionProductRepository implements ContributionProductRepositoryInterface
 {
@@ -88,11 +89,16 @@ class ContributionProductRepository implements ContributionProductRepositoryInte
 
         if ($request->hasFile('image')) {
             $image = $request->file('image');
-            $imageName = time() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('uploads'), $imageName);
-            $product->image = $imageName;
-        }
+            $disk = Storage::disk('s3');
+            if ($product->image && $disk->exists($product->image)) {
+                $disk->delete($product->image);
+            }
 
+            $image = $request->file('image');
+            $filename = 'product/image/' . uniqid() . '.' . $image->getClientOriginalExtension();
+            $disk->put($filename, file_get_contents($image));
+            $product->image = $filename;
+        }
 
         if ($product->save()) {
             $categories = json_decode($request->categories);
@@ -155,11 +161,16 @@ class ContributionProductRepository implements ContributionProductRepositoryInte
 
         if ($request->hasFile('image')) {
             $image = $request->file('image');
-            $imageName = time() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('uploads'), $imageName);
-            $product->image = $imageName;
-        }
+            $disk = Storage::disk('s3');
+            if ($product->image && $disk->exists($product->image)) {
+                $disk->delete($product->image);
+            }
 
+            $image = $request->file('image');
+            $filename = 'product/image/' . uniqid() . '.' . $image->getClientOriginalExtension();
+            $disk->put($filename, file_get_contents($image));
+            $product->image = $filename;
+        }
         if ($serial->type == 'bulk') {
             $serial->min_count = $request->min_count ? $request->min_count : 1;
             $serial->max_count = $request->max_count ? $request->max_count : 1;

@@ -136,6 +136,8 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
 
             if (isset($result['data']['summaryResult']) && $result['data']['summaryResult'] === "SUCCESS") {
                 $gatewayResponse = $result['data']['gatewayResponse'];
+                Log::info(' $gatewayResponsesssssssssssssssssssssssss',  $gatewayResponse);
+
                 $orderId = $gatewayResponse['order']['id'];
                 $amountPaid = $gatewayResponse['order']['totalCapturedAmount'];
 

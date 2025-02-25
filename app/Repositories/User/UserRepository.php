@@ -8,6 +8,7 @@ use App\Http\Resources\User\UserResource;
 use App\Models\User\User;
 use App\Repositories\User\Interface\UserRepositoryInterface;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Storage;
 
 class UserRepository implements UserRepositoryInterface
 {
@@ -36,12 +37,18 @@ class UserRepository implements UserRepositoryInterface
         $user->display_name = $request->fname.' '.$request->lname;
         $user->contact_no = $request->contact_no;
 
-        if ($request->hasFile('profile_photo')) {
+        if ($request->file('profile_photo')) {
+            $disk = Storage::disk('s3');
+            if ($user->profile_photo && $disk->exists($user->profile_photo)) {
+                $disk->delete($user->profile_photo);
+            }
+
             $image = $request->file('profile_photo');
-            $imageName = time() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('uploads'), $imageName);
-            $user->profile_photo = $imageName;
+            $filename = 'user/profile/' . uniqid() . '.' . $image->getClientOriginalExtension();
+            $disk->put($filename, file_get_contents($image));
+            $user->profile_photo = $filename;
         }
+
         if ($user->save()) {
             activity('user')->causedBy($user)->performedOn($user)->log('updated');
             return new UserResource($user);

@@ -8,7 +8,7 @@ use App\Http\Resources\Product\Bulk\BulkProductCollection;
 use App\Http\Resources\Product\Bulk\BulkProductResource;
 use App\Models\Employer\Employer;
 use App\Models\Product\Bulk\BulkProduct;
-use App\Models\Serial\Serial;
+use Illuminate\Support\Facades\Storage;
 use App\Repositories\Product\Interface\BulkProductRepositoryInterface;
 use Illuminate\Http\Response;
 
@@ -96,11 +96,18 @@ class BulkProductRepository implements BulkProductRepositoryInterface
         $product->serial = $request->serial;
         $product->serial_count = count(array_filter(explode("\n", $request->serial), 'trim'));
 
+
         if ($request->hasFile('image')) {
             $image = $request->file('image');
-            $imageName = time() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('uploads'), $imageName);
-            $product->image = $imageName;
+            $disk = Storage::disk('s3');
+            if ($product->image && $disk->exists($product->image)) {
+                $disk->delete($product->image);
+            }
+
+            $image = $request->file('image');
+            $filename = 'product/image/' . uniqid() . '.' . $image->getClientOriginalExtension();
+            $disk->put($filename, file_get_contents($image));
+            $product->image = $filename;
         }
 
         if ($product->save()) {
@@ -130,20 +137,20 @@ class BulkProductRepository implements BulkProductRepositoryInterface
         $product->serial = $request->serial;
         $product->serial_count = count(array_filter(explode("\n", $request->serial), 'trim'));
 
+
         if ($request->hasFile('image')) {
-            if ($product->image) {
-                $oldImagePath = public_path('uploads/' . $product->image);
-                if (file_exists($oldImagePath)) {
-                    unlink($oldImagePath);
-                }
+            $image = $product->file('image');
+            $disk = Storage::disk('s3');
+            if ($product->image && $disk->exists($product->image)) {
+                $disk->delete($product->image);
             }
 
             $image = $request->file('image');
-            $imageName = time() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('uploads'), $imageName);
-            $product->image = $imageName;
+            $filename = 'product/image/' . uniqid() . '.' . $image->getClientOriginalExtension();
+            $disk->put($filename, file_get_contents($image));
+            $product->image = $filename;
         }
-//        $categories = json_decode($request->categories);
+
         $product->categories()->sync($request->categories);
         if ($product->save()) {
             activity('bulk_product')->causedBy($product)->performedOn($product)->log('update');
