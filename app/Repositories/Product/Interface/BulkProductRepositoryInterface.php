@@ -11,6 +11,8 @@ interface BulkProductRepositoryInterface
 
     public function store($request);
     public function update($request);
+    public function delete($bulk_product_id);
+
 //    public function updateProductSerial($request);
 
 }

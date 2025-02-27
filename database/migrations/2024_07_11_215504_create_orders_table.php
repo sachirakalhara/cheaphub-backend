@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('description');
             $table->string('payment_status')->default('pending'); // pending, paid, failed
             $table->string('transaction_id')->nullable();
+            $table->string('order_id')->unique();
             $table->decimal('amount_paid', 10, 2)->nullable();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();

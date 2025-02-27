@@ -9,8 +9,10 @@ use App\Repositories\Category\Interface\CategoryRepositoryInterface;
 use App\Repositories\Package\Interface\PackageRepositoryInterface;
 use App\Repositories\Package\PackageRepository;
 use App\Repositories\Payment\Interface\MarxPaymentRepositoryInterface;
+use App\Repositories\Payment\Interface\OrderRepositoryInterface;
 use App\Repositories\Payment\Interface\WalletRepositoryInterface;
 use App\Repositories\Payment\MarxPaymentRepository;
+use App\Repositories\Payment\OrderRepository;
 use App\Repositories\Payment\WalletRepository;
 use App\Repositories\Product\BulkProductRepository;
 use App\Repositories\Product\Interface\BulkProductRepositoryInterface;
@@ -44,6 +46,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(MarxPaymentRepositoryInterface::class, MarxPaymentRepository::class);
         $this->app->bind(WalletRepositoryInterface::class, WalletRepository::class);
         $this->app->bind(CartRepositoryInterface::class, CartRepository::class);
+        $this->app->bind(OrderRepositoryInterface::class, OrderRepository::class);
         
     }
 

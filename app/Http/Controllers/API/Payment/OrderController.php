@@ -4,16 +4,33 @@ namespace App\Http\Controllers\API\Payment;
 
 use App\Http\Controllers\Controller;
 use App\Models\Payment\Order;
+use App\Repositories\Payment\Interface\OrderRepositoryInterface;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
+    private $orderRepository;
+
+    public function __construct(OrderRepositoryInterface $orderRepository)
+    {
+        $this->orderRepository = $orderRepository;
+    }
+
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+    }
+
+    public function getOrderByID($id)
+    {
+        return $this->orderRepository->findById($id);
+    }
+
+    public function filter(Request $request)
+    {
+        return $this->orderRepository->filter($request);
     }
 
     /**

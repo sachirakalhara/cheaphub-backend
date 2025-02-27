@@ -159,4 +159,16 @@ class BulkProductRepository implements BulkProductRepositoryInterface
             return Helper::error(Response::$statusTexts[Response::HTTP_NO_CONTENT], Response::HTTP_NO_CONTENT);
         }
     }
+
+    public function delete($bulk_product_id){
+        $product = BulkProduct::find($bulk_product_id);
+        if ($product) {
+            $product->categories()->detach();
+            $product->delete();
+            return Helper::success(Response::$statusTexts[Response::HTTP_OK], Response::HTTP_OK);
+        } else {
+            return Helper::error(Response::$statusTexts[Response::HTTP_NO_CONTENT], Response::HTTP_NO_CONTENT);
+        }
+    }
+
 }

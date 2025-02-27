@@ -12,6 +12,7 @@ use App\Http\Controllers\API\Tag\TagController;
 use App\Http\Controllers\API\User\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\MarxPaymentController;
+use App\Http\Controllers\API\Payment\OrderController;
 use App\Http\Controllers\API\Payment\WalletController;
 
 Route::post('/v1/register', [AuthController::class, 'register']);
@@ -51,30 +52,33 @@ Route::get('/v1/customer/marxpay/callback', [MarxPaymentController::class, 'paym
 // Protected routes
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::group(['prefix' => 'v1'], function () {
-        Route::group(['prefix' => 'admin'], function () {
-            Route::group(['prefix' => 'super-admin','middleware' =>['super_admin']], function () {
-                Route::post('/bulk/product/create', [BulkProductController::class, 'store']);
-                Route::put('/bulk/product/update', [BulkProductController::class, 'update']);
+        Route::get('/order/{id}', [OrderController::class, 'getOrderByID']);
+        Route::post('order/filter', [OrderController::class, 'filter']);
+        
 
-                Route::post('/contribution/product/create', [ContributionProductController::class, 'store']);
-                Route::put('/contribution/product/update', [ContributionProductController::class, 'update']);
+        Route::group(['prefix' => 'super-admin','middleware' =>['super_admin']], function () {
+            Route::post('/bulk/product/create', [BulkProductController::class, 'store']);
+            Route::put('/bulk/product/update', [BulkProductController::class, 'update']);
+            Route::delete('/bulk/product/delete/{bulk_product_id}', [BulkProductController::class, 'delete']);
 
-                Route::post('/subscription/create', [SubscriptionController::class, 'store']);
-                Route::delete('/subscription/delete/{product_id}', [SubscriptionController::class, 'delete']);
+            Route::post('/contribution/product/create', [ContributionProductController::class, 'store']);
+            Route::put('/contribution/product/update', [ContributionProductController::class, 'update']);
 
-                Route::post('/package/create', [PackageController::class, 'store']);
-                Route::delete('/package/delete/{package_id}', [PackageController::class, 'delete']);
+            Route::post('/subscription/create', [SubscriptionController::class, 'store']);
+            Route::delete('/subscription/delete/{product_id}', [SubscriptionController::class, 'delete']);
+
+            Route::post('/package/create', [PackageController::class, 'store']);
+            Route::delete('/package/delete/{package_id}', [PackageController::class, 'delete']);
 
 
-                Route::post('/category/create', [CategoryController::class, 'store']);
-                Route::put('/category/update', [CategoryController::class, 'update']);
-                Route::delete('/category/{id}', [CategoryController::class, 'delete']);
+            Route::post('/category/create', [CategoryController::class, 'store']);
+            Route::put('/category/update', [CategoryController::class, 'update']);
+            Route::delete('/category/{id}', [CategoryController::class, 'delete']);
 
-                Route::post('/tag/create', [TagController::class, 'store']);
-                Route::put('/tag/update', [TagController::class, 'update']);
-                Route::delete('/tag/{id}', [TagController::class, 'delete']);
+            Route::post('/tag/create', [TagController::class, 'store']);
+            Route::put('/tag/update', [TagController::class, 'update']);
+            Route::delete('/tag/{id}', [TagController::class, 'delete']);
 
-            });
         });
 
         Route::group(['prefix' => 'customer'], function () {

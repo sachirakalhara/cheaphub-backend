@@ -2,6 +2,7 @@
 
 namespace App\Models\User;
 
+use App\Models\Payment\Order;
 use App\Models\Payment\Wallet;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -71,4 +72,9 @@ class User extends Authenticatable
         return $this->hasOne(Wallet::class);
     }
 
+    
+    public function order()
+    {
+        return $this->hasOne(Order::class);
+    }
 }

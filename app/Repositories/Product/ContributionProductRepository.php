@@ -152,7 +152,7 @@ class ContributionProductRepository implements ContributionProductRepositoryInte
     public function update($request)
     {
         $product = ContributionProduct::find($request->id);
-        $serial = Serial::find($request->serial_id);
+        // $serial = Serial::find($request->serial_id);
         $product->name = $request->name;
         $product->description = $request->description;
         $product->price = $request->price;
@@ -171,11 +171,11 @@ class ContributionProductRepository implements ContributionProductRepositoryInte
             $disk->put($filename, file_get_contents($image));
             $product->image = $filename;
         }
-        if ($serial->type == 'bulk') {
-            $serial->min_count = $request->min_count ? $request->min_count : 1;
-            $serial->max_count = $request->max_count ? $request->max_count : 1;
-            $serial->save();
-        }
+        // if ($serial->type == 'bulk') {
+        //     $serial->min_count = $request->min_count ? $request->min_count : 1;
+        //     $serial->max_count = $request->max_count ? $request->max_count : 1;
+        //     $serial->save();
+        // }
 
         $categories = json_decode($request->categories);
         $product->categories()->sync($categories);

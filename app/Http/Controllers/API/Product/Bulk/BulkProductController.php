@@ -108,4 +108,11 @@ class BulkProductController extends Controller
         ]);
         return $this->bulkProductRepository->update($request);
     }
+
+
+    public function delete($bulk_product_id)
+    {
+        return $this->bulkProductRepository->delete($bulk_product_id);
+    }
+   
 }

@@ -114,13 +114,6 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             ];
             Log::info('Received payment callback request');
 
-            // if (!isset($currencyConfig['USD'])) {
-            //     return response()->json([
-            //         'status' => 'error',
-            //         'message' => 'Invalid currency type',
-            //     ], 400);
-            // }
-
             // Prepare API request
             $marxArgs = ['merchantRID' => $mur];
             Log::info('2222222222222222222222');
