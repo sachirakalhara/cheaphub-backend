@@ -72,10 +72,17 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             Log::info('MarxPay Response:', $result);
 
             if ($response->successful() && isset($result['data']['payUrl'])) {
-                $order->update(['payment_status' => 'pending']);
+                $order->update(
+                    [
+                        'payment_status' => 'pending',
+                        'transaction_id' => $result['data']['trId']
+
+                    ]
+                );
                 return response()->json([
                     'status' => 'success',
                     'redirect_url' => $result['data']['payUrl'],
+                    'transaction_id' => $result['data']['trId']
                 ]);
             }                
 
@@ -112,29 +119,22 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                     'url' => env('MARXPAY_USD_URL') . "/{$tr}",
                 ],
             ];
-            Log::info('Received payment callback request');
 
             // Prepare API request
             $marxArgs = ['merchantRID' => $mur];
-            Log::info('2222222222222222222222');
-            Log::info('marxArgs-',$marxArgs);
-            Log::info('currencyConfig-',$currencyConfig);
             $response = Http::withHeaders([
                 'user_secret' => $currencyConfig['LKR']['user_secret'],
                 'Content-Type' => 'application/json',
             ])->put($currencyConfig['LKR']['url'], $marxArgs);
 
             $result = $response->json();
-            Log::info('Payment callback response', ['response' => $result]);
-
             if (isset($result['data']['summaryResult']) && $result['data']['summaryResult'] === "SUCCESS") {
                 $gatewayResponse = $result['data']['gatewayResponse'];
                 Log::info(' $gatewayResponsesssssssssssssssssssssssss',  $gatewayResponse);
 
-                $orderId = $gatewayResponse['order']['id'];
-                $amountPaid = $gatewayResponse['order']['totalCapturedAmount'];
+                $amountPaid = $gatewayResponse['order']['amount'];
 
-                $order = Order::find($orderId);
+                $order = Order::where('transaction_id', $result['data']['trId'])->first();
                 if ($order) {
                     if($order->is_wallet == true){
                         $wallet = Wallet::where('user_id', $order->user_id)->first();
@@ -147,7 +147,6 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                     }
                     $order->update([
                         'payment_status' => 'paid',
-                        'transaction_id' => $tr,
                         'amount_paid' => $amountPaid,
                     ]);
                 }
@@ -155,7 +154,7 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                 return response()->json([
                     'status' => 'success',
                     'summaryResult' => 'SUCCESS',
-                    'order_id' => $orderId,
+                    'order_id' => $order->id,
                     'amount_paid' => $amountPaid,
                 ]);
             }
