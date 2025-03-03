@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\API\Product\Bulk;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Product\Bulk\BulkProductResource;
+use Illuminate\Http\Response;
 use App\Models\Product\Bulk\BulkProduct;
 use App\Repositories\Product\Interface\BulkProductRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use App\Helpers\Helper;
 
 class BulkProductController extends Controller
 {
@@ -68,6 +69,12 @@ class BulkProductController extends Controller
             'slug_url' => 'required|unique:bulk_products',
 
         ]);
+
+        $serial_count = count(array_filter(explode("\n", $request->serial), 'trim'));
+        if ($serial_count < $request->minimum_quantity) {
+            return Helper::error('Serial count is less than the minimum quantity required', Response::HTTP_BAD_REQUEST);
+        }
+
         return $this->bulkProductRepository->store($request);
     }
 
@@ -106,6 +113,11 @@ class BulkProductController extends Controller
             'slug_url' => 'required|unique:bulk_products,slug_url,' . $request->id ,
 
         ]);
+        
+        $serial_count = count(array_filter(explode("\n", $request->serial), 'trim'));
+        if ($serial_count < $request->minimum_quantity) {
+            return Helper::error('Serial count is less than the minimum quantity required', Response::HTTP_BAD_REQUEST);
+        }
         return $this->bulkProductRepository->update($request);
     }
 

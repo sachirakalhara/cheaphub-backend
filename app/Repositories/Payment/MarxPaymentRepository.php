@@ -3,10 +3,13 @@
 namespace App\Repositories\Payment;
 
 use App\Helpers\Helper;
+use App\Models\Cart\Cart;
+use App\Models\Payment\OrderItems;
 use App\Repositories\Payment\Interface\MarxPaymentRepositoryInterface;
 use Illuminate\Http\Response;
 use App\Models\Payment\Order;
 use App\Models\Payment\Wallet;
+use App\Models\Product\Bulk\BulkProduct;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -17,7 +20,18 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
     {
         $user = Auth::user();
 
-        // Create new order with pending status
+        if (isset($data['cart_id'])) {
+            $cart = Cart::find($data['cart_id']);
+            if ($cart) {
+                if ($cart->bulk_product_id) {
+                    $bulkProduct = BulkProduct::find($cart->bulk_product_id);
+                    if (!$bulkProduct || $bulkProduct->serial_count < $cart->quantity) {
+                        return response()->json(['message' => 'Not enough stock for the bulk product'], Response::HTTP_BAD_REQUEST);
+                    }
+                }
+            }
+        }
+
         $order = Order::create([
             'amount' => $data['amount'],
             'currency' => $data['currency'],
@@ -26,6 +40,19 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             'is_wallet' => $data['is_wallet'] ?? false,
             'user_id' => $user->id
         ]);
+
+        if (isset($data['cart_id'])) {
+            $cart = Cart::find($data['cart_id']);
+            if ($cart) {
+                OrderItems::create([
+                    'order_id' => $order->id,
+                    'bulk_product_id' => $cart->bulk_product_id,
+                    'contribution_product_id' => $cart->contribution_product_id,
+                    'quantity' => $cart->quantity,
+                ]);
+                $cart->delete();
+            }
+        }
 
         // Fetch credentials from .env
         $currencyConfig = [
@@ -69,22 +96,17 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             ])->post($currencyConfig[$data['currency']]['url'], $marxArgs);
 
             $result = $response->json();
-            Log::info('MarxPay Response:', $result);
-
             if ($response->successful() && isset($result['data']['payUrl'])) {
-                $order->update(
-                    [
-                        'payment_status' => 'pending',
-                        'transaction_id' => $result['data']['trId']
-
-                    ]
-                );
+                $order->update([
+                    'payment_status' => 'pending',
+                    'transaction_id' => $result['data']['trId']
+                ]);
                 return response()->json([
                     'status' => 'success',
                     'redirect_url' => $result['data']['payUrl'],
                     'transaction_id' => $result['data']['trId']
                 ]);
-            }                
+            }
 
             $order->update(['payment_status' => 'failed']);
             return response()->json([
@@ -97,6 +119,7 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             return response()->json([
                 'status' => 'error',
                 'message' => 'An error occurred while processing the payment.',
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -130,8 +153,6 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             $result = $response->json();
             if (isset($result['data']['summaryResult']) && $result['data']['summaryResult'] === "SUCCESS") {
                 $gatewayResponse = $result['data']['gatewayResponse'];
-                Log::info(' $gatewayResponsesssssssssssssssssssssssss',  $gatewayResponse);
-
                 $amountPaid = $gatewayResponse['order']['amount'];
 
                 $order = Order::where('transaction_id', $result['data']['trId'])->first();
@@ -166,7 +187,6 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
 
         } catch (\Exception $e) {
             Log::error('Payment callback error: ' . $e->getMessage());
-
             return response()->json([
                 'status' => 'error',
                 'message' => 'An error occurred while processing the payment callback.',

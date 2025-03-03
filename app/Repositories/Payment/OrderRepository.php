@@ -25,6 +25,7 @@ class OrderRepository implements OrderRepositoryInterface
     {
         $query = Order::query();
         $query->where('user_id',  $request->user_id );
+        $query->where('is_wallet',  false );
 
         if ($request->filled('order_id')) {
             $query->where('order_id', 'like', '%' . $request->order_id . '%');
@@ -32,6 +33,18 @@ class OrderRepository implements OrderRepositoryInterface
 
         if ($request->filled('payment_status')) {
             $query->where('payment_status', $request->payment_status);
+        }
+
+        if ($request->filled('type') && $request->type == 'bulk') {
+            $query->whereHas('orderItems', function ($q) {
+                $q->whereNotNull('bulk_product_id');
+            });
+        }
+
+        if ($request->filled('type') && $request->type == 'contribution') {
+            $query->whereHas('orderItems', function ($q) {
+                $q->whereNotNull('contribution_product_id');
+            });
         }
 
         if ($request->filled('transaction_id')) {

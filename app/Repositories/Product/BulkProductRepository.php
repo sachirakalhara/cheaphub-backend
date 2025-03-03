@@ -3,10 +3,8 @@
 namespace App\Repositories\Product;
 
 use App\Helpers\Helper;
-use App\Http\Resources\Employer\EmployerCollection;
 use App\Http\Resources\Product\Bulk\BulkProductCollection;
 use App\Http\Resources\Product\Bulk\BulkProductResource;
-use App\Models\Employer\Employer;
 use App\Models\Product\Bulk\BulkProduct;
 use Illuminate\Support\Facades\Storage;
 use App\Repositories\Product\Interface\BulkProductRepositoryInterface;
@@ -81,6 +79,7 @@ class BulkProductRepository implements BulkProductRepositoryInterface
 
     public function store($request)
     {
+        
         $product = new BulkProduct();
         $product->name = $request->name;
         $product->description = $request->description;
