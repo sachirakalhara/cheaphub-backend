@@ -19,7 +19,6 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
     public function makePayment($data)
     {
         $user = Auth::user();
-        Log::info('ppppppppppppppppppppppppp:', $data['is_wallet'] == false,$data['is_wallet']);
 
         if (isset($data['cart_id']) && $data['is_wallet'] == false) {
             $cart = Cart::find($data['cart_id']);
