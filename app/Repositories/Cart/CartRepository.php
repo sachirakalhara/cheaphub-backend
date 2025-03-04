@@ -37,7 +37,7 @@ class CartRepository implements CartRepositoryInterface
 
     public function getCart()
     {
-        $cartItems = Cart::with('bulkProduct','contributionProduct')->where('user_id', Auth::id())->get();
+        $cartItems = Cart::with('bulkProduct','package')->where('user_id', Auth::id())->get();
 
         if (count($cartItems) > 0) {
             return new CartCollection($cartItems);
