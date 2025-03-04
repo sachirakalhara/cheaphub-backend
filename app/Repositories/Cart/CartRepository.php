@@ -26,7 +26,7 @@ class CartRepository implements CartRepositoryInterface
             [
                 'user_id' => Auth::id(), 
                 'bulk_product_id' => $request->bulk_product_id,
-                'contribution_product_id' => $request->contribution_product_id
+                'package_id' => $request->package_id
             ],
             [
                 'quantity' => $request->quantity

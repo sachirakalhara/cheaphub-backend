@@ -80,7 +80,7 @@ class OrderRepository implements OrderRepositoryInterface
 
         if ($request->filled('type') && $request->type == 'contribution') {
             $query->whereHas('orderItems', function ($q) {
-                $q->whereNotNull('contribution_product_id');
+                $q->whereNotNull('package_id');
             });
         }
 

@@ -10,6 +10,7 @@ use Illuminate\Http\Response;
 use App\Models\Payment\Order;
 use App\Models\Payment\Wallet;
 use App\Models\Product\Bulk\BulkProduct;
+use App\Models\Subscription\Package;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -32,6 +33,14 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                     return response()->json(['message' => 'Not enough stock for the bulk product'], Response::HTTP_BAD_REQUEST);
                 }
             }
+
+            if ($cart->package_id) {
+                $package = Package::find($cart->package_id);
+                
+                if (!$package || $package->subscription->available_serial_count < $cart->quantity) {
+                    return response()->json(['message' => 'Not enough stock for the serial'], Response::HTTP_BAD_REQUEST);
+                }
+            }
         }
 
         $order = Order::create([
@@ -50,7 +59,7 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             OrderItems::create([
                 'order_id' => $order->id,
                 'bulk_product_id' => $cart->bulk_product_id,
-                'contribution_product_id' => $cart->contribution_product_id,
+                'package_id' => $cart->package_id,
                 'quantity' => $cart->quantity,
             ]);
             $cart->delete();

@@ -15,11 +15,11 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('order_id');
             $table->unsignedBigInteger('bulk_product_id')->nullable();
-            $table->unsignedBigInteger('contribution_product_id')->nullable();
+            $table->unsignedBigInteger('package_id')->nullable();
             $table->integer('quantity');
             $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
             $table->foreign('bulk_product_id')->references('id')->on('bulk_products');
-            $table->foreign('contribution_product_id')->references('id')->on('contribution_products');
+            $table->foreign('package_id')->references('id')->on('packages');
 
             $table->timestamps();
         });

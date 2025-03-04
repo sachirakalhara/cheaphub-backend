@@ -3,7 +3,7 @@
 namespace App\Models\Cart;
 
 use App\Models\Product\Bulk\BulkProduct;
-use App\Models\Product\Contribution\ContributionProduct;
+use App\Models\Subscription\Package;
 use App\Models\User\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -12,7 +12,7 @@ class Cart extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'bulk_product_id','contribution_product_id', 'quantity'];
+    protected $fillable = ['user_id', 'bulk_product_id','package_id', 'quantity'];
 
     public function user()
     {
@@ -24,8 +24,8 @@ class Cart extends Model
         return $this->belongsTo(BulkProduct::class);
     }
 
-    public function contributionProduct()
+    public function package()
     {
-        return $this->belongsTo(ContributionProduct::class);
+        return $this->belongsTo(Package::class);
     }
 }

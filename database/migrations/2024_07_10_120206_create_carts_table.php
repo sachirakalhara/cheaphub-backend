@@ -19,8 +19,8 @@ return new class extends Migration
             $table->unsignedBigInteger('bulk_product_id')->nullable();
             $table->foreign('bulk_product_id')->references('id')->on('bulk_products');
 
-            $table->unsignedBigInteger('contribution_product_id')->nullable();
-            $table->foreign('contribution_product_id')->references('id')->on('contribution_products');
+            $table->unsignedBigInteger('package_id')->nullable();
+            $table->foreign('package_id')->references('id')->on('packages');
 
             $table->integer('quantity');
             $table->timestamps();

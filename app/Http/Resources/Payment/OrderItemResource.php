@@ -22,7 +22,7 @@ class OrderItemResource extends JsonResource
             'order'=>OrderResource::collection($this->order),
             'quantity'=> $this->quantity,
             'bulkProduct'=> $this->bulkProduct,
-            'contributionProduct'=> $this->contributionProduct,
+            'package'=> $this->package,
             'created_at'=>$this->created_at
             
         ];
