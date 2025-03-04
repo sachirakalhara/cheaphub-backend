@@ -81,7 +81,7 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
 
         // Prepare API payload
         $marxArgs = [
-            'merchantRID' => $order->id,
+            'merchantRID' => $order->order_id,
             'amount' => floatval($data['amount']),
             'returnUrl' => route('marxpay.callback'),
             'validTimeLimit' => 30,
