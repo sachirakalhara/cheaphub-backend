@@ -21,13 +21,15 @@ class ContributionProductResource extends JsonResource
      */
     public function toArray($request)
     {
+        $disk = Storage::disk('s3');
+        $image = $this->image ? $disk->url($this->image) : null;
         return [
             'id' => $this->id,
             'name' => $this->name,
             'tag_id' => $this->tag_id,
             'description' => $this->description,
             'categories' => CategoryResource::collection($this->categories),
-            'image' => $this->image ? Storage::url($this->image) : null,
+            'image' => $image,
             'visibility' => $this->visibility,
             'slug_url' => route('api.slug-contribution-product.slug', [ 'slug_name' => $this->slug_url]),
             'service_info' => $this->service_info,

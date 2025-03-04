@@ -18,7 +18,8 @@ class BulkProductResource extends JsonResource
      */
     public function toArray($request)
     {
-
+        $disk = Storage::disk('s3');
+        $image = $this->image ? $disk->url($this->image) : null;
         return [
             'id' => $this->id,
             'name' => $this->name,
@@ -27,7 +28,7 @@ class BulkProductResource extends JsonResource
             'price' => $this->price,
             'gateway_fee' => $this->gateway_fee,
             'categories' => CategoryResource::collection($this->categories),
-            'image' => $this->image ? Storage::url($this->image) : null,
+            'image' => $image,
             'visibility' => $this->visibility,
             'slug_url' => route('api.slug-product.slug', [ 'slug_name' => $this->slug_url]),
             'service_info' => $this->service_info,
