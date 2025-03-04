@@ -6,6 +6,7 @@ use App\Helpers\Helper;
 use App\Http\Resources\Cart\CartCollection;
 use App\Models\Cart\Cart;
 use App\Models\Product\Bulk\BulkProduct;
+use App\Models\Subscription\Package;
 use App\Repositories\Cart\Interface\CartRepositoryInterface;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -18,6 +19,14 @@ class CartRepository implements CartRepositoryInterface
         if ($request->bulk_product_id) {
             $bulkProduct = BulkProduct::find($request->bulk_product_id);
             if (!$bulkProduct || $bulkProduct->serial_count < $request->quantity) {
+                return response()->json(['message' => 'Not enough stock for the bulk product'], Response::HTTP_BAD_REQUEST);
+            }
+        }
+
+
+        if ($request->package_id) {
+            $bulkProduct = Package::find($request->package_id);
+            if (!$bulkProduct || $bulkProduct->subscription->available_serial_count < $request->quantity) {
                 return response()->json(['message' => 'Not enough stock for the bulk product'], Response::HTTP_BAD_REQUEST);
             }
         }
