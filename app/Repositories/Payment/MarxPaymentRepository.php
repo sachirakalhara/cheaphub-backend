@@ -20,8 +20,11 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
     {
         $user = Auth::user();
 
-        if (isset($data['cart_id'])) {
+        if (isset($data['cart_id']) && $data['is_wallet'] == false) {
             $cart = Cart::find($data['cart_id']);
+            if (!$cart) {
+                return response()->json(['message' => 'Cart not found'], Response::HTTP_NOT_FOUND);
+            }
             if ($cart) {
                 if ($cart->bulk_product_id) {
                     $bulkProduct = BulkProduct::find($cart->bulk_product_id);
