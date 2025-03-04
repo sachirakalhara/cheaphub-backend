@@ -45,7 +45,7 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             'order_id' => 'order_' . str_pad(Order::max('id') + 1, 3, '0', STR_PAD_LEFT),
         ]);
 
-        if (isset($data['cart_id'])) {
+        if ( !$data['is_wallet']) {
             $cart = Cart::find($data['cart_id']);
             if ($cart) {
                 OrderItems::create([
