@@ -11,9 +11,12 @@ use App\Models\Payment\Order;
 use App\Models\Payment\Wallet;
 use App\Models\Product\Bulk\BulkProduct;
 use App\Models\Subscription\Package;
+use App\Models\Subscription\Subscription;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use NunoMaduro\Collision\Adapters\Phpunit\Subscribers\Subscriber;
+
 class MarxPaymentRepository implements MarxPaymentRepositoryInterface
 {
     
@@ -192,6 +195,12 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                         }
                     }
 
+                    if ($orderItem->package_id) {
+                        $package = Package::find($orderItem->package_id);
+                        if ($package) {
+                            Subscription::find($package->subscription_id)->decrement('available_serial_count', $orderItem->quantity);
+                        }
+                    }
                 }
 
                 return response()->json([
