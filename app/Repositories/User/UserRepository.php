@@ -28,6 +28,16 @@ class UserRepository implements UserRepositoryInterface
             return Helper::success(Response::$statusTexts[Response::HTTP_NO_CONTENT], Response::HTTP_NO_CONTENT);
         }
     }
+    
+    public function getUserByID($user_id)
+    {
+        $user = User::find($user_id);
+        if ($user) {
+            return new UserResource($user);
+        } else {
+            return Helper::error('User not found', Response::HTTP_NOT_FOUND);
+        }
+    }
 
     public function update($request)
     {

@@ -16,7 +16,6 @@ class OrderResource extends JsonResource
      */
     public function toArray($request)
     {
-        dd($this->orderItems);
         return [
             'id'=>$this->id,
             'amount'=>$this->amount,
@@ -27,7 +26,7 @@ class OrderResource extends JsonResource
             'user_id'=>$this->user,
             'amount_paid'=>$this->amount_paid,
             'is_wallet'=>$this->is_wallet,
-            'order_items'=>OrderItemResource::collection($this->orderItems),
+            'order_items'=>OrderItemResource::collection($this->whenLoaded('orderItems')),
             'order_id'=>$this->order_id,
             'created_at'=>$this->created_at
             

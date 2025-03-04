@@ -53,10 +53,14 @@ Route::get('/v1/customer/marxpay/callback', [MarxPaymentController::class, 'paym
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::group(['prefix' => 'v1'], function () {
         Route::get('/order/{id}', [OrderController::class, 'getOrderByID']);
-        Route::post('order/filter', [OrderController::class, 'filter']);
+        Route::get('/orders/{user_id}', [OrderController::class, 'getOrdersByUserID']);
+        Route::post('/order/filter', [OrderController::class, 'filter']);
         
 
         Route::group(['prefix' => 'super-admin','middleware' =>['super_admin']], function () {
+
+            Route::get('/total-customer-spend', [OrderController::class, 'totalCustomerWithSpend']);
+
             Route::post('/bulk/product/create', [BulkProductController::class, 'store']);
             Route::put('/bulk/product/update', [BulkProductController::class, 'update']);
             Route::delete('/bulk/product/delete/{bulk_product_id}', [BulkProductController::class, 'delete']);
@@ -97,8 +101,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         });
 
 
-    Route::post('/user/get-all', [UserController::class, 'index']);
+        Route::post('/user/get-all', [UserController::class, 'index']);
         Route::post('/user/update', [UserController::class, 'update']);
+        Route::get('/user/{id}', [UserController::class, 'getUserByID']);
+
 
         Route::post('/logout', [AuthController::class, 'logout']);
     });

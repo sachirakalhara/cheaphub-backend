@@ -8,6 +8,7 @@ use App\Http\Resources\Payment\OrderResource;
 use App\Models\Payment\Order;
 use App\Repositories\Payment\Interface\OrderRepositoryInterface;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 
 class OrderRepository implements OrderRepositoryInterface
 {
@@ -19,6 +20,42 @@ class OrderRepository implements OrderRepositoryInterface
         } else {
             return Helper::error('Order not found', Response::HTTP_NOT_FOUND);
         }
+    }
+
+    
+    public function getOrdersByUserID($user_id, $perPage = 10)
+    {
+        $orders = Order::where('user_id', $user_id)->paginate($perPage);
+
+        if ($orders->isNotEmpty()) {
+            return new OrderCollection($orders);
+        } else {
+            return Helper::error('No orders found for this user', Response::HTTP_NO_CONTENT);
+        }
+    }
+
+    
+    public function totalCustomerCountWithSpend()
+    {
+        $orders = Order::select('user_id', DB::raw('COALESCE(SUM(amount_paid), 0) as total_spend'))
+            ->groupBy('user_id')
+            ->havingRaw('SUM(amount_paid) > 0')
+            ->get();
+
+        $totalUsers = $orders->count();
+        $totalSpend = $orders->sum('total_spend');
+
+        if ($orders->isEmpty()) {
+            return response()->json([
+                'user_count' => 0,
+                'total_spend' => 0
+            ], Response::HTTP_OK);
+        }
+
+        return response()->json([
+            'user_count' => $totalUsers,
+            'total_spend' => $totalSpend
+        ], Response::HTTP_OK);
     }
 
     public function filter($request)

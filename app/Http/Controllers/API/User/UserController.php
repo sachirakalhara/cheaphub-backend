@@ -40,6 +40,11 @@ class UserController extends Controller
         return $this->userRepository->update($request);
     }
 
+    public function getUserByID($id)
+    {
+        return $this->userRepository->getUserByID($id);
+    }
+    
 
 
 }

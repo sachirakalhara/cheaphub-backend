@@ -28,11 +28,22 @@ class OrderController extends Controller
         return $this->orderRepository->findById($id);
     }
 
+    public function getOrdersByUserID($user_id)
+    {
+        return $this->orderRepository->getOrdersByUserID($user_id);
+    }
+
+    
     public function filter(Request $request)
     {
         return $this->orderRepository->filter($request);
     }
 
+    public function totalCustomerWithSpend()
+    {
+        return $this->orderRepository->totalCustomerCountWithSpend();
+    }
+    
     /**
      * Show the form for creating a new resource.
      */
