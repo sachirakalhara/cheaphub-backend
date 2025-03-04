@@ -21,6 +21,7 @@ class MarxPaymentController extends Controller
      */
     public function makePayment(Request $request)
     {
+        dd($request->all());
         // Validate required fields
         $request = $request->validate([
             'email' => 'required|email',
