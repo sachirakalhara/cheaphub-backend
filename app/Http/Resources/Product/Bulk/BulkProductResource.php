@@ -3,7 +3,7 @@
 namespace App\Http\Resources\Product\Bulk;
 
 use App\Http\Resources\Category\CategoryResource;
-use App\Http\Resources\Serial\SerialResource;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class BulkProductResource extends JsonResource
@@ -27,7 +27,7 @@ class BulkProductResource extends JsonResource
             'price' => $this->price,
             'gateway_fee' => $this->gateway_fee,
             'categories' => CategoryResource::collection($this->categories),
-            'image' => $this->image ? asset('uploads/' . $this->image) : null,
+            'image' => $this->image ? Storage::url($this->image) : null,
             'visibility' => $this->visibility,
             'slug_url' => route('api.slug-product.slug', [ 'slug_name' => $this->slug_url]),
             'service_info' => $this->service_info,

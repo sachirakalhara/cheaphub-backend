@@ -6,7 +6,7 @@ use App\Http\Resources\Category\CategoryResource;
 use App\Http\Resources\Serial\SerialResource;
 use App\Http\Resources\Subscription\SubscriptionResource;
 use App\Models\Serial\Serial;
-use App\Models\Subscription\Subscription;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ContributionProductResource extends JsonResource
@@ -27,7 +27,7 @@ class ContributionProductResource extends JsonResource
             'tag_id' => $this->tag_id,
             'description' => $this->description,
             'categories' => CategoryResource::collection($this->categories),
-            'image' => $this->image ? asset('uploads/' . $this->image) : null,
+            'image' => $this->image ? Storage::url($this->image) : null,
             'visibility' => $this->visibility,
             'slug_url' => route('api.slug-contribution-product.slug', [ 'slug_name' => $this->slug_url]),
             'service_info' => $this->service_info,

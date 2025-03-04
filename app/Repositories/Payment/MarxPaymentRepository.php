@@ -186,19 +186,20 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                         'amount_paid' => $amountPaid,
                     ]);
 
-
-                    $orderItem = OrderItems::where('order_id', $order->id)->first();
-                    if ($orderItem->bulk_product_id) {
-                        $bulkProduct = BulkProduct::find($orderItem->bulk_product_id);
-                        if ($bulkProduct) {
-                            $bulkProduct->decrement('serial_count', $orderItem->quantity);
+                    if($order->is_wallet == false){
+                        $orderItem = OrderItems::where('order_id', $order->id)->first();
+                        if ($orderItem->bulk_product_id) {
+                            $bulkProduct = BulkProduct::find($orderItem->bulk_product_id);
+                            if ($bulkProduct) {
+                                $bulkProduct->decrement('serial_count', $orderItem->quantity);
+                            }
                         }
-                    }
 
-                    if ($orderItem->package_id) {
-                        $package = Package::find($orderItem->package_id);
-                        if ($package) {
-                            Subscription::find($package->subscription_id)->decrement('available_serial_count', $orderItem->quantity);
+                        if ($orderItem->package_id) {
+                            $package = Package::find($orderItem->package_id);
+                            if ($package) {
+                                Subscription::find($package->subscription_id)->decrement('available_serial_count', $orderItem->quantity);
+                            }
                         }
                     }
                 }
