@@ -20,7 +20,7 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
     {
         $user = Auth::user();
 
-dd($data->cart_id);
+dd($data);
         if (isset($data['cart_id']) && $data['is_wallet'] == false) {
             $cart = Cart::find($data['cart_id']);
             if (!$cart) {
