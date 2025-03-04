@@ -20,17 +20,17 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
     {
         $user = Auth::user();
 
-        if (isset($data['cart_id']) && $data['is_wallet'] == false) {
+        if (isset($data['cart_id']) && ($data['is_wallet'] == false || $data['is_wallet'] == 'false')) {
             $cart = Cart::find($data['cart_id']);
             if (!$cart) {
-            return response()->json(['message' => 'Cart not found'], Response::HTTP_NOT_FOUND);
+                return response()->json(['message' => 'Cart not found'], Response::HTTP_NOT_FOUND);
             }
 
             if ($cart->bulk_product_id) {
-            $bulkProduct = BulkProduct::find($cart->bulk_product_id);
-            if (!$bulkProduct || $bulkProduct->serial_count < $cart->quantity) {
-                return response()->json(['message' => 'Not enough stock for the bulk product'], Response::HTTP_BAD_REQUEST);
-            }
+                $bulkProduct = BulkProduct::find($cart->bulk_product_id);
+                if (!$bulkProduct || $bulkProduct->serial_count < $cart->quantity) {
+                    return response()->json(['message' => 'Not enough stock for the bulk product'], Response::HTTP_BAD_REQUEST);
+                }
             }
         }
 
@@ -44,7 +44,7 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             'order_id' => 'order_' . str_pad(Order::max('id') + 1, 3, '0', STR_PAD_LEFT),
         ]);
 
-        if (isset($data['cart_id']) && $data['is_wallet'] == false) {
+        if (($data['is_wallet'] == false || $data['is_wallet'] == 'false')) {
             $cart = Cart::find($data['cart_id']);
             if ($cart) {
             OrderItems::create([
