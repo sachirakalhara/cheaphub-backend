@@ -18,8 +18,8 @@ class CartController extends Controller
     public function addToCart(Request $request)
     {
         $request->validate([
-            'bulk_product_id' => 'nullable|exists:bulk_products,id|required_without:contribution_product_id',
-            'contribution_product_id' => 'nullable|exists:contribution_products,id|required_without:bulk_product_id',        
+            'bulk_product_id' => 'nullable|exists:bulk_products,id|required_without:package_id',
+            'package_id' => 'nullable|exists:packages,id|required_without:bulk_product_id',        
             'quantity' => 'required|integer|min:1',
             'user_id' => 'required'
         ]);
