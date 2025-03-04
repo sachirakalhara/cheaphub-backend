@@ -41,7 +41,7 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             'payment_status' => 'pending',
             'is_wallet' => $data['is_wallet'] ?? false,
             'user_id' => $user->id,
-            'order_id' => 'order_' . str_pad(Order::max('id') + 1, 3, '0', STR_PAD_LEFT),
+            'order_id' => 'order_' . now()->format('YmdHis'),
         ]);
 
         if (($data['is_wallet'] == false || $data['is_wallet'] == 'false')) {
