@@ -12,6 +12,7 @@ class Order extends Model
     use HasFactory;
     
     protected $fillable = [
+        'id',
         'amount',
         'currency',
         'description',
