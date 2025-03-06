@@ -89,10 +89,8 @@ class ContributionProductController extends Controller
     {
        $request->validate([
            'id' => 'required',
-           'name' => 'required|unique:products,name,' . $request->id,
+           'name' => 'required|unique:contribution_products,name,' . $request->id,
            'tag_id' => 'required',
-           'price' => 'required',
-           'gateway_fee' => 'required',
            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
        ]);
        return $this->productRepository->update($request);
@@ -110,8 +108,8 @@ class ContributionProductController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(ContributionProduct $product)
+    public function delete($id)
     {
-        //
+        return $this->productRepository->delete($id);
     }
 }

@@ -10,7 +10,8 @@ interface ContributionProductRepositoryInterface
     public function store($request);
     public function findById($id);
     public function findBySlug($slug);
-   public function update($request);
+    public function delete($id);
+    public function update($request);
 //    public function updateProductSerial($request);
 
 }

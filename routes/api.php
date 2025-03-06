@@ -67,14 +67,18 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
             Route::post('/contribution/product/create', [ContributionProductController::class, 'store']);
             Route::put('/contribution/product/update', [ContributionProductController::class, 'update']);
+            Route::delete('/contribution/product/delete/{id}', [ContributionProductController::class, 'delete']);
 
             Route::post('/subscription/create', [SubscriptionController::class, 'store']);
+            Route::put('/subscription/update', [SubscriptionController::class, 'update']);
             Route::delete('/subscription/delete/{product_id}', [SubscriptionController::class, 'delete']);
+            Route::delete('/subscription/{subscription_id}', [SubscriptionController::class, 'deleteBydID']);
 
             Route::post('/package/create', [PackageController::class, 'store']);
             Route::delete('/package/delete/{package_id}', [PackageController::class, 'delete']);
+            Route::put('/package/update', [PackageController::class, 'update']);
 
-
+            
             Route::post('/category/create', [CategoryController::class, 'store']);
             Route::put('/category/update', [CategoryController::class, 'update']);
             Route::delete('/category/{id}', [CategoryController::class, 'delete']);

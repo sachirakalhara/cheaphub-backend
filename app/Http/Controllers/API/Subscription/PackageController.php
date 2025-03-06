@@ -39,7 +39,7 @@ class PackageController extends Controller
     {
         $request->validate([
             'subscription_id' => 'required',
-            'name' => 'required|string|unique:subscriptions',
+            'name' => 'required|string|unique:packages',
             'price' => 'required',
             'payment_method' => 'required',
             'replace_count' => 'required',
@@ -48,12 +48,10 @@ class PackageController extends Controller
         return $this->packageRepository->store($request);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Package $package)
+    
+    public function delete($package_id)
     {
-        //
+        return $this->packageRepository->delete($package_id);
     }
 
     /**
@@ -67,9 +65,17 @@ class PackageController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Package $package)
+    public function update(Request $request)
     {
-        //
+        $request->validate([
+            'id' => 'required',
+            'name' => 'required|string|unique:packages,name,' . $request->id,
+            'price' => 'required',
+            'payment_method' => 'required',
+            'replace_count' => 'required',
+            'expiry_duration' => 'required'
+        ]);
+        return $this->packageRepository->update($request);
     }
 
     /**

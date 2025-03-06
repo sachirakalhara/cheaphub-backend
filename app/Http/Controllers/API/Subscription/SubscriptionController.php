@@ -65,9 +65,14 @@ class SubscriptionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Subscription $subscription)
+    public function update(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string',
+            'serial' => 'required',
+            'gateway_fee' => 'required'
+        ]);
+        return $this->subscriptionRepository->update($request);
     }
 
     /**
@@ -77,4 +82,10 @@ class SubscriptionController extends Controller
     {
         return $this->subscriptionRepository->delete($product_id);
     }
+
+    public function deleteBydID($deleteBydID)
+    {
+        return $this->subscriptionRepository->deleteBydID($deleteBydID);
+    }
+    
 }

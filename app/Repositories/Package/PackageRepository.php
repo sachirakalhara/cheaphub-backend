@@ -5,6 +5,10 @@ namespace App\Repositories\Package;
 use App\Helpers\Helper;
 use App\Http\Resources\Subscription\PackageCollection;
 use App\Http\Resources\Subscription\PackageResource;
+use App\Models\Payment\Order;
+use App\Models\Payment\OrderItems;
+use App\Models\Product\Contribution\ContributionProduct;
+use App\Models\Product\Contribution\ContributionProductCategory;
 use App\Models\Subscription\Package;
 use App\Models\Subscription\Subscription;
 use App\Repositories\Package\Interface\PackageRepositoryInterface;
@@ -49,24 +53,51 @@ class PackageRepository implements PackageRepositoryInterface
             return Helper::error(Response::$statusTexts[Response::HTTP_NO_CONTENT], Response::HTTP_NO_CONTENT);
         }
     }
+    
     public function update($request)
     {
+        $package = Package::find($request->id);
+        if (!$package) {
+            return Helper::error("Package not found", Response::HTTP_NOT_FOUND);
+        }
 
+        $package->fill($request->only([
+            'name', 
+            'price', 
+            'payment_method', 
+            'expiry_duration', 
+            'replace_count'
+        ]));
+
+        if ($package->save()) {
+            activity('package')->causedBy($package)->performedOn($package)->log('updated');
+            return new PackageResource($package);
+        } else {
+            return Helper::error("Failed to update package", Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
-    public function delete($category_id)
+    public function delete($package_id)
     {
-//        $category = Category::find($category_id);
-//        $productCategory = ContributionProductCategory::where('category_id',$category_id)->first();
-//        if($productCategory){
-//            return Helper::error(Response::$statusTexts[Response::HTTP_IM_USED], Response::HTTP_IM_USED);
-//        }
-//        if ($category->delete()) {
-//            activity('category')->causedBy($category)->performedOn($category)->log('updated');
-//            return Helper::success(Response::$statusTexts[Response::HTTP_OK], Response::HTTP_OK);
-//        } else {
-//            return Helper::error(Response::$statusTexts[Response::HTTP_NO_CONTENT], Response::HTTP_NO_CONTENT);
-//        }
+        $orderItem = OrderItems::where('package_id', $package_id)->first();
+        if ($orderItem) {
+            $is_order = Order::where('payment_status', 'paid')->find($orderItem->order_id);
+            if ($is_order) {
+                return Helper::error("Cannot delete package with active orders", Response::HTTP_CONFLICT);
+            }
+        }
+
+        $package = Package::find($package_id);
+        if (!$package) {
+            return Helper::error("Package not found", Response::HTTP_NOT_FOUND);
+        }
+
+        if ($package->delete()) {
+            activity('package')->causedBy($package)->performedOn($package)->log('deleted');
+            return Helper::success(Response::$statusTexts[Response::HTTP_OK], Response::HTTP_OK);
+        } else {
+            return Helper::error("Failed to delete package", Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
 }

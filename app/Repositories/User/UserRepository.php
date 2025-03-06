@@ -15,14 +15,21 @@ class UserRepository implements UserRepositoryInterface
 
     public function all($request)
     {
+        $query = User::query();
 
-        if($request->input('all', '') == 1) {
-            $user_list = User::all();
-        } else {
-            $user_list = User::orderBy('created_at', 'desc')->paginate(10);
+        // Name search
+        if ($request->has('search')) {
+            $query->where('fname', 'like', '%' . $request->input('search') . '%')
+                  ->orWhere('lname', 'like', '%' . $request->input('search') . '%');
         }
 
-        if (count($user_list) > 0) {
+        if ($request->input('all', '') == 1) {
+            $user_list = $query->get();
+        } else {
+            $user_list = $query->orderBy('created_at', 'desc')->paginate(10);
+        }
+
+        if ($user_list->count() > 0) {
             return new UserCollection($user_list);
         } else {
             return Helper::success(Response::$statusTexts[Response::HTTP_NO_CONTENT], Response::HTTP_NO_CONTENT);

@@ -5,8 +5,9 @@ namespace App\Repositories\Product;
 use App\Helpers\Helper;
 use App\Http\Resources\Product\Contribution\ContributionProductCollection;
 use App\Http\Resources\Product\Contribution\ContributionProductResource;
+use App\Models\Payment\Order;
+use App\Models\Payment\OrderItems;
 use App\Models\Product\Contribution\ContributionProduct;
-use App\Models\Serial\Serial;
 use App\Repositories\Product\Interface\ContributionProductRepositoryInterface;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
@@ -76,6 +77,7 @@ class ContributionProductRepository implements ContributionProductRepositoryInte
             return Helper::success(Response::$statusTexts[Response::HTTP_NO_CONTENT], Response::HTTP_NO_CONTENT);
         }
     }
+
     public function store($request)
     {
 
@@ -149,15 +151,20 @@ class ContributionProductRepository implements ContributionProductRepositoryInte
             return Helper::error(Response::$statusTexts[Response::HTTP_NO_CONTENT], Response::HTTP_NO_CONTENT);
         }
     }
+
     public function update($request)
     {
         $product = ContributionProduct::find($request->id);
-        // $serial = Serial::find($request->serial_id);
+        if (!$product) {
+            return Helper::error('Product not found', Response::HTTP_NOT_FOUND);
+        }
+
         $product->name = $request->name;
         $product->description = $request->description;
-        $product->price = $request->price;
-        $product->gateway_fee = $request->gateway_fee;
         $product->tag_id = $request->tag_id;
+        $product->service_info = $request->service_info;
+        $product->slug_url = $request->slug_url;
+        $product->visibility = $request->visibility;
 
         if ($request->hasFile('image')) {
             $image = $request->file('image');
@@ -166,26 +173,61 @@ class ContributionProductRepository implements ContributionProductRepositoryInte
                 $disk->delete($product->image);
             }
 
-            $image = $request->file('image');
             $filename = 'product/image/' . uniqid() . '.' . $image->getClientOriginalExtension();
             $disk->put($filename, file_get_contents($image));
             $product->image = $filename;
         }
-        // if ($serial->type == 'bulk') {
-        //     $serial->min_count = $request->min_count ? $request->min_count : 1;
-        //     $serial->max_count = $request->max_count ? $request->max_count : 1;
-        //     $serial->save();
-        // }
 
-        $categories = json_decode($request->categories);
-        $product->categories()->sync($categories);
+        $categories = json_decode($request->categories, true);
+        if (is_array($categories)) {
+            $product->categories()->sync($categories);
+        }
 
         if ($product->save()) {
-
             activity('product')->causedBy($product)->performedOn($product)->log('updated');
             return new ContributionProductResource($product);
         } else {
-            return Helper::error(Response::$statusTexts[Response::HTTP_NO_CONTENT], Response::HTTP_NO_CONTENT);
+            return Helper::error('Failed to update product', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+
+    public function delete($id)
+    {
+        $contributionProduct = ContributionProduct::find($id);
+
+        if (!$contributionProduct) {
+            return Helper::error('Product not found', Response::HTTP_NOT_FOUND);
+        }
+
+        foreach ($contributionProduct->subscriptions as $subscription) {
+            foreach ($subscription->packages as $package) {
+                $orderItem = OrderItems::where('package_id', $package->id)->first();
+                if ($orderItem) {
+                    $is_order = Order::where('payment_status', 'paid')->where('id', $orderItem->order_id)->exists();
+                    if ($is_order) {
+                        return Helper::error("Cannot delete product with active orders", Response::HTTP_CONFLICT);
+                    }
+                }
+            }
+        }
+
+        $disk = Storage::disk('s3');
+        if ($contributionProduct->image && $disk->exists($contributionProduct->image)) {
+            $disk->delete($contributionProduct->image);
+        }
+
+        $contributionProduct->categories()->detach();
+
+        foreach ($contributionProduct->subscriptions as $subscription) {
+            $subscription->packages()->delete(); 
+            $subscription->delete();
+        }
+
+        $contributionProduct->delete();
+
+        return Helper::success('Product deleted successfully', Response::HTTP_OK);
+    }
+
+    
 }
