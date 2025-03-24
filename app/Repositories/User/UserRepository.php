@@ -23,6 +23,10 @@ class UserRepository implements UserRepositoryInterface
                   ->orWhere('lname', 'like', '%' . $request->input('search') . '%');
         }
 
+        if ($request->has('user_type') == 'customer') {
+            $query->where('user_level_id',2);
+        }
+
         if ($request->input('all', '') == 1) {
             $user_list = $query->get();
         } else {

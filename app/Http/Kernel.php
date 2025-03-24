@@ -2,6 +2,7 @@
 
 namespace App\Http;
 
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
@@ -67,4 +68,11 @@ class Kernel extends HttpKernel
         'super_admin' => \App\Http\Middleware\CheckSuperAdminRole::class,
 
     ];
+
+    protected function schedule(Schedule $schedule)
+    {
+        // Schedule the custom command to run daily at midnight
+        $schedule->command('coupons:delete-expired-coupons')->daily();
+    }
+
 }

@@ -27,6 +27,8 @@ use App\Repositories\User\Interface\UserRepositoryInterface;
 use App\Repositories\User\UserLevelRepository;
 use App\Repositories\User\UserRepository;
 use Illuminate\Support\ServiceProvider;
+use App\Repositories\Coupon\CouponRepository;
+use App\Repositories\Coupon\Interface\CouponRepositoryInterface;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -47,6 +49,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(WalletRepositoryInterface::class, WalletRepository::class);
         $this->app->bind(CartRepositoryInterface::class, CartRepository::class);
         $this->app->bind(OrderRepositoryInterface::class, OrderRepository::class);
+        $this->app->bind(CouponRepositoryInterface::class, CouponRepository::class);
         
     }
 

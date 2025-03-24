@@ -4,6 +4,7 @@ use App\Http\Controllers\API\Auth\AuthController;
 use App\Http\Controllers\API\Cart\CartController;
 use App\Http\Controllers\API\Category\CategoryController;
 use App\Http\Controllers\API\CoinbasePaymentController;
+use App\Http\Controllers\API\Coupon\CouponController;
 use App\Http\Controllers\API\Product\Bulk\BulkProductController;
 use App\Http\Controllers\API\Product\Contribution\ContributionProductController;
 use App\Http\Controllers\API\Subscription\PackageController;
@@ -60,6 +61,11 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::group(['prefix' => 'super-admin','middleware' =>['super_admin']], function () {
 
             Route::get('/total-customer-spend', [OrderController::class, 'totalCustomerWithSpend']);
+
+            Route::post('/coupon/create', [CouponController::class, 'store']);
+            Route::put('/coupon/update', [CouponController::class, 'update']);
+            Route::post('/coupon/get-all', [CouponController::class, 'index']);
+            Route::delete('/coupon/{id}', [CouponController::class, 'delete']);
 
             Route::post('/bulk/product/create', [BulkProductController::class, 'store']);
             Route::put('/bulk/product/update', [BulkProductController::class, 'update']);
