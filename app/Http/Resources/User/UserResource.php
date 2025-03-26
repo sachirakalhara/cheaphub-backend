@@ -36,8 +36,9 @@ class UserResource extends JsonResource
             'user_level'=>$this->userLevel->scope,
             'wallet' => $this->wallet ? $this->wallet->balance : '0.00',
             'user_spend' => $user_spend,
-            'total_spend' => $total_spend,
-            'total_customer' => $this->get()->count(),
+            // 'total_spend' => $total_spend,
+            // 'total_customer' => $this->get()->count(),
+            'order_history' => $this->order
         ];
     }
 }
