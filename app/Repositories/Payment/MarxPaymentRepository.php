@@ -68,8 +68,8 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                 return response()->json(['message' => 'Coupon has expired'], Response::HTTP_BAD_REQUEST);
                 }
     
-                if ($product_type != 'bulk' || $product_type != 'subscription' || $coupon->product_type != 'both') {
-                return response()->json(['message' => 'Coupon is not applicable for this product type'], Response::HTTP_BAD_REQUEST);
+                if ($coupon->product_type !== 'both' && $coupon->product_type !== $product_type) {
+                    return response()->json(['message' => 'Coupon is not applicable for this product type'], Response::HTTP_BAD_REQUEST);
                 }
     
                 $amount = $product_price * $cart->quantity;
