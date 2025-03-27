@@ -8,5 +8,7 @@ interface CouponRepositoryInterface
     public function store($request);
     public function update($request);
     public function delete($id);
+    public function checkCoupon($coupon_code,$product_type);
+    
     
 }

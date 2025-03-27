@@ -88,5 +88,25 @@ class CouponRepository implements CouponRepositoryInterface
         }
     }
 
+    public function checkCoupon($coupon_code,$product_type)
+    {
+        // 'id',
+        // 'product_type',//bulk
+        // 'discount_percentage',
+        // 'max_discount_amount',
+        // 'expiry_date',
+        // 'coupon_code'
+
+        $coupon = Coupon::where('coupon_code', $coupon_code)
+                ->where('product_type', $product_type)
+                ->where('expiry_date', '>=', Carbon::now()->format('Y-m-d'))
+                ->first();
+
+        if ($coupon) {
+            return new CouponResource($coupon);
+        } else {
+            return Helper::error('Coupon not found', Response::HTTP_NOT_FOUND);
+        }
+    }
 
 }
