@@ -21,7 +21,8 @@ class Order extends Model
         'user_id',
         'amount_paid',
         'is_wallet',
-        'order_id'
+        'order_id',
+        'discount'
     ];
 
     public function user()

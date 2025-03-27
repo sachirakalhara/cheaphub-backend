@@ -4,6 +4,7 @@ namespace App\Repositories\Payment;
 
 use App\Helpers\Helper;
 use App\Models\Cart\Cart;
+use App\Models\Coupon\Coupon;
 use App\Models\Payment\OrderItems;
 use App\Repositories\Payment\Interface\MarxPaymentRepositoryInterface;
 use Illuminate\Http\Response;
@@ -23,15 +24,22 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
     public function makePayment($data)
     {
         $user = Auth::user();
+        $amount = $data['amount'];
+        $discount = 0;
 
         if (isset($data['cart_id']) && $data['is_wallet'] == false) {
+
+            $product_price=0;
             $cart = Cart::find($data['cart_id']);
+            $product_type = null;
             if (!$cart) {
                 return response()->json(['message' => 'Cart not found'], Response::HTTP_NOT_FOUND);
             }
 
             if ($cart->bulk_product_id) {
                 $bulkProduct = BulkProduct::find($cart->bulk_product_id);
+                $product_price = $bulkProduct->price;
+                $product_type = 'bulk';
                 if (!$bulkProduct || $bulkProduct->serial_count < $cart->quantity) {
                     return response()->json(['message' => 'Not enough stock for the bulk product'], Response::HTTP_BAD_REQUEST);
                 }
@@ -39,15 +47,49 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
 
             if ($cart->package_id) {
                 $package = Package::find($cart->package_id);
-                
+                $product_price = $package->price;
+                $product_type = 'subscription';
                 if (!$package || $package->subscription->available_serial_count < $cart->quantity) {
                     return response()->json(['message' => 'Not enough stock for the serial'], Response::HTTP_BAD_REQUEST);
                 }
             }
+
+
+
+            $coupon = null;
+            if ($cart->coupon_code) {
+                $coupon = Coupon::where('code', $cart->coupon_code)->first();
+    
+                if (!$coupon) {
+                return response()->json(['message' => 'Invalid coupon code'], Response::HTTP_BAD_REQUEST);
+                }
+    
+                if ($coupon->expiry_date < now()) {
+                return response()->json(['message' => 'Coupon has expired'], Response::HTTP_BAD_REQUEST);
+                }
+    
+                if ($product_type != 'bulk' || $product_type != 'subscription' || $coupon->product_type != 'both') {
+                return response()->json(['message' => 'Coupon is not applicable for this product type'], Response::HTTP_BAD_REQUEST);
+                }
+    
+                $amount = $product_price * $cart->quantity;
+                $discount = $amount * $coupon->discount_percentage / 100;
+    
+                if ($discount > $coupon->max_discount_amount) {
+                $discount = $coupon->max_discount_amount;
+                }
+    
+                if ($discount > $amount) {
+                return response()->json(['message' => 'Discount exceeds total price'], Response::HTTP_BAD_REQUEST);
+                }
+            }
+    
         }
+ 
 
         $order = Order::create([
-            'amount' => $data['amount'],
+            'amount' => $amount,
+            'discount' => $discount,
             'currency' => $data['currency'],
             'description' => $data['description'] ?? '',
             'payment_status' => 'pending',
@@ -93,7 +135,7 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
         // Prepare API payload
         $marxArgs = [
             'merchantRID' => $order->order_id,
-            'amount' => floatval($data['amount']),
+            'amount' => floatval($amount - $discount),
             'returnUrl' => route('marxpay.callback'),
             'validTimeLimit' => 30,
             'customerMail' => $data['email'],
@@ -102,7 +144,6 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             'currency' => $data['currency'],
             'orderSummary' => $data['description'],
             'customerReference' => $user->id . " " . $data['email'],
-            'discount' => 20,
         ];
 
         try {

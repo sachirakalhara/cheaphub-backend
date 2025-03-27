@@ -23,6 +23,7 @@ return new class extends Migration
             $table->foreign('package_id')->references('id')->on('packages');
 
             $table->integer('quantity');
+            $table->string('coupon_code')->nullable();
             $table->timestamps();
         });
     }

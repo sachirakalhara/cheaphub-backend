@@ -5,6 +5,7 @@ namespace App\Repositories\Cart;
 use App\Helpers\Helper;
 use App\Http\Resources\Cart\CartCollection;
 use App\Models\Cart\Cart;
+use App\Models\Coupon\Coupon;
 use App\Models\Product\Bulk\BulkProduct;
 use App\Models\Subscription\Package;
 use App\Repositories\Cart\Interface\CartRepositoryInterface;
@@ -16,20 +17,56 @@ class CartRepository implements CartRepositoryInterface
 
     public function addToCart($request)
     {
+        $product_type = null;
+        $product_price = 0;
+
         if ($request->bulk_product_id) {
+            $product_type = 'bulk';
             $bulkProduct = BulkProduct::find($request->bulk_product_id);
+            $product_price = $bulkProduct->price;
             if (!$bulkProduct || $bulkProduct->serial_count < $request->quantity) {
                 return response()->json(['message' => 'Not enough stock for the bulk product'], Response::HTTP_BAD_REQUEST);
             }
         }
 
-
         if ($request->package_id) {
+            $product_type = 'subscription';
             $bulkProduct = Package::find($request->package_id);
+            $product_price = $bulkProduct->price;
             if (!$bulkProduct || $bulkProduct->subscription->available_serial_count < $request->quantity) {
                 return response()->json(['message' => 'Not enough stock for the bulk product'], Response::HTTP_BAD_REQUEST);
             }
         }
+
+
+        $coupon = null;
+        if ($request->coupon_code) {
+            $coupon = Coupon::where('code', $request->coupon_code)->first();
+
+            if (!$coupon) {
+            return response()->json(['message' => 'Invalid coupon code'], Response::HTTP_BAD_REQUEST);
+            }
+
+            if ($coupon->expiry_date < now()) {
+            return response()->json(['message' => 'Coupon has expired'], Response::HTTP_BAD_REQUEST);
+            }
+
+            if ($product_type != 'bulk' || $product_type != 'subscription' || $coupon->product_type != 'both') {
+            return response()->json(['message' => 'Coupon is not applicable for this product type'], Response::HTTP_BAD_REQUEST);
+            }
+
+            $total_price = $product_price * $request->quantity;
+            $discount = $total_price * $coupon->discount_percentage / 100;
+
+            if ($discount > $coupon->max_discount_amount) {
+            $discount = $coupon->max_discount_amount;
+            }
+
+            if ($discount > $total_price) {
+            return response()->json(['message' => 'Discount exceeds total price'], Response::HTTP_BAD_REQUEST);
+            }
+        }
+        
 
         $cart = Cart::updateOrCreate(
             [
@@ -38,7 +75,8 @@ class CartRepository implements CartRepositoryInterface
                 'package_id' => $request->package_id
             ],
             [
-                'quantity' => $request->quantity
+                'quantity' => $request->quantity,
+                'coupon_code' => $request->coupon_code
             ]
         );
         return response()->json(['message' => 'Product added to cart', 'cart' => $cart]);
