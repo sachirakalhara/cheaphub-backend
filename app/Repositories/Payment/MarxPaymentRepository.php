@@ -58,7 +58,7 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
 
             $coupon = null;
             if ($cart->coupon_code) {
-                $coupon = Coupon::where('code', $cart->coupon_code)->first();
+                $coupon = Coupon::where('coupon_code', $cart->coupon_code)->first();
     
                 if (!$coupon) {
                 return response()->json(['message' => 'Invalid coupon code'], Response::HTTP_BAD_REQUEST);
