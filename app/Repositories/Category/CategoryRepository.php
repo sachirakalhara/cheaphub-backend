@@ -42,7 +42,7 @@ class CategoryRepository implements CategoryRepositoryInterface
         if ($request->input('all', false)) {
             $category_list = $query->get();
         } else {
-            $category_list = Helper::paginate($query);
+            $category_list = $query->orderBy('created_at', 'desc')->paginate(10);
         }
 
         if ($category_list->isNotEmpty()) {

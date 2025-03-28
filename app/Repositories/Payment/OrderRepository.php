@@ -61,8 +61,11 @@ class OrderRepository implements OrderRepositoryInterface
     public function filter($request)
     {
         $query = Order::query();
-        $query->where('user_id',  $request->user_id );
         $query->where('is_wallet',  false );
+
+        if ($request->filled('user_id')) {
+            $query->where('user_id',  $request->user_id );
+        }
 
         if ($request->filled('order_id')) {
             $query->where('order_id', 'like', '%' . $request->order_id . '%');
@@ -96,7 +99,7 @@ class OrderRepository implements OrderRepositoryInterface
         if ($request->input('all', false)) {
             $order_list = $query->get();
         } else {
-            $order_list = Helper::paginate($query);
+            $order_list = $query->orderBy('created_at', 'desc')->paginate(10);
         }
 
         if ($order_list->isNotEmpty()) {
