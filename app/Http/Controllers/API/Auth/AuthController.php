@@ -205,7 +205,7 @@ class AuthController extends Controller
 
     public function confirmationLink($user)
     {
-        return env('APP_URL') . '/api/v1/confirm-email/' . $user->id . '/' . $this->confirmKey($user);
+        return env('APP_URL') . 'api/v1/confirm-email/' . $user->id . '/' . $this->confirmKey($user);
     }
 
     public function confirmKey($user)
