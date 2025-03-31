@@ -8,5 +8,6 @@ interface OrderRepositoryInterface
     public function getOrdersByUserID($user_id);
     public function filter($request);
     public function totalCustomerCountWithSpend();
-    
+    public function changeStatus($request);
+
 }

@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\MarxPaymentController;
 use App\Http\Controllers\API\Payment\OrderController;
 use App\Http\Controllers\API\Payment\WalletController;
+use App\Http\Controllers\API\Ticket\TicketController;
 
 Route::post('/v1/register', [AuthController::class, 'register']);
 Route::post('/v1/login', [AuthController::class, 'login']);
@@ -57,10 +58,15 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/orders/{user_id}', [OrderController::class, 'getOrdersByUserID']);
         Route::post('/order/filter', [OrderController::class, 'filter']);
         
+        Route::post('/ticket/get-all', [TicketController::class, 'index']);
+        Route::post('/ticket', [TicketController::class, 'store']);
+        Route::post('/ticket/comment', [TicketController::class, 'addComment']);
+        Route::post('/ticket/status-change', [TicketController::class, 'statusChange']);
 
         Route::group(['prefix' => 'super-admin','middleware' =>['super_admin']], function () {
-
+            
             Route::get('/total-customer-spend', [OrderController::class, 'totalCustomerWithSpend']);
+            Route::post('/order/status-change', [OrderController::class, 'changeStatus']);
 
             Route::post('/coupon/create', [CouponController::class, 'store']);
             Route::put('/coupon/update', [CouponController::class, 'update']);

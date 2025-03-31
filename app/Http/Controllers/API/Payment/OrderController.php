@@ -44,12 +44,10 @@ class OrderController extends Controller
         return $this->orderRepository->totalCustomerCountWithSpend();
     }
     
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    
+    public function changeStatus(Request $request)
     {
-        //
+        return $this->orderRepository->changeStatus($request);
     }
 
     /**

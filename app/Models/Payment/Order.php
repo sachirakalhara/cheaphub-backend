@@ -3,6 +3,7 @@
 namespace App\Models\Payment;
 
 use App\Models\Payment\OrderItems;
+use App\Models\Ticket\Ticket;
 use App\Models\User\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -34,4 +35,10 @@ class Order extends Model
     {
         return $this->hasOne(OrderItems::class);
     }
+
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class);
+    }
+    
 }

@@ -29,6 +29,8 @@ use App\Repositories\User\UserRepository;
 use Illuminate\Support\ServiceProvider;
 use App\Repositories\Coupon\CouponRepository;
 use App\Repositories\Coupon\Interface\CouponRepositoryInterface;
+use App\Repositories\Ticket\Interface\TicketRepositoryInterface;
+use App\Repositories\Ticket\TicketRepository;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -50,6 +52,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(CartRepositoryInterface::class, CartRepository::class);
         $this->app->bind(OrderRepositoryInterface::class, OrderRepository::class);
         $this->app->bind(CouponRepositoryInterface::class, CouponRepository::class);
+        $this->app->bind(TicketRepositoryInterface::class, TicketRepository::class);
         
     }
 

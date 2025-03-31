@@ -109,4 +109,24 @@ class OrderRepository implements OrderRepositoryInterface
         }
     }
 
+
+    public function changeStatus($data)
+    {
+        $order = Order::find($data->id);
+
+        if (!$order) {
+            return Helper::error('Order not found', Response::HTTP_NOT_FOUND);
+        }
+
+        $validStatuses = ['pending', 'paid', 'failed'];
+        if (!in_array($data->status, $validStatuses)) {
+            return Helper::error('Invalid status provided', Response::HTTP_BAD_REQUEST);
+        }
+
+        $order->payment_status = $data->status;
+        $order->save();
+
+        return Helper::success('Order status updated successfully', Response::HTTP_OK);
+    }
+
 }
