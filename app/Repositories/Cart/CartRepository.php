@@ -20,6 +20,10 @@ class CartRepository implements CartRepositoryInterface
         $product_type = null;
         $product_price = 0;
 
+        if ($request->bulk_product_id && $request->package_id) {
+            return response()->json(['message' => 'Cannot add both bulk product and package at the same time'], Response::HTTP_BAD_REQUEST);
+        }
+
         if ($request->bulk_product_id) {
             $product_type = 'bulk';
             $bulkProduct = BulkProduct::find($request->bulk_product_id);
@@ -34,21 +38,20 @@ class CartRepository implements CartRepositoryInterface
             $bulkProduct = Package::find($request->package_id);
             $product_price = $bulkProduct->price;
             if (!$bulkProduct || $bulkProduct->subscription->available_serial_count < $request->quantity) {
-                return response()->json(['message' => 'Not enough stock for the bulk product'], Response::HTTP_BAD_REQUEST);
+                return response()->json(['message' => 'Not enough stock for the package'], Response::HTTP_BAD_REQUEST);
             }
         }
-
 
         $coupon = null;
         if ($request->coupon_code) {
             $coupon = Coupon::where('coupon_code', $request->coupon_code)->first();
 
             if (!$coupon) {
-            return response()->json(['message' => 'Invalid coupon code'], Response::HTTP_BAD_REQUEST);
+                return response()->json(['message' => 'Invalid coupon code'], Response::HTTP_BAD_REQUEST);
             }
 
             if ($coupon->expiry_date < now()) {
-            return response()->json(['message' => 'Coupon has expired'], Response::HTTP_BAD_REQUEST);
+                return response()->json(['message' => 'Coupon has expired'], Response::HTTP_BAD_REQUEST);
             }
 
             if ($coupon->product_type !== 'both' && $coupon->product_type !== $product_type) {
@@ -59,18 +62,17 @@ class CartRepository implements CartRepositoryInterface
             $discount = $total_price * $coupon->discount_percentage / 100;
 
             if ($discount > $coupon->max_discount_amount) {
-            $discount = $coupon->max_discount_amount;
+                $discount = $coupon->max_discount_amount;
             }
 
             if ($discount > $total_price) {
-            return response()->json(['message' => 'Discount exceeds total price'], Response::HTTP_BAD_REQUEST);
+                return response()->json(['message' => 'Discount exceeds total price'], Response::HTTP_BAD_REQUEST);
             }
         }
-        
 
         $cart = Cart::updateOrCreate(
             [
-                'user_id' => Auth::id(), 
+                'user_id' => Auth::id(),
                 'bulk_product_id' => $request->bulk_product_id,
                 'package_id' => $request->package_id
             ],
