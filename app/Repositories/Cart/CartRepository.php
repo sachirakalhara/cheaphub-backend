@@ -20,6 +20,12 @@ class CartRepository implements CartRepositoryInterface
         $product_type = null;
         $product_price = 0;
 
+        $is_cart = Cart::where('user_id', Auth::id())->first();
+
+        if (($request->bulk_product_id && $request->package_id) || ($request->bulk_product_id && $is_cart->package_id) || ($request->package_id && $is_cart->bulk_product_id)) {
+            return response()->json(['message' => 'Cannot add both bulk product and package at the same time'], Response::HTTP_BAD_REQUEST);
+        }
+
         if ($request->bulk_product_id) {
             $product_type = 'bulk';
             $bulkProduct = BulkProduct::find($request->bulk_product_id);
