@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Resources\Cart;
+use Illuminate\Support\Facades\Storage;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
