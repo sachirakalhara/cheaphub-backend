@@ -88,7 +88,7 @@ class CouponRepository implements CouponRepositoryInterface
         }
     }
 
-    public function checkCoupon($coupon_code,$product_type)
+    public function checkCoupon($data)
     {
         // 'id',
         // 'product_type',//bulk
@@ -97,8 +97,8 @@ class CouponRepository implements CouponRepositoryInterface
         // 'expiry_date',
         // 'coupon_code'
 
-        $coupon = Coupon::where('coupon_code', $coupon_code)
-                ->where('product_type', $product_type)
+        $coupon = Coupon::where('coupon_code', $data->coupon_code)
+                ->where('product_type', $data->product_type)
                 ->where('expiry_date', '>=', Carbon::now()->format('Y-m-d'))
                 ->first();
 

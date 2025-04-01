@@ -112,7 +112,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             Route::get('/cart', [CartController::class, 'getCart']);
             Route::delete('/cart/{id}', [CartController::class, 'removeFromCart']);
             Route::delete('/cart/clear/all', [CartController::class, 'clearCart']);
-            Route::get('/coupon/{coupon_code}/{product_type}', [CouponController::class, 'checkCoupon']);
+            Route::post('/coupon', [CouponController::class, 'checkCoupon']);
 
 
         });
