@@ -5,6 +5,7 @@ namespace App\Models\Product\Bulk;
 use App\Models\Category\Category;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Facades\Storage;
 
 class BulkProduct extends Model
 {
@@ -25,8 +26,15 @@ class BulkProduct extends Model
         'slug_url',
         'visibility'
     ];
+
     public function categories(): BelongsToMany
     {
         return $this->belongsToMany(Category::class, 'bulk_product_categories');
+    }
+
+    // Accessor for the image attribute
+    public function getImageAttribute($value)
+    {
+        return $value ? Storage::disk('s3')->url($value) : null;
     }
 }
