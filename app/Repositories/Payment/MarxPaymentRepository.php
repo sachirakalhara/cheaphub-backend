@@ -279,7 +279,7 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                     'amount_paid' => $amountPaid,
                 ]);
 
-                if (!$order->is_wallet) {
+                if (!$order->is_wallet || $order->is_wallet === 0) {
                     $orderItems = OrderItems::where('order_id', $order->id)->get();
                     foreach ($orderItems as $orderItem) {
                         if ($orderItem->bulk_product_id) {
@@ -298,6 +298,11 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                                 }
                             }
                         }
+                    }
+                    $cart = Cart::where('user_id', $order->user_id)->first();
+                    if ($cart) {
+                        $cart->cartItems()->delete();
+                        $cart->delete();
                     }
                 }
 
