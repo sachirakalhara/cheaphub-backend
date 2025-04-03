@@ -21,12 +21,13 @@ class CartResource extends JsonResource
             'id'=>$this->id,
             'user'=> $this->user,
             'coupon_code'=> $this->coupon_code,
-            'cartItems'=> collect($this->cartItems)->map(function ($cartItem) {
+            'cartItems'=> $this->cartItems->map(function ($item) {
                 return [
-                    'id' => $cartItem['id'],
-                    'bulk_product' => $cartItem['bulkProduct'],
-                    'package' => $cartItem['package'],
-                    'quantity' => $cartItem['quantity'],
+                    'id' => $item->id,
+                    'product' => $item->product,
+                    'quantity' => $item->quantity,
+                    'price' => $item->price,
+                    'total' => $item->quantity * $item->price,
                 ];
             }),
         ];
