@@ -114,6 +114,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             Route::delete('/cart/clear/all', [CartController::class, 'clearCart']);
             Route::post('/coupon', [CouponController::class, 'checkCoupon']);
 
+            
+            Route::get('package/replace/{package_id}', [PackageController::class, 'replaceCount']);
 
         });
 

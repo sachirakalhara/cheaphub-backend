@@ -13,6 +13,7 @@ use App\Models\Subscription\Package;
 use App\Models\Subscription\Subscription;
 use App\Repositories\Package\Interface\PackageRepositoryInterface;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 
 class PackageRepository implements PackageRepositoryInterface
 {
@@ -24,6 +25,24 @@ class PackageRepository implements PackageRepositoryInterface
         } else {
             $category_list = Package::where('subscription_id',$request->subscription_id)->orderBy('created_at', 'desc')->paginate(10);
         }
+
+        if (count($category_list) > 0) {
+            return new PackageCollection($category_list);
+        } else {
+            return Helper::success(Response::$statusTexts[Response::HTTP_NO_CONTENT], Response::HTTP_NO_CONTENT);
+        }
+    }
+
+
+    
+    public function replaceCount($package_id)
+    {
+
+        $user_id = Auth::user()->id;
+        $orderItem = OrderItems::where('package_id',$package_id)->where('user_id', $user_id)->first();
+
+        $category_list = Package::where('subscription_id',$request->subscription_id)->get();
+
 
         if (count($category_list) > 0) {
             return new PackageCollection($category_list);

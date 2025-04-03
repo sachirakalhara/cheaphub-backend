@@ -90,12 +90,9 @@ class CouponRepository implements CouponRepositoryInterface
 
     public function checkCoupon($data)
     {
-        // 'id',
-        // 'product_type',//bulk
-        // 'discount_percentage',
-        // 'max_discount_amount',
-        // 'expiry_date',
-        // 'coupon_code'
+        if (empty($data->coupon_code)) {
+            return Helper::error('Coupon code is required', Response::HTTP_BAD_REQUEST);
+        }
 
         $coupon = Coupon::where('coupon_code', $data->coupon_code)
                 ->where('product_type', $data->product_type)
@@ -105,7 +102,7 @@ class CouponRepository implements CouponRepositoryInterface
         if ($coupon) {
             return new CouponResource($coupon);
         } else {
-            return Helper::error('Coupon not found', Response::HTTP_NOT_FOUND);
+            return Helper::error('Invalid or expired coupon', Response::HTTP_NOT_FOUND);
         }
     }
 

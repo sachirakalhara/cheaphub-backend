@@ -8,5 +8,6 @@ interface PackageRepositoryInterface
     public function store($request);
     public function update($request);
     public function delete($package_id);
+    public function replaceCount($package_id);
 
 }

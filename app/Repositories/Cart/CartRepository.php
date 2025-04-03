@@ -22,7 +22,9 @@ class CartRepository implements CartRepositoryInterface
 
         $is_cart = Cart::where('user_id', Auth::id())->first();
 
-        if (($request->bulk_product_id && $request->package_id) || ($request->bulk_product_id && $is_cart->package_id) || ($request->package_id && $is_cart->bulk_product_id)) {
+        if (($request->bulk_product_id && $request->package_id) || 
+            ($request->bulk_product_id && optional($is_cart)->package_id) || 
+            ($request->package_id && optional($is_cart)->bulk_product_id)) {
             return response()->json(['message' => 'Cannot add both bulk product and package at the same time'], Response::HTTP_BAD_REQUEST);
         }
 
@@ -80,7 +82,7 @@ class CartRepository implements CartRepositoryInterface
             ],
             [
                 'quantity' => $request->quantity,
-                'coupon_code' => $request->coupon_code
+                'coupon_code' => $request->coupon_code ?? null
             ]
         );
         return response()->json(['message' => 'Product added to cart', 'cart' => $cart]);

@@ -78,6 +78,12 @@ class PackageController extends Controller
         return $this->packageRepository->update($request);
     }
 
+
+    
+    public function replaceCount($package_id)
+    {
+        return $this->packageRepository->replaceCount($package_id);
+    }
     /**
      * Remove the specified resource from storage.
      */
