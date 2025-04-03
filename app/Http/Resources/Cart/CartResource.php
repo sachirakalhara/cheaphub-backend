@@ -23,10 +23,10 @@ class CartResource extends JsonResource
             'coupon_code'=> $this->coupon_code,
             'cartItems'=> collect($this->cartItems)->map(function ($cartItem) {
                 return [
-                    'id' => $cartItem->id,
-                    'bulk_product' => $cartItem->bulkProduct,
-                    'package' => $cartItem->package,
-                    'quantity' => $cartItem->quantity,
+                    'id' => $cartItem['id'],
+                    'bulk_product' => $cartItem['bulkProduct'],
+                    'package' => $cartItem['package'],
+                    'quantity' => $cartItem['quantity'],
                 ];
             }),
         ];
