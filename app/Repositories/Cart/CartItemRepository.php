@@ -15,6 +15,7 @@ class CartItemRepository implements CartItemRepositoryInterface
     public function addToCart($request)
     {
         $userId = Auth::id();
+        $totalQty = 0;
         if (!$userId) {
             return response()->json(['message' => 'User not authenticated'], Response::HTTP_UNAUTHORIZED);
         }
@@ -65,7 +66,7 @@ class CartItemRepository implements CartItemRepositoryInterface
                 'package_id' => $request->package_id,
             ],
             [
-                'quantity' => $qty,
+                'quantity' => $totalQty,
             ]
         );
 
