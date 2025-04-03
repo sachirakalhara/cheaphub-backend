@@ -25,10 +25,11 @@ class CartResource extends JsonResource
                 if (is_object($item)) {
                     return [
                         'id' => $item->id,
-                        'product' => $item->product,
+                        'bulk_product' => $item->bulkProduct,
+                        'package' => $item->package,
                         'quantity' => $item->quantity,
-                        'price' => $item->price,
-                        'total' => $item->quantity * $item->price,
+                        'price' => $item->bulkProduct ? $item->bulkProduct->price : ($item->package ? $item->package->price : 0),
+                        'total' => $item->quantity * ($item->bulkProduct ? $item->bulkProduct->price : ($item->package ? $item->package->price : 0)),
                     ];
                 }
                 return null;
