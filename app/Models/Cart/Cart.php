@@ -12,20 +12,15 @@ class Cart extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'bulk_product_id','package_id', 'quantity','coupon_code'];
+    protected $fillable = ['user_id','coupon_code'];
 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function bulkProduct()
+    public function cartItems()
     {
-        return $this->belongsTo(BulkProduct::class);
-    }
-
-    public function package()
-    {
-        return $this->belongsTo(Package::class);
+        return $this->hasOne(CartItem::class);
     }
 }

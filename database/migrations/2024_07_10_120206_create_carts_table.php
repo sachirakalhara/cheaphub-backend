@@ -15,14 +15,6 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
-
-            $table->unsignedBigInteger('bulk_product_id')->nullable();
-            $table->foreign('bulk_product_id')->references('id')->on('bulk_products');
-
-            $table->unsignedBigInteger('package_id')->nullable();
-            $table->foreign('package_id')->references('id')->on('packages');
-
-            $table->integer('quantity');
             $table->string('coupon_code')->nullable();
             $table->timestamps();
         });

@@ -15,22 +15,14 @@ class CartController extends Controller
         $this->cartRepository = $cartRepository;
     }
 
-    public function addToCart(Request $request)
+    public function cartDetails(Request $equest)
     {
-        $request->validate([
-            'bulk_product_id' => 'nullable|exists:bulk_products,id|required_without:package_id',
-            'package_id' => 'nullable|exists:packages,id|required_without:bulk_product_id',        
-            'quantity' => 'required|integer|min:1',
-            'user_id' => 'required'
-        ]);
-
-        return $this->cartRepository->addToCart($request);
+        return $this->cartRepository->cartDetails($equest);
     }
 
     public function getCart()
     {
         return $this->cartRepository->getCart();
-
     }
 
     public function removeFromCart($id)

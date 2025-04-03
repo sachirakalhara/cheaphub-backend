@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\Auth\AuthController;
 use App\Http\Controllers\API\Cart\CartController;
+use App\Http\Controllers\API\Cart\CartItemController;
 use App\Http\Controllers\API\Category\CategoryController;
 use App\Http\Controllers\API\CoinbasePaymentController;
 use App\Http\Controllers\API\Coupon\CouponController;
@@ -103,17 +104,16 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
         Route::group(['prefix' => 'customer'], function () {
             Route::post('/marxpay/payment', [MarxPaymentController::class, 'makePayment']);
-            // Route::post('/marxpay/callback', [MarxPaymentController::class, 'paymentCallback'])->name('marxpay.callback');
-            // Route::get('/marxpay/callback', [MarxPaymentController::class, 'paymentCallback'])->name('marxpay.callback');
 
             Route::get('/wallet/show', [WalletController::class, 'show']);
              
-            Route::post('/cart', [CartController::class, 'addToCart']);
+            Route::post('/cart-item/add', [CartItemController::class, 'addToCart']);
+            Route::delete('/cart-item/delete/{id}', [CartItemController::class, 'removeItemByItemId']);
+
+            Route::post('/cart/detail', [CartController::class, 'cartDetails']);
             Route::get('/cart', [CartController::class, 'getCart']);
             Route::delete('/cart/{id}', [CartController::class, 'removeFromCart']);
             Route::delete('/cart/clear/all', [CartController::class, 'clearCart']);
-            Route::post('/coupon', [CouponController::class, 'checkCoupon']);
-
             
             Route::get('package/replace/{package_id}', [PackageController::class, 'replaceCount']);
 

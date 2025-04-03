@@ -88,22 +88,23 @@ class CouponRepository implements CouponRepositoryInterface
         }
     }
 
-    public function checkCoupon($data)
-    {
-        if (empty($data->coupon_code)) {
-            return Helper::error('Coupon code is required', Response::HTTP_BAD_REQUEST);
-        }
+    //check Cart coltroler cartDetails
+    // public function checkCoupon($data)
+    // {
+    //     if (empty($data->coupon_code)) {
+    //         return Helper::error('Coupon code is required', Response::HTTP_BAD_REQUEST);
+    //     }
 
-        $coupon = Coupon::where('coupon_code', $data->coupon_code)
-                ->where('product_type', $data->product_type)
-                ->where('expiry_date', '>=', Carbon::now()->format('Y-m-d'))
-                ->first();
+    //     $coupon = Coupon::where('coupon_code', $data->coupon_code)
+    //             ->where('product_type', $data->product_type)
+    //             ->where('expiry_date', '>=', Carbon::now()->format('Y-m-d'))
+    //             ->first();
 
-        if ($coupon) {
-            return new CouponResource($coupon);
-        } else {
-            return Helper::error('Invalid or expired coupon', Response::HTTP_NOT_FOUND);
-        }
-    }
+    //     if ($coupon) {
+    //         return new CouponResource($coupon);
+    //     } else {
+    //         return Helper::error('Invalid or expired coupon', Response::HTTP_NOT_FOUND);
+    //     }
+    // }
 
 }

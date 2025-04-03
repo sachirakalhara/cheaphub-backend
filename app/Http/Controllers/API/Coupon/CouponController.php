@@ -56,8 +56,9 @@ class CouponController extends Controller
         return $this->couponRepository->delete($id);
     }
 
-    public function checkCoupon(Request $request)
-    {
-        return $this->couponRepository->checkCoupon($request);
-    }
+        //check Cart coltroler cartDetails
+    // public function checkCoupon(Request $request)
+    // {
+    //     return $this->couponRepository->checkCoupon($request);
+    // }
 }

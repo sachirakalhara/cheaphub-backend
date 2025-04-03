@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Repositories\Cart\CartItemRepository;
 use App\Repositories\Cart\CartRepository;
+use App\Repositories\Cart\Interface\CartItemRepositoryInterface;
 use App\Repositories\Cart\Interface\CartRepositoryInterface;
 use App\Repositories\Category\CategoryRepository;
 use App\Repositories\Category\Interface\CategoryRepositoryInterface;
@@ -53,6 +55,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(OrderRepositoryInterface::class, OrderRepository::class);
         $this->app->bind(CouponRepositoryInterface::class, CouponRepository::class);
         $this->app->bind(TicketRepositoryInterface::class, TicketRepository::class);
+        $this->app->bind(CartItemRepositoryInterface::class, CartItemRepository::class);
         
     }
 

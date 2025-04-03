@@ -4,6 +4,7 @@ namespace App\Repositories\Payment;
 
 use App\Helpers\Helper;
 use App\Models\Cart\Cart;
+use App\Models\Cart\CartItem;
 use App\Models\Coupon\Coupon;
 use App\Models\Payment\OrderItems;
 use App\Repositories\Payment\Interface\MarxPaymentRepositoryInterface;
@@ -20,77 +21,98 @@ use NunoMaduro\Collision\Adapters\Phpunit\Subscribers\Subscriber;
 
 class MarxPaymentRepository implements MarxPaymentRepositoryInterface
 {
-    
     public function makePayment($data)
     {
         $user = Auth::user();
-        $amount = $data['amount'];
+        $amount = $data['amount'] ?? 0;
         $discount = 0;
 
-        if (isset($data['cart_id']) && $data['is_wallet'] == false) {
+        if ($amount <= 0) {
+            return response()->json(['message' => 'Invalid amount'], Response::HTTP_BAD_REQUEST);
+        }
 
-            $product_price=0;
-            $cart = Cart::find($data['cart_id']);
-            $product_type = null;
-            if (!$cart) {
-                return response()->json(['message' => 'Cart not found'], Response::HTTP_NOT_FOUND);
+        $cart = Cart::with('cartItems')->where('user_id', $user->id)->first();
+
+        if ($cart && !$data['is_wallet']) {
+            if (!$cart->cartItems || $cart->cartItems->isEmpty()) {
+                return response()->json(['message' => 'Cart is empty'], Response::HTTP_BAD_REQUEST);
             }
 
-            if ($cart->bulk_product_id) {
-                $bulkProduct = BulkProduct::find($cart->bulk_product_id);
-                $product_price = $bulkProduct->price;
-                $product_type = 'bulk';
-                if (!$bulkProduct || $bulkProduct->serial_count < $cart->quantity) {
+            $cartItemPackages = CartItem::where('cart_id', $cart->id)
+                ->whereNotNull('package_id')
+                ->get();
+
+            $cartItemBulkProducts = CartItem::where('cart_id', $cart->id)
+                ->whereNotNull('bulk_product_id')
+                ->get();
+
+            foreach ($cartItemPackages as $cartItemPackage) {
+                $package = Package::find($cartItemPackage->package_id);
+                if (!$package) {
+                    return response()->json(['message' => 'Package not found'], Response::HTTP_NOT_FOUND);
+                }
+
+                if ($package->subscription->available_serial_count < $cartItemPackage->quantity) {
+                    return response()->json(['message' => 'Not enough stock for the package'], Response::HTTP_BAD_REQUEST);
+                }
+            }
+
+            foreach ($cartItemBulkProducts as $cartItemBulkProduct) {
+                $bulkProduct = BulkProduct::find($cartItemBulkProduct->bulk_product_id);
+                if (!$bulkProduct) {
+                    return response()->json(['message' => 'Bulk product not found'], Response::HTTP_NOT_FOUND);
+                }
+
+                if ($bulkProduct->serial_count < $cartItemBulkProduct->quantity) {
                     return response()->json(['message' => 'Not enough stock for the bulk product'], Response::HTTP_BAD_REQUEST);
                 }
             }
 
-            if ($cart->package_id) {
-                $package = Package::find($cart->package_id);
-                $product_price = $package->price;
-                $product_type = 'subscription';
-                if (!$package || $package->subscription->available_serial_count < $cart->quantity) {
-                    return response()->json(['message' => 'Not enough stock for the serial'], Response::HTTP_BAD_REQUEST);
-                }
-            }
-
-
-
-            $coupon = null;
             if ($cart->coupon_code) {
                 $coupon = Coupon::where('coupon_code', $cart->coupon_code)->first();
-    
+
                 if (!$coupon) {
-                return response()->json(['message' => 'Invalid coupon code'], Response::HTTP_BAD_REQUEST);
+                    return response()->json(['message' => 'Invalid coupon code'], Response::HTTP_BAD_REQUEST);
                 }
-    
+
                 if ($coupon->expiry_date < now()) {
-                return response()->json(['message' => 'Coupon has expired'], Response::HTTP_BAD_REQUEST);
+                    return response()->json(['message' => 'Coupon has expired'], Response::HTTP_BAD_REQUEST);
                 }
-    
-                if ($coupon->product_type !== 'both' && $coupon->product_type !== $product_type) {
-                    return response()->json(['message' => 'Coupon is not applicable for this product type'], Response::HTTP_BAD_REQUEST);
+
+                $packagesTotalPrice = $cart->cartItems->whereNotNull('package_id')->sum(function ($item) {
+                    $package = Package::find($item->package_id);
+                    return $package ? $package->price * $item->quantity : 0;
+                });
+
+                $bulkProductsTotalPrice = $cart->cartItems->whereNotNull('bulk_product_id')->sum(function ($item) {
+                    $bulkProduct = BulkProduct::find($item->bulk_product_id);
+                    return $bulkProduct ? $bulkProduct->price * $item->quantity : 0;
+                });
+
+                $totalPrice = $packagesTotalPrice + $bulkProductsTotalPrice;
+
+                if (in_array($coupon->product_type, ['subscription', 'both'])) {
+                    $discount += $packagesTotalPrice * $coupon->discount_percentage / 100;
                 }
-    
-                $amount = $product_price * $cart->quantity;
-                $discount = $amount * $coupon->discount_percentage / 100;
-    
-                if ($discount > $coupon->max_discount_amount) {
-                $discount = $coupon->max_discount_amount;
+
+                if (in_array($coupon->product_type, ['bulk', 'both'])) {
+                    $discount += $bulkProductsTotalPrice * $coupon->discount_percentage / 100;
                 }
-    
-                if ($discount > $amount) {
-                return response()->json(['message' => 'Discount exceeds total price'], Response::HTTP_BAD_REQUEST);
+
+                $discount = min($discount, $coupon->max_discount_amount);
+
+                if ($discount > $totalPrice) {
+                    return response()->json(['message' => 'Discount exceeds total price'], Response::HTTP_BAD_REQUEST);
                 }
+
+                $amount = $totalPrice - $discount;
             }
-    
         }
- 
 
         $order = Order::create([
             'amount' => $amount,
             'discount' => $discount,
-            'currency' => $data['currency'],
+            'currency' => $data['currency'] ?? 'LKR',
             'description' => $data['description'] ?? '',
             'payment_status' => 'pending',
             'is_wallet' => $data['is_wallet'] ?? false,
@@ -98,20 +120,23 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             'order_id' => 'order_' . now()->format('YmdHis'),
         ]);
 
-        if (($data['is_wallet'] == false || $data['is_wallet'] == 'false')) {
+        if (!$data['is_wallet']) {
             $cart = Cart::find($data['cart_id']);
             if ($cart) {
-            OrderItems::create([
-                'order_id' => $order->id,
-                'bulk_product_id' => $cart->bulk_product_id,
-                'package_id' => $cart->package_id,
-                'quantity' => $cart->quantity,
-            ]);
-            $cart->delete();
+                CartItem::where('cart_id', $cart->id)->get()->each(function ($cartItem) use ($order) {
+                    OrderItems::create([
+                        'order_id' => $order->id,
+                        'bulk_product_id' => $cartItem->bulk_product_id,
+                        'package_id' => $cartItem->package_id,
+                        'quantity' => $cartItem->quantity,
+                    ]);
+                });
+
+                $cart->cartItems()->delete();
+                $cart->delete();
             }
         }
 
-        // Fetch credentials from .env
         $currencyConfig = [
             'LKR' => [
                 'user_secret' => env('MARXPAY_LKR_USER_SECRET'),
@@ -125,25 +150,20 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
 
         if (!isset($currencyConfig[$data['currency']])) {
             $order->update(['payment_status' => 'failed']);
-
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Unsupported currency.',
-            ], 400);
+            return response()->json(['status' => 'error', 'message' => 'Unsupported currency.'], 400);
         }
 
-        // Prepare API payload
         $marxArgs = [
             'merchantRID' => $order->order_id,
-            'amount' => floatval($amount - $discount),
+            'amount' => floatval($amount),
             'returnUrl' => route('marxpay.callback'),
             'validTimeLimit' => 30,
-            'customerMail' => $data['email'],
-            'customerMobile' => $data['tel'],
+            'customerMail' => $data['email'] ?? '',
+            'customerMobile' => $data['tel'] ?? '',
             'mode' => "WEB",
             'currency' => $data['currency'],
-            'orderSummary' => $data['description'],
-            'customerReference' => $user->id . " " . $data['email'],
+            'orderSummary' => $data['description'] ?? '',
+            'customerReference' => $user->id . " " . ($data['email'] ?? ''),
         ];
 
         try {
@@ -183,10 +203,16 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
     
     public function paymentCallback($data)
     {
-
         try {
-            $mur = $data['mur'];
-            $tr = $data['tr'];
+            $mur = $data['mur'] ?? null;
+            $tr = $data['tr'] ?? null;
+
+            if (!$mur || !$tr) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Missing required parameters.',
+                ], Response::HTTP_BAD_REQUEST);
+            }
 
             // Fetch credentials from .env
             $currencyConfig = [
@@ -200,6 +226,13 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                 ],
             ];
 
+            if (!isset($currencyConfig['LKR'])) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Currency configuration not found.',
+                ], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+
             // Prepare API request
             $marxArgs = ['merchantRID' => $mur];
             $response = Http::withHeaders([
@@ -207,29 +240,48 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                 'Content-Type' => 'application/json',
             ])->put($currencyConfig['LKR']['url'], $marxArgs);
 
+            if (!$response->successful()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Failed to communicate with payment gateway.',
+                    'details' => $response->json(),
+                ], $response->status());
+            }
+
             $result = $response->json();
             if (isset($result['data']['summaryResult']) && $result['data']['summaryResult'] === "SUCCESS") {
-                $gatewayResponse = $result['data']['gatewayResponse'];
-                $amountPaid = $gatewayResponse['order']['amount'];
+                $gatewayResponse = $result['data']['gatewayResponse'] ?? [];
+                $amountPaid = $gatewayResponse['order']['amount'] ?? 0;
 
-                $order = Order::where('transaction_id', $result['data']['trId'])->first();
-                if ($order) {
-                    if($order->is_wallet == true){
-                        $wallet = Wallet::where('user_id', $order->user_id)->first();
+                $order = Order::where('transaction_id', $result['data']['trId'] ?? null)->first();
+                if (!$order) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Order not found.',
+                    ], Response::HTTP_NOT_FOUND);
+                }
 
-                        if (!$wallet) {
-                            return Helper::error('Wallet not found', Response::HTTP_NOT_FOUND);
-                        }
-                
-                        $wallet->increment('balance', $amountPaid);
+                if ($order->is_wallet) {
+                    $wallet = Wallet::where('user_id', $order->user_id)->first();
+
+                    if (!$wallet) {
+                        return response()->json([
+                            'status' => 'error',
+                            'message' => 'Wallet not found.',
+                        ], Response::HTTP_NOT_FOUND);
                     }
-                    $order->update([
-                        'payment_status' => 'paid',
-                        'amount_paid' => $amountPaid,
-                    ]);
 
-                    if($order->is_wallet == false){
-                        $orderItem = OrderItems::where('order_id', $order->id)->first();
+                    $wallet->increment('balance', $amountPaid);
+                }
+
+                $order->update([
+                    'payment_status' => 'paid',
+                    'amount_paid' => $amountPaid,
+                ]);
+
+                if (!$order->is_wallet) {
+                    $orderItems = OrderItems::where('order_id', $order->id)->get();
+                    foreach ($orderItems as $orderItem) {
                         if ($orderItem->bulk_product_id) {
                             $bulkProduct = BulkProduct::find($orderItem->bulk_product_id);
                             if ($bulkProduct) {
@@ -240,7 +292,10 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                         if ($orderItem->package_id) {
                             $package = Package::find($orderItem->package_id);
                             if ($package) {
-                                Subscription::find($package->subscription_id)->decrement('available_serial_count', $orderItem->quantity);
+                                $subscription = Subscription::find($package->subscription_id);
+                                if ($subscription) {
+                                    $subscription->decrement('available_serial_count', $orderItem->quantity);
+                                }
                             }
                         }
                     }
@@ -256,8 +311,9 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
 
             return response()->json([
                 'status' => 'error',
-                'message' => 'Payment failed or invalid response',
-            ], 500);
+                'message' => 'Payment failed or invalid response.',
+                'details' => $result,
+            ], Response::HTTP_BAD_REQUEST);
 
         } catch (\Exception $e) {
             Log::error('Payment callback error: ' . $e->getMessage());
@@ -265,9 +321,8 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                 'status' => 'error',
                 'message' => 'An error occurred while processing the payment callback.',
                 'error' => $e->getMessage(),
-            ], 500);
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-
 
 }
