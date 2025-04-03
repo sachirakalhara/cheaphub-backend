@@ -22,14 +22,17 @@ class CartResource extends JsonResource
             'user'=> $this->user,
             'coupon_code'=> $this->coupon_code,
             'cartItems'=> collect($this->cartItems)->map(function ($item) {
-                return [
-                    'id' => $item->id,
-                    'product' => $item->product,
-                    'quantity' => $item->quantity,
-                    'price' => $item->price,
-                    'total' => $item->quantity * $item->price,
-                ];
-            }),
+                if (is_object($item)) {
+                    return [
+                        'id' => $item->id,
+                        'product' => $item->product,
+                        'quantity' => $item->quantity,
+                        'price' => $item->price,
+                        'total' => $item->quantity * $item->price,
+                    ];
+                }
+                return null;
+            })->filter(),
         ];
     }
 
