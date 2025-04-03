@@ -214,7 +214,6 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                 ], Response::HTTP_BAD_REQUEST);
             }
 
-            // Fetch credentials from .env
             $currencyConfig = [
                 'LKR' => [
                     'user_secret' => env('MARXPAY_LKR_USER_SECRET'),
