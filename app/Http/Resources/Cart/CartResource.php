@@ -17,24 +17,11 @@ class CartResource extends JsonResource
      */
     public function toArray($request)
     {
-        dd($this->cartItems);
         return [
             'id'=>$this->id,
             'user'=> $this->user,
             'coupon_code'=> $this->coupon_code,
-            'cartItems'=> collect($this->cartItems)->map(function ($item) {
-                if (is_object($item)) {
-                    return [
-                        'id' => $item->id,
-                        'bulk_product' => $item->bulkProduct,
-                        'package' => $item->package,
-                        'quantity' => $item->quantity,
-                        'price' => $item->bulkProduct ? $item->bulkProduct->price : ($item->package ? $item->package->price : 0),
-                        'total' => $item->quantity * ($item->bulkProduct ? $item->bulkProduct->price : ($item->package ? $item->package->price : 0)),
-                    ];
-                }
-                return null;
-            })->filter(),
+            'cartItems' => CartItemResource::collection($this->cartItems)
         ];
     }
 
