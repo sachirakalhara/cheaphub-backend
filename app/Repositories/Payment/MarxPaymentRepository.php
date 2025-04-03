@@ -120,7 +120,7 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             'order_id' => 'order_' . now()->format('YmdHis'),
         ]);
 
-        if (!$data['is_wallet']) {
+        if (!$data['is_wallet'] || $data['is_wallet'] === 0) {
             $cart = Cart::find($data['cart_id']);
             if ($cart) {
                 CartItem::where('cart_id', $cart->id)->get()->each(function ($cartItem) use ($order) {
@@ -284,7 +284,8 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                         if ($orderItem->bulk_product_id) {
                             $bulkProduct = BulkProduct::find($orderItem->bulk_product_id);
                             if ($bulkProduct) {
-                                $bulkProduct->decrement('serial_count', $orderItem->quantity);
+                                $bulkProduct->serial_count -=  $orderItem->quantity;
+                                $bulkProduct->save();
                             }
                         }
 
@@ -293,15 +294,11 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                             if ($package) {
                                 $subscription = Subscription::find($package->subscription_id);
                                 if ($subscription) {
-                                    $subscription->decrement('available_serial_count', $orderItem->quantity);
+                                    $subscription->available_serial_count -= $orderItem->quantity;
+                                    $subscription->save();
                                 }
                             }
                         }
-                    }
-                    $cart = Cart::where('user_id', $order->user_id)->first();
-                    if ($cart) {
-                        $cart->cartItems()->delete();
-                        $cart->delete();
                     }
                 }
 
