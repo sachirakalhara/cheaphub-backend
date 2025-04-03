@@ -81,7 +81,7 @@ class CartRepository implements CartRepositoryInterface
     {
         $cart = Cart::with('cartItems')->where('user_id', Auth::id())->first();
 
-        if (count($cart) > 0) {
+        if ($cart) {
             return new CartResource($cart);
         } else {
             return Helper::error(Response::$statusTexts[Response::HTTP_NO_CONTENT], Response::HTTP_NO_CONTENT);
