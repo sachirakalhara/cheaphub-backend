@@ -17,6 +17,7 @@ class CartResource extends JsonResource
      */
     public function toArray($request)
     {
+        dd($this->cartItems);
         return [
             'id'=>$this->id,
             'user'=> $this->user,
