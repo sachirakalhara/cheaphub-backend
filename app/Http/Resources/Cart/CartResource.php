@@ -21,7 +21,7 @@ class CartResource extends JsonResource
             'id'=>$this->id,
             'user'=> $this->user,
             'coupon_code'=> $this->coupon_code,
-            'cartItems'=> CartItemResource::collection($this->cartItems)
+            'cartItems'=> $this->cartItems
         ];
     }
 
