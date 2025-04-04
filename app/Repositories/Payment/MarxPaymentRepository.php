@@ -206,6 +206,7 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
         try {
             $mur = $data['mur'] ?? null;
             $tr = $data['tr'] ?? null;
+            $currency =$data['currency'];
 
             if (!$mur || !$tr) {
                 return response()->json([
@@ -235,9 +236,9 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             // Prepare API request
             $marxArgs = ['merchantRID' => $mur];
             $response = Http::withHeaders([
-                'user_secret' => $currencyConfig['USD']['user_secret'],
+                'user_secret' => $currencyConfig[$currency]['user_secret'],
                 'Content-Type' => 'application/json',
-            ])->put($currencyConfig['USD']['url'], $marxArgs);
+            ])->put($currencyConfig[$currency]['url'], $marxArgs);
 
             if (!$response->successful()) {
                 return response()->json([
