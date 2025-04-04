@@ -156,7 +156,8 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
         $marxArgs = [
             'merchantRID' => $order->order_id,
             'amount' => floatval($amount),
-            'returnUrl' => route('marxpay.callback'),
+            // 'returnUrl' => route('marxpay.callback'),
+            'returnUrl' => "https://cheaphub.io/marxpay",
             'validTimeLimit' => 30,
             'customerMail' => $data['email'] ?? '',
             'customerMobile' => $data['tel'] ?? '',
