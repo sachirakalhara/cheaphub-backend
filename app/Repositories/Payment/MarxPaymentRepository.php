@@ -235,9 +235,9 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             // Prepare API request
             $marxArgs = ['merchantRID' => $mur];
             $response = Http::withHeaders([
-                'user_secret' => $currencyConfig['LKR']['user_secret'],
+                'user_secret' => $currencyConfig['USD']['user_secret'],
                 'Content-Type' => 'application/json',
-            ])->put($currencyConfig['LKR']['url'], $marxArgs);
+            ])->put($currencyConfig['USD']['url'], $marxArgs);
 
             if (!$response->successful()) {
                 return response()->json([
