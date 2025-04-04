@@ -25,7 +25,7 @@ class MarxPaymentController extends Controller
         $request->validate([
             'email' => 'required|email',
             'tel' => 'required|string',
-            'amount' => 'required|numeric|min:1',
+            'amount' => 'required|numeric',
             'currency' => 'required|string',
             'description' => 'nullable|string',
             'is_wallet' => 'nullable|boolean',
