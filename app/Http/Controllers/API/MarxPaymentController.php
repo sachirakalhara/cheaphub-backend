@@ -24,7 +24,6 @@ class MarxPaymentController extends Controller
         // Validate required fields
         $request->validate([
             'email' => 'required|email',
-            'tel' => 'required|string',
             'amount' => 'required|numeric',
             'currency' => 'required|string',
             'description' => 'nullable|string',
