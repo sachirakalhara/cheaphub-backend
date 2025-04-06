@@ -36,6 +36,9 @@ class MarxPaymentController extends Controller
 
     public function paymentCallback(Request $request)
     {
+        $request->validate([
+            'currency' => 'required|string'
+        ]);
         return $this->marxPaymentRepository->paymentCallback($request);
     }
 }

@@ -48,7 +48,6 @@ Route::get('/v1/contribution/slug-contribution-product/{slug_name}', [Contributi
 Route::get('/v1/contribution/product/{id}', [ContributionProductController::class, 'findById']);
 Route::post('/v1/contribution/product/filter', [ContributionProductController::class, 'filter']);
 
-Route::get('/v1/customer/marxpay/callback', [MarxPaymentController::class, 'paymentCallback'])->name('marxpay.callback');
 
 
 
@@ -104,6 +103,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
         Route::group(['prefix' => 'customer'], function () {
             Route::post('/marxpay/payment', [MarxPaymentController::class, 'makePayment']);
+            Route::post('/marxpay/callback', [MarxPaymentController::class, 'paymentCallback'])->name('marxpay.callback');
 
             Route::get('/wallet/show', [WalletController::class, 'show']);
              
