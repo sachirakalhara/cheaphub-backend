@@ -123,7 +123,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('/user/get-all', [UserController::class, 'index']);
         Route::post('/user/update', [UserController::class, 'update']);
         Route::get('/user/{id}', [UserController::class, 'getUserByID']);
-
+        Route::get('/user/info/{id}', [UserController::class, 'getUserInfoByID']);
+        
 
         Route::post('/logout', [AuthController::class, 'logout']);
     });

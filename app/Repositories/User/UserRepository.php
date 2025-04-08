@@ -4,6 +4,7 @@ namespace App\Repositories\User;
 
 use App\Helpers\Helper;
 use App\Http\Resources\User\UserCollection;
+use App\Http\Resources\User\UserInfoResource;
 use App\Http\Resources\User\UserResource;
 use App\Models\User\User;
 use App\Repositories\User\Interface\UserRepositoryInterface;
@@ -52,6 +53,17 @@ class UserRepository implements UserRepositoryInterface
         }
     }
 
+    public function getUserInfoByID($user_id)
+    {
+        $user = User::find($user_id);
+        if ($user) {
+            return new UserInfoResource($user);
+        } else {
+            return Helper::error('User not found', Response::HTTP_NOT_FOUND);
+        }
+    }
+
+    
     public function update($request)
     {
         $user = User::find($request->id);

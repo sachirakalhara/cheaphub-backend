@@ -35,7 +35,7 @@ class BulkProductResource extends JsonResource
             'minimum_quantity' => $this->minimum_quantity,
             'maximum_quantity' => $this->maximum_quantity,
             'serial' => $this->serial,
-            'serial_count' => $this->serial_count,
+            'available_serial_count' => $this->serial_count,
             'payment_method' => $this->payment_method,
 
         ];
