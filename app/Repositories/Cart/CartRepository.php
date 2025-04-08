@@ -29,7 +29,7 @@ class CartRepository implements CartRepositoryInterface
         }
 
         $user_id = Auth::id(); 
-        $cart = Cart::with('cartItems')->where('user_id', $user_id)->first();
+        $cart = Cart::where('user_id', $user_id)->first();
 dd( $user_id, $cart);
         if (!$cart) {
             return response()->json(['message' => 'Cart not found'], Response::HTTP_NOT_FOUND);
