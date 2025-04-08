@@ -25,7 +25,7 @@ class UserInfoResource extends JsonResource
         $wallet_balance = $wallet->sum('balance');
 
         $orders = Order::where('user_id', $this->id)->get();
-        $tickets = Ticket::where('user_id', $this->id)->get();
+        // $tickets = Ticket::where('user_id', $this->id)->get();
 
         return [
             'id'=>$this->id,
