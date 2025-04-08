@@ -37,7 +37,7 @@ class UserInfoResource extends JsonResource
             'order_count' => $orders->count(),
             // 'ticket_count' => $tickets->count(),
             'ticket_count' => 0,
-            'user_created' => $this->created_at->diffInDays(now()),
+            'user_created' => $this->created_at,
         ];
     }
 }
