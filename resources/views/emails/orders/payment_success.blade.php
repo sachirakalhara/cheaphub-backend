@@ -8,7 +8,7 @@
     <div style="max-width: 600px; margin: auto; background: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.05);">
         <h2 style="color: #4CAF50;">✅ Payment Confirmed!</h2>
 
-        <p>Hi {{ $user->name }},</p>
+        <p>Hi {{ $user->display_name }},</p>
 
         <p>Thank you for your payment! We're happy to let you know that your order <strong>#{{ $order->order_id }}</strong> has been successfully processed.</p>
 
