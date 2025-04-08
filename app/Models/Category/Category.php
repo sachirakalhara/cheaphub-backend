@@ -12,7 +12,8 @@ class Category extends Model
     protected $fillable = [
         'id',
         'name',
-        'description'
+        'description',
+        'image'
     ];
 
     public function bulkProducts(): BelongsToMany

@@ -11,6 +11,7 @@ use App\Models\Product\Bulk\BulkProduct;
 use App\Models\Product\Contribution\ContributionProductCategory;
 use App\Repositories\Category\Interface\CategoryRepositoryInterface;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Storage;
 
 class CategoryRepository implements CategoryRepositoryInterface
 {
@@ -72,6 +73,14 @@ class CategoryRepository implements CategoryRepositoryInterface
         $category = new Category();
         $category->name = $request->name;
         $category->description = $request->description;
+        if ($request->file('image')) {
+            $disk = Storage::disk('s3');
+            $image = $request->file('image');
+            $filename = 'category/' . uniqid() . '.' . $image->getClientOriginalExtension();
+            $disk->put($filename, file_get_contents($image));
+            $category->image = $filename;
+        }
+
         if ($category->save()) {
             activity('category')->causedBy($category)->performedOn($category)->log('created');
             return new CategoryResource($category);
@@ -84,6 +93,19 @@ class CategoryRepository implements CategoryRepositoryInterface
         $category = Category::find($request->id);
         $category->name = $request->name;
         $category->description = $request->description;
+
+
+        if ($request->file('image')) {
+            $disk = Storage::disk('s3');
+            if ($category->image && $disk->exists($category->image)) {
+                $disk->delete($category->image);
+            }
+
+            $image = $request->file('image');
+            $filename = 'category/' . uniqid() . '.' . $image->getClientOriginalExtension();
+            $disk->put($filename, file_get_contents($image));
+            $category->image = $filename;
+        }
         if ($category->save()) {
             activity('category')->causedBy($category)->performedOn($category)->log('updated');
             return new CategoryResource($category);

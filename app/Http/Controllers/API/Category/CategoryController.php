@@ -44,7 +44,9 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|unique:categories'
+            'name' => 'required|string|unique:categories',
+            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
+
         ]);
 
         return $this->categoryRepository->store($request);
@@ -74,6 +76,7 @@ class CategoryController extends Controller
         $request->validate([
             'id' => 'required',
             'name' => 'required|unique:categories,name,' . $request->id,
+            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
 
         ]);
 
