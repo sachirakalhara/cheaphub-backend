@@ -336,7 +336,7 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
     function sendSuccessfulEmail($order){
         Mail::to($order->user->email)->queue(new MailQueue([
             'subject' => 'Your Payment Was Successful - Order #' . $order->order_id,
-            'template' => 'emails.orders.payment_success',
+            'template' => 'orders.payment_success',
             'user' => $order->user,
             'order' => $order
         ]));
