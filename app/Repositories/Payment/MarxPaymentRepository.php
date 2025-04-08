@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\MailQueue;
-
+use App\Models\User\User;
 use NunoMaduro\Collision\Adapters\Phpunit\Subscribers\Subscriber;
 
 class MarxPaymentRepository implements MarxPaymentRepositoryInterface
@@ -334,10 +334,11 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
     }
 
     function sendSuccessfulEmail($order){
-        Mail::to($order->user->email)->queue(new MailQueue([
+        $user = User::find($order->user_id);
+        Mail::to($user->email)->queue(new MailQueue([
             'subject' => 'Your Payment Was Successful - Order #' . $order->order_id,
             'template' => 'orders.payment_success',
-            'user' => $order->user,
+            'user' => $user,
             'order' => $order
         ]));
     }
