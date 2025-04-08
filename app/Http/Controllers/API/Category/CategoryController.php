@@ -79,6 +79,12 @@ class CategoryController extends Controller
 
         return $this->categoryRepository->update($request);
     }
+    
+    public function trendingCategory()
+    {
+
+        return $this->categoryRepository->trendingCategory();
+    }
 
     /**
      * Remove the specified resource from storage.

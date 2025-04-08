@@ -52,6 +52,21 @@ class CategoryRepository implements CategoryRepositoryInterface
         }
     }
 
+    
+    public function trendingCategory()
+    {
+        $category_list = Category::withCount('contributionProducts')
+            ->orderByDesc('contribution_products_count')
+            ->take(5)
+            ->get();    
+        if (count($category_list) > 0) {
+            return new CategoryCollection($category_list);
+        } else {
+            return Helper::success(Response::$statusTexts[Response::HTTP_NO_CONTENT], Response::HTTP_NO_CONTENT);
+        }
+    }
+
+
     public function store($request)
     {
         $category = new Category();

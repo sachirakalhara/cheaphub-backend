@@ -42,6 +42,8 @@ Route::post('/v1/tag/filter', [TagController::class, 'filter']);
 
 Route::post('/v1/category/get-all', [CategoryController::class, 'index']);
 Route::post('/v1/category/filter', [CategoryController::class, 'filter']);
+Route::get('/v1/category/trending', [CategoryController::class, 'trendingCategory']);
+
 Route::post('/v1/package/get-all', [PackageController::class, 'index']);
 Route::post('/v1/subscription/get-all', [SubscriptionController::class, 'index']);
 
