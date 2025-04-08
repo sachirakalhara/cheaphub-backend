@@ -31,7 +31,6 @@ class ContributionProductResource extends JsonResource
             'categories' => CategoryResource::collection($this->categories),
             'image' => $image,
             'visibility' => $this->visibility,
-            'slug_url' => route('api.slug-contribution-product.slug', [ 'slug_name' => $this->slug_url]),
             'service_info' => $this->service_info,
             'subscriptions' => SubscriptionResource::collection($this->subscriptions),
 

@@ -45,23 +45,16 @@ class ContributionProductController extends Controller
         return $this->productRepository->findById($id);
     }
 
-    public function findBySlug($slug)
-    {
-        return $this->productRepository->findBySlug($slug);
-    }
-
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
 
-        $request->merge(['slug_url' => Str::slug($request->slug_url)]);
         $request->validate([
             'name' => 'required|string|unique:contribution_products',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'tag_id' => 'required',
-            'slug_url' => 'required|unique:contribution_products'
         ]);
         return $this->productRepository->store($request);
     }

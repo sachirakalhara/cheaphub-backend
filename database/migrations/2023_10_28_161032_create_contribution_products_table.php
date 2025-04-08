@@ -19,7 +19,6 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->text('image');
             $table->text('service_info')->nullable();
-            $table->text('slug_url');
             $table->text('visibility')->nullable();
             $table->timestamps();
         });

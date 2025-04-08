@@ -26,7 +26,6 @@ return new class extends Migration
             $table->integer('minimum_quantity');
             $table->integer('maximum_quantity')->nullable();
             $table->text('service_info')->nullable();
-            $table->text('slug_url');
             $table->text('visibility')->nullable();
             $table->timestamps();
 

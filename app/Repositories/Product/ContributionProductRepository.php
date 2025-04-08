@@ -67,17 +67,6 @@ class ContributionProductRepository implements ContributionProductRepositoryInte
         }
     }
 
-
-    public function findBySlug($slug)
-    {
-        $product = ContributionProduct::where('slug_url',$slug)->first();
-        if ($product) {
-            return new ContributionProductResource($product);
-        } else {
-            return Helper::success(Response::$statusTexts[Response::HTTP_NO_CONTENT], Response::HTTP_NO_CONTENT);
-        }
-    }
-
     public function store($request)
     {
 
@@ -86,7 +75,6 @@ class ContributionProductRepository implements ContributionProductRepositoryInte
         $product->description = $request->description;
         $product->tag_id = $request->tag_id;
         $product->service_info = $request->service_info;
-        $product->slug_url = $request->slug_url;
         $product->visibility = $request->visibility;
 
         if ($request->hasFile('image')) {
@@ -163,7 +151,6 @@ class ContributionProductRepository implements ContributionProductRepositoryInte
         $product->description = $request->description;
         $product->tag_id = $request->tag_id;
         $product->service_info = $request->service_info;
-        $product->slug_url = $request->slug_url;
         $product->visibility = $request->visibility;
 
         if ($request->hasFile('image')) {

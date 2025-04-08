@@ -22,7 +22,6 @@ class BulkProduct extends Model
         'minimum_quantity',
         'maximum_quantity',
         'service_info',
-        'slug_url',
         'visibility'
     ];
     public function categories(): BelongsToMany

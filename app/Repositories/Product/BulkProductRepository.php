@@ -66,16 +66,6 @@ class BulkProductRepository implements BulkProductRepositoryInterface
         }
     }
 
-    public function findBySlug($slug)
-    {
-        $product = BulkProduct::where('slug_url',$slug)->first();
-        if ($product) {
-            return new BulkProductResource($product);
-        } else {
-            return Helper::success(Response::$statusTexts[Response::HTTP_NO_CONTENT], Response::HTTP_NO_CONTENT);
-        }
-    }
-
 
     public function store($request)
     {
@@ -90,7 +80,6 @@ class BulkProductRepository implements BulkProductRepositoryInterface
         $product->minimum_quantity = $request->minimum_quantity;
         $product->maximum_quantity = $request->maximum_quantity;
         $product->service_info = $request->service_info;
-        $product->slug_url = $request->slug_url;
         $product->visibility = $request->visibility;
         $product->serial = $request->serial;
         $product->serial_count = count(array_filter(explode("\n", $request->serial), 'trim'));
@@ -131,7 +120,6 @@ class BulkProductRepository implements BulkProductRepositoryInterface
         $product->minimum_quantity = $request->minimum_quantity;
         $product->maximum_quantity = $request->maximum_quantity;
         $product->service_info = $request->service_info;
-        $product->slug_url = $request->slug_url;
         $product->visibility = $request->visibility;
         $product->serial = $request->serial;
         $product->serial_count = count(array_filter(explode("\n", $request->serial), 'trim'));

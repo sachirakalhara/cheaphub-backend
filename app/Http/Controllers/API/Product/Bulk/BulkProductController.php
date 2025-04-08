@@ -32,11 +32,6 @@ class BulkProductController extends Controller
         return $this->bulkProductRepository->findById($id);
     }
 
-    public function findBySlug($slug)
-    {
-        return $this->bulkProductRepository->findBySlug($slug);
-    }
-
     public function filter(Request $request)
     {
         return $this->bulkProductRepository->filter($request);
@@ -56,7 +51,6 @@ class BulkProductController extends Controller
      */
     public function store(Request $request)
     {
-        $request->merge(['slug_url' => Str::slug($request->slug_url)]);
         $request->validate([
             'name' => 'required|string|unique:bulk_products',
             'price' => 'required',
@@ -66,7 +60,6 @@ class BulkProductController extends Controller
             'tag_id' => 'required',
             'payment_method' => 'required',
             'minimum_quantity' => 'required',
-            'slug_url' => 'required|unique:bulk_products',
 
         ]);
 
@@ -99,7 +92,6 @@ class BulkProductController extends Controller
      */
     public function update(Request $request)
     {
-        $request->merge(['slug_url' => Str::slug($request->slug_url)]);
         $request->validate([
             'name' => 'required|string|unique:bulk_products,name,' . $request->id,
             'id' => 'required',
@@ -110,7 +102,6 @@ class BulkProductController extends Controller
             'tag_id' => 'required',
             'payment_method' => 'required',
             'minimum_quantity' => 'required',
-            'slug_url' => 'required|unique:bulk_products,slug_url,' . $request->id ,
 
         ]);
         

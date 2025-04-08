@@ -6,7 +6,6 @@ interface BulkProductRepositoryInterface
 {
     public function all($request);
     public function findById($id);
-    public function findBySlug($slug);
     public function filter($request);
 
     public function store($request);
