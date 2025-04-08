@@ -36,6 +36,7 @@ class UserInfoResource extends JsonResource
             'wallet_balance' => $wallet_balance,
             'order_count' => $orders->count(),
             // 'ticket_count' => $tickets->count(),
+            'ticket_count' => 0,
             'user_created' => $this->created_at->diffInDays(now()),
         ];
     }
