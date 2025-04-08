@@ -121,7 +121,7 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
         ]);
 
         if (!$data['is_wallet'] || $data['is_wallet'] === 0) {
-            $cart = Cart::find($data['cart_id']);
+            $cart = Cart::where('user_id',$user->id)->first();
             if ($cart) {
                 CartItem::where('cart_id', $cart->id)->get()->each(function ($cartItem) use ($order) {
                     OrderItems::create([
