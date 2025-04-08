@@ -27,8 +27,8 @@ class CartRepository implements CartRepositoryInterface
                 return response()->json(['message' => 'Coupon has expired'], Response::HTTP_BAD_REQUEST);
             }
         }
-
-        $cart = Cart::with('cartItems')->where('user_id', Auth::id())->first();
+        $user_id = Auth::user()->id;
+        $cart = Cart::with('cartItems')->where('user_id', $user_id)->first();
 
         if (!$cart) {
             return response()->json(['message' => 'Cart not found'], Response::HTTP_NOT_FOUND);
