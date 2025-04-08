@@ -38,7 +38,11 @@ class UserResource extends JsonResource
             'user_spend' => $user_spend,
             'total_spend' => $total_spend,
             'total_customer' => $this->get()->count(),
-            'order_history' => $this->order
+            'order_history' => $this->order,
+            'roles' => $this->getRoleNames()
+
+
+
         ];
     }
 }
