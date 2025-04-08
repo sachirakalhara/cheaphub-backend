@@ -16,7 +16,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\MarxPaymentController;
 use App\Http\Controllers\API\Payment\OrderController;
 use App\Http\Controllers\API\Payment\WalletController;
+use App\Http\Controllers\API\Product\Contribution\ProductReplacementController;
 use App\Http\Controllers\API\Ticket\TicketController;
+use App\Models\Product\Contribution\ProductReplacement;
 
 Route::post('/v1/register', [AuthController::class, 'register']);
 Route::post('/v1/login', [AuthController::class, 'login']);
@@ -115,7 +117,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             Route::delete('/cart/{id}', [CartController::class, 'removeFromCart']);
             Route::delete('/cart/clear/all', [CartController::class, 'clearCart']);
             
-            Route::get('package/replace/{package_id}', [PackageController::class, 'replaceCount']);
+            Route::get('package/replace/{package_id}', [ProductReplacementController::class, 'getAvalableCount']);
+            Route::post('package/replace/store', [ProductReplacementController::class, 'store']);
 
         });
 

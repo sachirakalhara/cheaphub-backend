@@ -33,24 +33,6 @@ class PackageRepository implements PackageRepositoryInterface
         }
     }
 
-
-    
-    public function replaceCount($package_id)
-    {
-
-        $user_id = Auth::user()->id;
-        $orderItem = OrderItems::where('package_id',$package_id)->where('user_id', $user_id)->first();
-
-        $category_list = Package::where('subscription_id',$request->subscription_id)->get();
-
-
-        if (count($category_list) > 0) {
-            return new PackageCollection($category_list);
-        } else {
-            return Helper::success(Response::$statusTexts[Response::HTTP_NO_CONTENT], Response::HTTP_NO_CONTENT);
-        }
-    }
-
     public function store($request)
     {
         $subscription = Subscription::find($request->subscription_id);

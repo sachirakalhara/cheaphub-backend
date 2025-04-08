@@ -31,6 +31,8 @@ use App\Repositories\User\UserRepository;
 use Illuminate\Support\ServiceProvider;
 use App\Repositories\Coupon\CouponRepository;
 use App\Repositories\Coupon\Interface\CouponRepositoryInterface;
+use App\Repositories\Product\Interface\ProductReplacementRepositoryInterface;
+use App\Repositories\Product\ProductReplacementRepository;
 use App\Repositories\Ticket\Interface\TicketRepositoryInterface;
 use App\Repositories\Ticket\TicketRepository;
 
@@ -56,6 +58,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(CouponRepositoryInterface::class, CouponRepository::class);
         $this->app->bind(TicketRepositoryInterface::class, TicketRepository::class);
         $this->app->bind(CartItemRepositoryInterface::class, CartItemRepository::class);
+        $this->app->bind(ProductReplacementRepositoryInterface::class, ProductReplacementRepository::class);
         
     }
 
