@@ -17,6 +17,9 @@ use App\Models\Subscription\Subscription;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\MailQueue;
+
 use NunoMaduro\Collision\Adapters\Phpunit\Subscribers\Subscriber;
 
 class MarxPaymentRepository implements MarxPaymentRepositoryInterface
@@ -304,6 +307,8 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                     }
                 }
 
+                $this->sendSuccessfulEmail($order);
+
                 return response()->json([
                     'status' => 'success',
                     'summaryResult' => 'SUCCESS',
@@ -326,6 +331,15 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                 'error' => $e->getMessage(),
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    function sendSuccessfulEmail($order){
+        Mail::to($order->user->email)->queue(new MailQueue([
+            'subject' => 'Your Payment Was Successful - Order #' . $order->order_id,
+            'template' => 'emails.orders.payment_success',
+            'user' => $order->user,
+            'order' => $order
+        ]));
     }
 
 }
