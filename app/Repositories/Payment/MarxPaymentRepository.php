@@ -307,7 +307,7 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                     }
                 }
 
-                $this->sendSuccessfulEmail($order);
+                // $this->sendSuccessfulEmail($order);
 
                 return response()->json([
                     'status' => 'success',
@@ -333,14 +333,14 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
         }
     }
 
-    function sendSuccessfulEmail($order){
-        $user = User::find($order->user_id);
-        Mail::to($user->email)->queue(new MailQueue([
-            'subject' => 'Your Payment Was Successful - Order #' . $order->order_id,
-            'template' => 'orders.payment_success',
-            'user' => $user,
-            'order' => $order
-        ]));
-    }
+    // function sendSuccessfulEmail($order){
+    //     $user = User::find($order->user_id);
+    //     Mail::to($user->email)->queue(new MailQueue([
+    //         'subject' => 'Your Payment Was Successful - Order #' . $order->order_id,
+    //         'template' => 'orders.payment_success',
+    //         'user' => $user,
+    //         'order' => $order
+    //     ]));
+    // }
 
 }
