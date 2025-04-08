@@ -20,23 +20,21 @@ class UserInfoResource extends JsonResource
      */
     public function toArray($request)
     {
-        $disk = Storage::disk('s3');
         $wallet = Wallet::where('user_id', $this->id)->get();
         $wallet_balance = $wallet->sum('balance');
-
-        $orders = Order::where('user_id', $this->id)->get();
-        // $tickets = Ticket::where('user_id', $this->id)->get();
-
+    
+        $orders = Order::with('tickets')->where('user_id', $this->id)->get();
+        $ticketsCount = $orders->flatMap->tickets->count();
+    
         return [
-            'id'=>$this->id,
-            'display_name'=> $this->display_name,
-            'fname'=>$this->fname,
-            'lname'=>$this->lname,
-            'email'=> $this->email,
+            'id' => $this->id,
+            'display_name' => $this->display_name,
+            'fname' => $this->fname,
+            'lname' => $this->lname,
+            'email' => $this->email,
             'wallet_balance' => $wallet_balance,
             'order_count' => $orders->count(),
-            // 'ticket_count' => $tickets->count(),
-            'ticket_count' => 0,
+            'ticket_count' => $ticketsCount,
             'user_created' => $this->created_at,
         ];
     }
