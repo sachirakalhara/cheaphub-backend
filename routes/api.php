@@ -33,7 +33,7 @@ Route::post('/coinbase/callback', [CoinbasePaymentController::class, 'paymentCal
 
 //public & Auth Related API
 Route::post('/v1/bulk/product/get-all', [BulkProductController::class, 'index']);
-Route::get('/v1/bulk/slug-product/{slug_name}', [BulkProductController::class, 'findBySlug'])->name('api.slug-product.slug');
+// Route::get('/v1/bulk/slug-product/{slug_name}', [BulkProductController::class, 'findBySlug'])->name('api.slug-product.slug');
 Route::post('/v1/bulk/product/filter', [BulkProductController::class, 'filter']);
 
 Route::post('/v1/tag/get-all', [TagController::class, 'index']);
@@ -48,7 +48,7 @@ Route::post('/v1/package/get-all', [PackageController::class, 'index']);
 Route::post('/v1/subscription/get-all', [SubscriptionController::class, 'index']);
 
 Route::post('/v1/contribution/product/get-all', [ContributionProductController::class, 'index']);
-Route::get('/v1/contribution/slug-contribution-product/{slug_name}', [ContributionProductController::class, 'findBySlug'])->name('api.slug-contribution-product.slug');
+// Route::get('/v1/contribution/slug-contribution-product/{slug_name}', [ContributionProductController::class, 'findBySlug'])->name('api.slug-contribution-product.slug');
 Route::get('/v1/contribution/product/{id}', [ContributionProductController::class, 'findById']);
 Route::post('/v1/contribution/product/filter', [ContributionProductController::class, 'filter']);
 
