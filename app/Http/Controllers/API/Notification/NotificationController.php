@@ -18,9 +18,23 @@ class NotificationController extends Controller
 
     public function markAllAsRead(Request $request)
     {
-        $user = $request->user();
-        $user->unreadNotifications->markAsRead();
+        $ids = $request->input('ids', []);
 
-        return response()->json(['message' => 'All notifications marked as read']);
+        $request->user()->unreadNotifications()
+            ->when(!empty($ids), fn($query) => $query->whereIn('id', $ids))
+            ->update(['read_at' => now()]);
+
+        return response()->json([
+            'message' => empty($ids) ? 'All notifications marked as read.' : 'Selected notifications marked as read.',
+        ]);
     }
+
+
+    // public function markAllAsRead(Request $request)
+    // {
+    //     $user = $request->user();
+    //     $user->unreadNotifications->markAsRead();
+
+    //     return response()->json(['message' => 'All notifications marked as read']);
+    // }
 }
