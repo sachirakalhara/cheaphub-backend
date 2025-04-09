@@ -17,9 +17,6 @@ class CartItemResource extends JsonResource
      */
     public function toArray($request)
     {
-        if ($this->package) {
-            $this->package->image = $this->package->image ? Storage::disk('s3')->url($this->package->image) : null;
-        }
         if ($this->bulkProduct) {
             $this->bulkProduct->image = $this->bulkProduct->image ? Storage::disk('s3')->url($this->bulkProduct->image) : null;
         }

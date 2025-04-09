@@ -101,6 +101,23 @@ class AuthController extends Controller
             ], 401);
         }
 
+    
+        if ($request->userLevel == 'super_admin' && $user->userLevel->scope != 'super_admin') {
+            return response()->json([
+                'message' => 'User Unauthorized',
+                'error' => 'user_unauthorized',
+                'status_code' => 401
+            ], 401);
+        }
+        
+        if ($request->userLevel == 'customer' && $user->userLevel->scope != 'customer') {
+            return response()->json([
+                'message' => 'User Unauthorized',
+                'error' => 'user_unauthorized',
+                'status_code' => 401
+            ], 401);
+        }
+
         if ($user->email_verified_at == null) {
             return response()->json([
                 'message' => "Email not verified",
