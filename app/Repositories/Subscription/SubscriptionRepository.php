@@ -71,13 +71,24 @@ class SubscriptionRepository implements SubscriptionRepositoryInterface
         }
     }
     
-    public function delete($product_id){
-        $subscription_list = Subscription::where('product_id',$product_id)->get();
-        foreach ($subscription_list as $subscription) {
-            $subscription->delete();
+    public function delete($product_id)
+    {
+        if (empty($product_id)) {
+            return Helper::error('Product ID is required', Response::HTTP_BAD_REQUEST);
         }
+
+        $subscriptionList = Subscription::where('product_id', $product_id)->get();
+
+        if ($subscriptionList->isEmpty()) {
+            return Helper::error('No subscriptions found for the given product ID', Response::HTTP_NOT_FOUND);
+        }
+
+        // Delete all subscriptions in bulk
+        Subscription::where('product_id', $product_id)->delete();
+
         return Helper::success(Response::$statusTexts[Response::HTTP_OK], Response::HTTP_OK);
     }
+
 
     public function deleteBydID($id){
         $subscription = Subscription::find($id);
