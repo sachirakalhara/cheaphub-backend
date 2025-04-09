@@ -14,6 +14,7 @@ use App\Http\Controllers\API\Tag\TagController;
 use App\Http\Controllers\API\User\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\MarxPaymentController;
+use App\Http\Controllers\API\Notification\NotificationController;
 use App\Http\Controllers\API\Payment\OrderController;
 use App\Http\Controllers\API\Payment\WalletController;
 use App\Http\Controllers\API\Product\Contribution\ProductReplacementController;
@@ -58,6 +59,9 @@ Route::post('/v1/contribution/product/filter', [ContributionProductController::c
 // Protected routes
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::group(['prefix' => 'v1'], function () {
+        Route::get('/notifications', [NotificationController::class, 'index']);
+        Route::post('/notifications/mark-as-read', [NotificationController::class, 'markAllAsRead']);
+        
         Route::get('/order/{id}', [OrderController::class, 'getOrderByID']);
         Route::get('/orders/{user_id}', [OrderController::class, 'getOrdersByUserID']);
         Route::post('/order/filter', [OrderController::class, 'filter']);
