@@ -74,14 +74,6 @@ class SubscriptionController extends Controller
         return $this->subscriptionRepository->update($request);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function delete($product_id)
-    {
-        return $this->subscriptionRepository->delete($product_id);
-    }
-
     public function deleteBydID($deleteBydID)
     {
         return $this->subscriptionRepository->deleteBydID($deleteBydID);
