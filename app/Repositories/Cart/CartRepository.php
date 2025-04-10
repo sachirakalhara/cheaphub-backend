@@ -21,6 +21,12 @@ class CartRepository implements CartRepositoryInterface
         $coupon = null;
         $message = 'Cart details retrieved successfully';
 
+        $user_id = Auth::id(); 
+        $cart = Cart::with('cartItems')->where('user_id', $user_id)->first();
+        if (!$cart) {
+            return response()->json(['message' => 'Cart not found'], Response::HTTP_NOT_FOUND);
+        }
+        
         if ($request->coupon_code) {
             $coupon = Coupon::where('coupon_code', $request->coupon_code)->first();
 
@@ -28,15 +34,9 @@ class CartRepository implements CartRepositoryInterface
                 return response()->json(['message' => 'Coupon has expired'], Response::HTTP_BAD_REQUEST);
             }
 
-            if($coupon->user_id == Auth::id()) {
+            if($cart->user_id == $user_id && $cart->coupon_code == $request->coupon_code) {
                 $message = 'The coupon code has already been applied';
             }
-        }
-
-        $user_id = Auth::id(); 
-        $cart = Cart::with('cartItems')->where('user_id', $user_id)->first();
-        if (!$cart) {
-            return response()->json(['message' => 'Cart not found'], Response::HTTP_NOT_FOUND);
         }
 
         // Calculate total price for packages and bulk products
