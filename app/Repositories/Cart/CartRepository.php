@@ -26,7 +26,7 @@ class CartRepository implements CartRepositoryInterface
         if (!$cart) {
             return response()->json(['message' => 'Cart not found'], Response::HTTP_NOT_FOUND);
         }
-        
+
         if ($request->coupon_code) {
             $coupon = Coupon::where('coupon_code', $request->coupon_code)->first();
 
@@ -84,13 +84,62 @@ class CartRepository implements CartRepositoryInterface
 
     public function getCart()
     {
-        $cart = Cart::with('cartItems')->where('user_id', Auth::id())->first();
 
-        if ($cart) {
-            return new CartResource($cart);
-        } else {
-            return Helper::error(Response::$statusTexts[Response::HTTP_NO_CONTENT], Response::HTTP_NO_CONTENT);
+        $coupon = null;
+        $message = 'Cart details retrieved successfully';
+
+        $user_id = Auth::id(); 
+        $cart = Cart::with('cartItems')->where('user_id', $user_id)->first();
+        if (!$cart) {
+            return response()->json(['message' => 'Cart not found'], Response::HTTP_NOT_FOUND);
         }
+
+        if ($cart->coupon_code) {
+            $coupon = Coupon::where('coupon_code', $cart->coupon_code)->first();
+
+            if ($coupon && $coupon->expiry_date < now()) {
+                return response()->json(['message' => 'Coupon has expired'], Response::HTTP_BAD_REQUEST);
+            }
+        }
+
+        // Calculate total price for packages and bulk products
+        $packagesTotalPrice = $cart->cartItems->whereNotNull('package_id')->sum(function ($item) {
+            $package = Package::find($item->package_id);
+            return $package ? $package->price * $item->quantity : 0;
+        });
+
+        $bulkProductsTotalPrice = $cart->cartItems->whereNotNull('bulk_product_id')->sum(function ($item) {
+            $bulkProduct = BulkProduct::find($item->bulk_product_id);
+            return $bulkProduct ? $bulkProduct->price * $item->quantity : 0;
+        });
+
+        $totalPrice = $packagesTotalPrice + $bulkProductsTotalPrice;
+        $discount = 0;
+
+        if ($coupon) {
+            if (in_array($coupon->product_type, ['subscription', 'both'])) {
+                $discount += $packagesTotalPrice * $coupon->discount_percentage / 100;
+            }
+
+            if (in_array($coupon->product_type, ['bulk', 'both'])) {
+                $discount += $bulkProductsTotalPrice * $coupon->discount_percentage / 100;
+            }
+
+            $discount = min($discount, $coupon->max_discount_amount);
+
+            if ($discount > $totalPrice) {
+                return response()->json(['message' => 'Discount exceeds total price'], Response::HTTP_BAD_REQUEST);
+            }
+        }
+
+        $data = [
+            'cart' => $cart,
+            'total_price' => $totalPrice,
+            'discount' => $discount,
+            'final_price' => $totalPrice - $discount,
+        ];
+
+        return response()->json(['message' =>$message, 'data' => $data]);
     }
 
     public function removeFromCart($id)
