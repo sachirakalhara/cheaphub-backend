@@ -19,12 +19,17 @@ class CartRepository implements CartRepositoryInterface
     public function cartDetails($request)
     {
         $coupon = null;
+        $message = 'Cart details retrieved successfully';
 
         if ($request->coupon_code) {
             $coupon = Coupon::where('coupon_code', $request->coupon_code)->first();
 
             if ($coupon && $coupon->expiry_date < now()) {
                 return response()->json(['message' => 'Coupon has expired'], Response::HTTP_BAD_REQUEST);
+            }
+
+            if($coupon->user_id != Auth::id()) {
+                $message = 'The coupon code has already been applied';
             }
         }
 
@@ -74,7 +79,7 @@ class CartRepository implements CartRepositoryInterface
             'final_price' => $totalPrice - $discount,
         ];
 
-        return response()->json(['message' => 'Cart details retrieved successfully', 'data' => $data]);
+        return response()->json(['message' =>$message, 'data' => $data]);
     }
 
     public function getCart()
