@@ -4,6 +4,7 @@ namespace App\Repositories\Cart;
 
 use App\Helpers\Helper;
 use App\Http\Resources\Cart\CartCollection;
+use App\Http\Resources\Cart\CartItemResource;
 use App\Http\Resources\Cart\CartResource;
 use App\Models\Cart\Cart;
 use App\Models\Coupon\Coupon;
@@ -134,6 +135,7 @@ class CartRepository implements CartRepositoryInterface
 
         $data = [
             'cart' => $cart,
+            'cartItems' => CartItemResource::collection($cart->cartItems),
             'total_price' => $totalPrice,
             'discount' => $discount,
             'final_price' => $totalPrice - $discount,
