@@ -14,9 +14,17 @@ class TicketRepository implements TicketRepositoryInterface
     {
 
         $query = Ticket::query();
-
+        $user = auth()->user();
+        $role = $user->getRoleNames();
         if ($request->filled('ticket_number')) {
             $query->where('ticket_number', 'like', '%' . $request->ticket_number . '%');
+        }
+
+        if($role  == 'super-admin'){
+
+        }
+        if ($request->filled('user_id')) {
+            $query->where('customer_id',  $request->user_id );
         }
 
         if ($request->input('all', false)) {
