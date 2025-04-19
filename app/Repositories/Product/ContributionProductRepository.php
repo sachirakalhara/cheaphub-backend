@@ -6,7 +6,6 @@ use App\Helpers\Helper;
 use App\Http\Resources\Product\Contribution\ContributionProductCollection;
 use App\Http\Resources\Product\Contribution\ContributionProductResource;
 use App\Models\Payment\Order;
-use App\Models\Payment\OrderItems;
 use App\Models\Product\Contribution\ContributionProduct;
 use App\Repositories\Product\Interface\ContributionProductRepositoryInterface;
 use Illuminate\Http\Response;
