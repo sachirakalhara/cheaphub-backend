@@ -10,6 +10,7 @@ use App\Models\Payment\OrderItems;
 use App\Models\Product\Contribution\ContributionProduct;
 use App\Repositories\Product\Interface\ContributionProductRepositoryInterface;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class ContributionProductRepository implements ContributionProductRepositoryInterface
@@ -179,42 +180,95 @@ class ContributionProductRepository implements ContributionProductRepositoryInte
     }
 
 
+    // public function delete($id)
+    // {
+    //     $contributionProduct = ContributionProduct::find($id);
+
+    //     if (!$contributionProduct) {
+    //         return Helper::error('Product not found', Response::HTTP_NOT_FOUND);
+    //     }
+
+    //     foreach ($contributionProduct->subscriptions as $subscription) {
+    //         foreach ($subscription->packages as $package) {
+    //             $orderItem = OrderItems::where('package_id', $package->id)->first();
+    //             if ($orderItem) {
+    //                 $is_order = Order::where('payment_status', 'paid')->where('id', $orderItem->order_id)->exists();
+    //                 if ($is_order) {
+    //                     return Helper::error("Cannot delete product with active orders", Response::HTTP_CONFLICT);
+    //                 }
+    //             }
+    //         }
+    //     }
+
+    //     $disk = Storage::disk('s3');
+    //     if ($contributionProduct->image && $disk->exists($contributionProduct->image)) {
+    //         $disk->delete($contributionProduct->image);
+    //     }
+
+    //     $contributionProduct->categories()->detach();
+
+    //     foreach ($contributionProduct->subscriptions as $subscription) {
+    //         $subscription->packages()->delete(); 
+    //         $subscription->delete();
+    //     }
+
+    //     $contributionProduct->delete();
+
+    //     return Helper::success('Product deleted successfully', Response::HTTP_OK);
+    // }
     public function delete($id)
     {
-        $contributionProduct = ContributionProduct::find($id);
-
+        $contributionProduct = ContributionProduct::with('subscriptions.packages')->find($id);
+    
         if (!$contributionProduct) {
             return Helper::error('Product not found', Response::HTTP_NOT_FOUND);
         }
-
-        foreach ($contributionProduct->subscriptions as $subscription) {
-            foreach ($subscription->packages as $package) {
-                $orderItem = OrderItems::where('package_id', $package->id)->first();
-                if ($orderItem) {
-                    $is_order = Order::where('payment_status', 'paid')->where('id', $orderItem->order_id)->exists();
-                    if ($is_order) {
-                        return Helper::error("Cannot delete product with active orders", Response::HTTP_CONFLICT);
-                    }
-                }
+    
+        // Check if any related order is paid
+        $packageIds = $contributionProduct->subscriptions
+            ->flatMap->packages
+            ->pluck('id')
+            ->unique();
+    
+        $hasPaidOrder = Order::where('payment_status', 'paid')
+            ->whereHas('items', function ($query) use ($packageIds) {
+                $query->whereIn('package_id', $packageIds);
+            })->exists();
+    
+        if ($hasPaidOrder) {
+            return Helper::error('Cannot delete product with active paid orders', Response::HTTP_CONFLICT);
+        }
+    
+        DB::beginTransaction();
+    
+        try {
+            // Delete image from storage
+            $disk = Storage::disk('s3');
+            if ($contributionProduct->image && $disk->exists($contributionProduct->image)) {
+                $disk->delete($contributionProduct->image);
             }
+    
+            // Detach categories
+            $contributionProduct->categories()->detach();
+    
+            // Delete subscriptions and packages
+            foreach ($contributionProduct->subscriptions as $subscription) {
+                $subscription->packages()->delete();
+                $subscription->delete();
+            }
+    
+            // Delete the product
+            $contributionProduct->delete();
+    
+            DB::commit();
+    
+            return Helper::success('Product deleted successfully', Response::HTTP_OK);
+    
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return Helper::error('Failed to delete product. ' . $e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-
-        $disk = Storage::disk('s3');
-        if ($contributionProduct->image && $disk->exists($contributionProduct->image)) {
-            $disk->delete($contributionProduct->image);
-        }
-
-        $contributionProduct->categories()->detach();
-
-        foreach ($contributionProduct->subscriptions as $subscription) {
-            $subscription->packages()->delete(); 
-            $subscription->delete();
-        }
-
-        $contributionProduct->delete();
-
-        return Helper::success('Product deleted successfully', Response::HTTP_OK);
     }
-
+    
     
 }
