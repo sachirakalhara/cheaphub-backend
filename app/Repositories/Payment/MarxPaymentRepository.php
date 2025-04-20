@@ -176,11 +176,13 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
 
             $config = $currencyConfig[$currency];
 
-            $url = "https://dev.app.marx.lk/api/v2/ipg/orders";//todo
+            $local_user_secret = '$2a$10$VWp.BxyYQ9k/6uE.QXJCPOw9vVaDl9GLMxejme/XNH.lE0RYQUusq';
+            $local_url = "https://dev.app.marx.lk/api/v2/ipg/orders";//todo
+
             $response = Http::withHeaders([
-                'user_secret' => $config['user_secret'],
+                'user_secret' => $local_user_secret,
                 'Content-Type' => 'application/json',
-            ])->post( $url , $marxArgs);
+            ])->post( $local_url , $marxArgs);
 
             // $response = Http::withHeaders([
             //     'user_secret' => $currencyConfig[$data['currency']]['user_secret'],
