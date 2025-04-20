@@ -92,7 +92,7 @@ class CartRepository implements CartRepositoryInterface
         $user_id = Auth::id(); 
         $cart = Cart::with('cartItems')->where('user_id', $user_id)->first();
         if (!$cart) {
-            return response()->json(['message' => 'Cart not found'], Response::HTTP_NOT_FOUND);
+            return response()->json(['message' =>'No items found in the cart.', 'data' => []], 204);
         }
 
         if ($cart->coupon_code) {
