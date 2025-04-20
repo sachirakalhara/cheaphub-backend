@@ -178,43 +178,6 @@ class ContributionProductRepository implements ContributionProductRepositoryInte
         }
     }
 
-
-    // public function delete($id)
-    // {
-    //     $contributionProduct = ContributionProduct::find($id);
-
-    //     if (!$contributionProduct) {
-    //         return Helper::error('Product not found', Response::HTTP_NOT_FOUND);
-    //     }
-
-    //     foreach ($contributionProduct->subscriptions as $subscription) {
-    //         foreach ($subscription->packages as $package) {
-    //             $orderItem = OrderItems::where('package_id', $package->id)->first();
-    //             if ($orderItem) {
-    //                 $is_order = Order::where('payment_status', 'paid')->where('id', $orderItem->order_id)->exists();
-    //                 if ($is_order) {
-    //                     return Helper::error("Cannot delete product with active orders", Response::HTTP_CONFLICT);
-    //                 }
-    //             }
-    //         }
-    //     }
-
-    //     $disk = Storage::disk('s3');
-    //     if ($contributionProduct->image && $disk->exists($contributionProduct->image)) {
-    //         $disk->delete($contributionProduct->image);
-    //     }
-
-    //     $contributionProduct->categories()->detach();
-
-    //     foreach ($contributionProduct->subscriptions as $subscription) {
-    //         $subscription->packages()->delete(); 
-    //         $subscription->delete();
-    //     }
-
-    //     $contributionProduct->delete();
-
-    //     return Helper::success('Product deleted successfully', Response::HTTP_OK);
-    // }
     public function delete($id)
     {
         $contributionProduct = ContributionProduct::with('subscriptions.packages')->find($id);

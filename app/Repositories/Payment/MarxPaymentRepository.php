@@ -172,10 +172,19 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
         ];
 
         try {
+            $currency = $data['currency'] ?? 'USD';
+
+            $config = $currencyConfig[$currency];
+
             $response = Http::withHeaders([
-                'user_secret' => $currencyConfig[$data['currency']]['user_secret'],
+                'user_secret' => $config['user_secret'],
                 'Content-Type' => 'application/json',
-            ])->post($currencyConfig[$data['currency']]['url'], $marxArgs);
+            ])->post($config['url'], $marxArgs);
+
+            // $response = Http::withHeaders([
+            //     'user_secret' => $currencyConfig[$data['currency']]['user_secret'],
+            //     'Content-Type' => 'application/json',
+            // ])->post($currencyConfig[$data['currency']]['url'], $marxArgs);
 
             $result = $response->json();
             if ($response->successful() && isset($result['data']['payUrl'])) {
