@@ -26,9 +26,8 @@ class OrderResource extends JsonResource
             'user_id'=>$this->user,
             'amount_paid'=>$this->amount_paid,
             'is_wallet'=>$this->is_wallet,
-            'order_items'=>OrderItemResource::collection($this->whenLoaded('orderItems')),
+            'order_items'=>OrderItemResource::collection($this->orderItems),
             'order_id'=>$this->order_id,
-            'test'=>'test',
             'created_at'=>$this->created_at
             
         ];
