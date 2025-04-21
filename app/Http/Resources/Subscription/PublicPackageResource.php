@@ -19,7 +19,7 @@ class PublicPackageResource extends JsonResource
     {
         $subscription = Subscription::find($this->subscription_id);
         unset($subscription->available_serial_count);
-
+        unset($subscription->serial);
         return [
             'id' => $this->id,
             'name' => $this->name,
