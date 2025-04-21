@@ -23,7 +23,7 @@ class PublicSubscriptionResource extends JsonResource
             // 'serial' => $this->serial,
             'available_serial_count' => $this->available_serial_count,
             'gateway_fee' => $this->gateway_fee,
-            'packages' => PackageResource::collection($this->packages),
+            'packages' => PublicPackageResource::collection($this->packages),
 
         ];
     }
