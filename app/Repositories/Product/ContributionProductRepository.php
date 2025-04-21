@@ -5,6 +5,7 @@ namespace App\Repositories\Product;
 use App\Helpers\Helper;
 use App\Http\Resources\Product\Contribution\ContributionProductCollection;
 use App\Http\Resources\Product\Contribution\ContributionProductResource;
+use App\Http\Resources\Product\Contribution\PublicContributionProductCollection;
 use App\Models\Payment\Order;
 use App\Models\Product\Contribution\ContributionProduct;
 use App\Repositories\Product\Interface\ContributionProductRepositoryInterface;
@@ -61,7 +62,7 @@ class ContributionProductRepository implements ContributionProductRepositoryInte
             $product_list = Helper::paginate($query->get());
         }
         if ($product_list->isNotEmpty()) {
-            return new ContributionProductCollection($product_list);
+            return new PublicContributionProductCollection($product_list);
         } else {
             return Helper::success(Response::$statusTexts[Response::HTTP_NO_CONTENT], Response::HTTP_NO_CONTENT);
         }

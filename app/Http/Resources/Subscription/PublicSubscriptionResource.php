@@ -4,7 +4,7 @@ namespace App\Http\Resources\Subscription;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class SubscriptionResource extends JsonResource
+class PublicSubscriptionResource extends JsonResource
 {
     public static $wrap = 'subscription';
 
@@ -20,7 +20,7 @@ class SubscriptionResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'serial' => $this->serial,
+            // 'serial' => $this->serial,
             'available_serial_count' => $this->available_serial_count,
             'gateway_fee' => $this->gateway_fee,
             'packages' => PackageResource::collection($this->packages),

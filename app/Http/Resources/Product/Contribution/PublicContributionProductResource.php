@@ -3,11 +3,11 @@
 namespace App\Http\Resources\Product\Contribution;
 
 use App\Http\Resources\Category\CategoryResource;
-use App\Http\Resources\Subscription\SubscriptionResource;
+use App\Http\Resources\Subscription\PublicSubscriptionResource;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ContributionProductResource extends JsonResource
+class PublicContributionProductResource extends JsonResource
 {
     public static $wrap = 'contribution_product';
 
@@ -30,7 +30,7 @@ class ContributionProductResource extends JsonResource
             'image' => $image,
             'visibility' => $this->visibility,
             'service_info' => $this->service_info,
-            'subscriptions' => SubscriptionResource::collection($this->subscriptions),
+            'subscriptions' => PublicSubscriptionResource::collection($this->subscriptions),
 
         ];
     }
