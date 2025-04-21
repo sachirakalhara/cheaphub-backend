@@ -19,7 +19,7 @@ class OrderItemResource extends JsonResource
         return [
 
             'id'=>$this->id,
-            'order'=>OrderResource::collection($this->order),
+            // 'order'=>OrderResource::collection($this->order),
             'quantity'=> $this->quantity,
             'bulkProduct'=> $this->bulkProduct,
             'package'=> $this->package,
