@@ -9,7 +9,7 @@ use App\Models\Serial\Serial;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ContributionProductResource extends JsonResource
+class PublicContributionProductResource extends JsonResource
 {
     public static $wrap = 'contribution_product';
 
