@@ -6,6 +6,7 @@ use App\Http\Resources\Category\CategoryResource;
 use App\Http\Resources\Subscription\SubscriptionResource;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Auth;
 
 class ContributionProductResource extends JsonResource
 {
@@ -30,6 +31,7 @@ class ContributionProductResource extends JsonResource
             'image' => $image,
             'visibility' => $this->visibility,
             'service_info' => $this->service_info,
+            'url' => Auth::user() ? `cheaphub.io/contribution/{$this->id}/{$this->name}` : null,
             'subscriptions' => SubscriptionResource::collection($this->subscriptions),
 
         ];
