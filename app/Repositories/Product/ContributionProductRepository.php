@@ -19,9 +19,9 @@ class ContributionProductRepository implements ContributionProductRepositoryInte
     {
 
         if($request->input('all', '') == 1) {
-            $product_list = ContributionProduct::all();
+            $product_list = ContributionProduct::where('visibility','open')->all();
         } else {
-            $product_list = ContributionProduct::orderBy('created_at', 'desc')->paginate(10);
+            $product_list = ContributionProduct::where('visibility','open')->orderBy('created_at', 'desc')->paginate(10);
         }
 
         if (count($product_list) > 0) {
@@ -44,7 +44,7 @@ class ContributionProductRepository implements ContributionProductRepositoryInte
     public function filter($request)
     {
         $query = ContributionProduct::query();
-
+        $query->where('visibility','open');
         if ($request->filled('products_name')) {
             $query->where('name', 'like', '%' . $request->products_name . '%');
         }
