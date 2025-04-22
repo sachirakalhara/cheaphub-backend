@@ -16,9 +16,9 @@ class BulkProductRepository implements BulkProductRepositoryInterface
     {
 
         if($request->input('all', '') == 1) {
-            $product_list = BulkProduct::all();
+            $product_list = BulkProduct::where('visibility','open')->get();
         } else {
-            $product_list = BulkProduct::orderBy('created_at', 'desc')->paginate(10);
+            $product_list = BulkProduct::where('visibility','open')->orderBy('created_at', 'desc')->paginate(10);
         }
 
         if (count($product_list) > 0) {
@@ -31,7 +31,7 @@ class BulkProductRepository implements BulkProductRepositoryInterface
     public function filter($request)
     {
         $query = BulkProduct::query();
-
+        $query->where('visibility','open');
         if ($request->filled('products_name')) {
             $query->where('name', 'like', '%' . $request->products_name . '%');
         }
