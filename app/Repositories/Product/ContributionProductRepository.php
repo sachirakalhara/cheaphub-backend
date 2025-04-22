@@ -38,7 +38,7 @@ class ContributionProductRepository implements ContributionProductRepositoryInte
     {
         $user =Auth::user();
         $query = ContributionProduct::query();
-
+dd($user->userLevel->scope);
         if($user && $user->userLevel->scope != "super_admin"){
             $query->where('visibility', 'open');
         }  
