@@ -8,23 +8,48 @@ use App\Http\Resources\Product\Contribution\ContributionProductResource;
 use App\Http\Resources\Product\Contribution\PublicContributionProductCollection;
 use App\Models\Payment\Order;
 use App\Models\Product\Contribution\ContributionProduct;
+use App\Models\User\User;
+use App\Models\User\UserLevel;
 use App\Repositories\Product\Interface\ContributionProductRepositoryInterface;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class ContributionProductRepository implements ContributionProductRepositoryInterface
 {
+    // public function all($request)
+    // {
+
+    //     if($request->input('all', '') == 1) {
+    //         $product_list = ContributionProduct::where('visibility','open')->get();
+    //     } else {
+    //         $product_list = ContributionProduct::where('visibility','open')->orderBy('created_at', 'desc')->paginate(10);
+    //     }
+
+    //     if (count($product_list) > 0) {
+    //         return new ContributionProductCollection($product_list);
+    //     } else {
+    //         return Helper::success(Response::$statusTexts[Response::HTTP_NO_CONTENT], Response::HTTP_NO_CONTENT);
+    //     }
+    // }
+
     public function all($request)
     {
+        $user = User::find(Auth::user()->id);
+        $query = ContributionProduct::query();
 
-        if($request->input('all', '') == 1) {
-            $product_list = ContributionProduct::where('visibility','open')->get();
+        if($user && $user->userLevel->scope != "super_admin"){
+            $query->where('visibility', 'open');
+        }  
+    
+        if ($request->input('all', '') == 1) {
+            $product_list = $query->get();
         } else {
-            $product_list = ContributionProduct::where('visibility','open')->orderBy('created_at', 'desc')->paginate(10);
+            $product_list = $query->orderBy('created_at', 'desc')->paginate(10);
         }
-
-        if (count($product_list) > 0) {
+    
+        if ($product_list->count() > 0) {
             return new ContributionProductCollection($product_list);
         } else {
             return Helper::success(Response::$statusTexts[Response::HTTP_NO_CONTENT], Response::HTTP_NO_CONTENT);
