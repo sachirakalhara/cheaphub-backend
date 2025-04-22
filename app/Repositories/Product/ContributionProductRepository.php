@@ -19,7 +19,7 @@ class ContributionProductRepository implements ContributionProductRepositoryInte
     {
 
         if($request->input('all', '') == 1) {
-            $product_list = ContributionProduct::where('visibility','open')->all();
+            $product_list = ContributionProduct::where('visibility','open')->get();
         } else {
             $product_list = ContributionProduct::where('visibility','open')->orderBy('created_at', 'desc')->paginate(10);
         }
