@@ -5,6 +5,7 @@ namespace App\Repositories\Product\Interface;
 interface BulkProductRepositoryInterface
 {
     public function all($request);
+    public function getAllWithVisibility($request);
     public function findById($id);
     public function filter($request);
 

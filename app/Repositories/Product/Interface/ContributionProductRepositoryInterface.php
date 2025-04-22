@@ -5,6 +5,7 @@ namespace App\Repositories\Product\Interface;
 interface ContributionProductRepositoryInterface
 {
     public function all($request);
+    public function getAllWithVisibility($request);
     public function filter($request);
 
     public function store($request);

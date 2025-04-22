@@ -28,6 +28,22 @@ class BulkProductRepository implements BulkProductRepositoryInterface
         }
     }
 
+    public function getAllWithVisibility($request)
+    {
+
+        if($request->input('all', '') == 1) {
+            $product_list = BulkProduct::all();
+        } else {
+            $product_list = BulkProduct::orderBy('created_at', 'desc')->paginate(10);
+        }
+
+        if (count($product_list) > 0) {
+            return new BulkProductCollection($product_list);
+        } else {
+            return Helper::success(Response::$statusTexts[Response::HTTP_NO_CONTENT], Response::HTTP_NO_CONTENT);
+        }
+    }
+
     public function filter($request)
     {
         $query = BulkProduct::query();

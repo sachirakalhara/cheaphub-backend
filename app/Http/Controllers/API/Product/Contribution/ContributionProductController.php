@@ -25,6 +25,11 @@ class ContributionProductController extends Controller
         return $this->productRepository->all($request);
     }
     
+    public function getAllWithVisibility(Request $request)
+    {
+        return $this->productRepository->getAllWithVisibility($request);
+    }
+
     public function filter(Request $request)
     {
         return $this->productRepository->filter($request);

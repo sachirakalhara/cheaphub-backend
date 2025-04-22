@@ -27,6 +27,11 @@ class BulkProductController extends Controller
         return $this->bulkProductRepository->all($request);
     }
 
+    public function getAllWithVisibility(Request $request)
+    {
+        return $this->bulkProductRepository->getAllWithVisibility($request);
+    }
+    
     public function findById($id)
     {
         return $this->bulkProductRepository->findById($id);
