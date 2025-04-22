@@ -84,10 +84,12 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             Route::post('/bulk/product/create', [BulkProductController::class, 'store']);
             Route::put('/bulk/product/update', [BulkProductController::class, 'update']);
             Route::delete('/bulk/product/delete/{bulk_product_id}', [BulkProductController::class, 'delete']);
+            Route::post('/bulk/product/get-all-visibility', [BulkProductController::class, 'getAllWithVisibility']);
 
             Route::post('/contribution/product/create', [ContributionProductController::class, 'store']);
             Route::put('/contribution/product/update', [ContributionProductController::class, 'update']);
             Route::delete('/contribution/product/delete/{id}', [ContributionProductController::class, 'delete']);
+            Route::post('/contribution/product/get-all-visibility', [ContributionProductController::class, 'getAllWithVisibility']);
 
             Route::post('/subscription/create', [SubscriptionController::class, 'store']);
             Route::put('/subscription/update', [SubscriptionController::class, 'update']);
