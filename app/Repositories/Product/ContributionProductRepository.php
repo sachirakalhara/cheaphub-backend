@@ -36,7 +36,7 @@ class ContributionProductRepository implements ContributionProductRepositoryInte
 
     public function all($request)
     {
-        $user =Auth::user();
+        $user =auth()->user();
         $query = ContributionProduct::query();
 dd($user->userLevel->scope);
         if($user && $user->userLevel->scope != "super_admin"){
