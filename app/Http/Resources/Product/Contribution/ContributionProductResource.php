@@ -22,7 +22,6 @@ class ContributionProductResource extends JsonResource
     {
         $disk = Storage::disk('s3');
         $image = $this->image ? $disk->url($this->image) : null;
-        dd(Auth::user());
         return [
             'id' => $this->id,
             'name' => $this->name,
@@ -32,7 +31,7 @@ class ContributionProductResource extends JsonResource
             'image' => $image,
             'visibility' => $this->visibility,
             'service_info' => $this->service_info,
-            'url' => auth()->user() ? `cheaphub.io/contribution/{$this->id}/{$this->name}` : null,
+            'url' => Auth::user() ? `cheaphub.io/contribution/{$this->id}/{$this->name}` : null,
             'subscriptions' => SubscriptionResource::collection($this->subscriptions),
 
         ];
