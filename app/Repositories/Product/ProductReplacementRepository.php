@@ -66,10 +66,18 @@ class ProductReplacementRepository implements ProductReplacementRepositoryInterf
 
         $productReplacement->save();
 
+        
+        $serials = array_filter(explode("\n", $package->subscription->serial), 'trim');
+        $randomSerial = $serials ? $serials[array_rand($serials)] : null;
+        $data = [
+            $productReplacement,
+            $randomSerial
+        ];
+
         return response()->json([
             'status' => true,
             'message' => 'Replacement updated successfully',
-            'data' => $productReplacement,
+            'data' => $data,
         ], Response::HTTP_OK);
     }
 }

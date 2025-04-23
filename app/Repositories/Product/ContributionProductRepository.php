@@ -118,44 +118,44 @@ class ContributionProductRepository implements ContributionProductRepositoryInte
         }
     }
 
-    public function updateProductSerial($request)
-    {
-        $product = ContributionProduct::find($request->product_id);
-        $productSerial = $product->serials[0];
-        if ( $productSerial->type == 'normal') {
-            $serial = Serial::find($productSerial->id);
-        }else{
-            $serial = new Serial();
-        }
+    // public function updateProductSerial($request)
+    // {
+    //     $product = ContributionProduct::find($request->product_id);
+    //     $productSerial = $product->serials[0];
+    //     if ( $productSerial->type == 'normal') {
+    //         $serial = Serial::find($productSerial->id);
+    //     }else{
+    //         $serial = new Serial();
+    //     }
 
-        if ($request->hasFile('serial')) {
-            $serialContents = file_get_contents($request->file('serial')->getRealPath());
+    //     if ($request->hasFile('serial')) {
+    //         $serialContents = file_get_contents($request->file('serial')->getRealPath());
 
-            $containsPipe = strpos($serialContents, '|') !== false;
-            $serial->name = $serialContents;
+    //         $containsPipe = strpos($serialContents, '|') !== false;
+    //         $serial->name = $serialContents;
 
-            if ($containsPipe && $productSerial->type == 'normal') {
-                $serial->type = 'normal';
-                $serial->min_count = 1;
-                $serial->max_count = 1;
-            } else if($containsPipe == false && $productSerial->type == 'bulk'){
-                $serial->type = 'bulk';
-                $serial->min_count = $productSerial->min_count;
-                $serial->max_count = $productSerial->max_count;
-            }else{
-                return Helper::error('Serial type is different', 205);
-            }
-        }
+    //         if ($containsPipe && $productSerial->type == 'normal') {
+    //             $serial->type = 'normal';
+    //             $serial->min_count = 1;
+    //             $serial->max_count = 1;
+    //         } else if($containsPipe == false && $productSerial->type == 'bulk'){
+    //             $serial->type = 'bulk';
+    //             $serial->min_count = $productSerial->min_count;
+    //             $serial->max_count = $productSerial->max_count;
+    //         }else{
+    //             return Helper::error('Serial type is different', 205);
+    //         }
+    //     }
 
-        $serial->product_id = $product->id;
+    //     $serial->product_id = $product->id;
 
-        if ($serial->save()) {
-            activity('serial')->causedBy($serial)->performedOn($serial)->log('updated');
-            return new ContributionProductResource($product);
-        } else {
-            return Helper::error(Response::$statusTexts[Response::HTTP_NO_CONTENT], Response::HTTP_NO_CONTENT);
-        }
-    }
+    //     if ($serial->save()) {
+    //         activity('serial')->causedBy($serial)->performedOn($serial)->log('updated');
+    //         return new ContributionProductResource($product);
+    //     } else {
+    //         return Helper::error(Response::$statusTexts[Response::HTTP_NO_CONTENT], Response::HTTP_NO_CONTENT);
+    //     }
+    // }
 
     public function update($request)
     {
