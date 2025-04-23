@@ -77,7 +77,17 @@ class ProductReplacementRepository implements ProductReplacementRepositoryInterf
         return response()->json([
             'status' => true,
             'message' => 'Replacement updated successfully',
-            'data' => $data,
+            'data' => [
+                [
+                    'user_id' => $productReplacement->user_id,
+                    'package_id' => $productReplacement->package_id,
+                    'avalable_replace_count' => $productReplacement->avalable_replace_count,
+                    'updated_at' => $productReplacement->updated_at,
+                    'created_at' => $productReplacement->created_at,
+                    'id' => $productReplacement->id,
+                    'sirial' => $randomSerial,
+                ]
+            ]
         ], Response::HTTP_OK);
     }
 }
