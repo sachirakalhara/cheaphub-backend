@@ -31,7 +31,7 @@ class ContributionProductResource extends JsonResource
             'image' => $image,
             'visibility' => $this->visibility,
             'service_info' => $this->service_info,
-            'url' => Auth::user() ? `cheaphub.io/contribution/{$this->id}/{$this->name}` : null,
+            'url' => auth()->user() ? `cheaphub.io/contribution/{$this->id}/{$this->name}` : null,
             'subscriptions' => SubscriptionResource::collection($this->subscriptions),
 
         ];

@@ -31,7 +31,7 @@ class BulkProductResource extends JsonResource
             'categories' => CategoryResource::collection($this->categories),
             'image' => $image,
             'visibility' => $this->visibility,
-            'url' => Auth::user() ? `cheaphub.io/bulk/{$this->id}/{$this->name}` : null,
+            'url' => auth()->user() ? `cheaphub.io/bulk/{$this->id}/{$this->name}` : null,
             'service_info' => $this->service_info,
             'minimum_quantity' => $this->minimum_quantity,
             'maximum_quantity' => $this->maximum_quantity,
