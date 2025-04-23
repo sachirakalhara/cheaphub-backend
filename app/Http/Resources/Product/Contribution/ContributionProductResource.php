@@ -22,6 +22,7 @@ class ContributionProductResource extends JsonResource
     {
         $disk = Storage::disk('s3');
         $image = $this->image ? $disk->url($this->image) : null;
+        dd(Auth::user());
         return [
             'id' => $this->id,
             'name' => $this->name,
