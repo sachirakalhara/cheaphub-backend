@@ -23,7 +23,7 @@ class BulkProductResource extends JsonResource
         $image = $this->image ? $disk->url($this->image) : null;
 
         $test = !empty(Auth::user()->id) ? `cheaphub.io/bulk/{$this->id}/{$this->name}` : null;
-        dd($test,'cheaphub.io/bulk/{{$this->id}}/{$this->name}',!empty(Auth::user()->id));
+        dd($test,"cheaphub.io/bulk/{{$this->id}}/{$this->name}",!empty(Auth::user()->id));
 
 
 
