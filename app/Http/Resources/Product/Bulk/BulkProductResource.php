@@ -22,11 +22,6 @@ class BulkProductResource extends JsonResource
         $disk = Storage::disk('s3');
         $image = $this->image ? $disk->url($this->image) : null;
 
-        $test = !empty(Auth::user()->id) ? `cheaphub.io/bulk/{$this->id}/{$this->name}` : null;
-        dd($test,"cheaphub.io/bulk/{{$this->id}}/{$this->name}",!empty(Auth::user()->id));
-
-
-
         return [
             'id' => $this->id,
             'name' => $this->name,
@@ -37,7 +32,7 @@ class BulkProductResource extends JsonResource
             'categories' => CategoryResource::collection($this->categories),
             'image' => $image,
             'visibility' => $this->visibility,
-            'url' => !empty(Auth::user()->id) ? `cheaphub.io/bulk/{$this->id}/{$this->name}` : null,
+            'url' => !empty(Auth::user()->id) ? "cheaphub.io/bulk/{$this->id}/{$this->name}" : null,
             'service_info' => $this->service_info,
             'minimum_quantity' => $this->minimum_quantity,
             'maximum_quantity' => $this->maximum_quantity,
