@@ -27,7 +27,6 @@ class PackageResource extends JsonResource
             'replace_count' => $this->replace_count,
             'expiry_duration' => $this->expiry_duration,
             'payment_method' => $this->payment_method,
-            'subscription' => Subscription::find($this->subscription_id),
             'contributionProduct' => new ContributionProductResource($this->subscription->contributionProduct),
         ];
     }
