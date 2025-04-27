@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Payment;
 
+use App\Http\Resources\Subscription\PackageResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class OrderItemResource extends JsonResource
@@ -22,9 +23,10 @@ class OrderItemResource extends JsonResource
             // 'order'=>OrderResource::collection($this->order),
             'quantity'=> $this->quantity,
             'bulkProduct'=> $this->bulkProduct,
-            'package'=> $this->package,
-            'created_at'=>$this->created_at
-            
+            'package'=> $this->package->with('subscription'),
+            'created_at'=>$this->created_at,
+            // 'package1'=>PackageResource::collection($this->order),
+
         ];
     }
 
