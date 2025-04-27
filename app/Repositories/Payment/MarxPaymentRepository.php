@@ -510,11 +510,11 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
 
             // $config = $currencyConfig[$currency];
 
-            $local_user_secret = '$2a$10$VWp.BxyYQ9k/6uE.QXJCPOw9vVaDl9GLMxejme/XNH.lE0RYQUusq';
+            $local_user_secret = '$2a$10$x1CAe9YuEz9G1X1ZQrTrLOJXFu2PSvrwLuBcWpgT2ecRAx5sxfOhW';
             $marx_sandbox_url = 'https://payment.api.dev.marxpos.com/api/v4/ipg/orders';
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
-                'merchant-api-key' => '$2a$10$M9yvJJgX5UX5s3towdFsneT8fO73IXoIjB0Y17.Ba/CBLS/EaAycm',
+                'merchant-api-key' => $local_user_secret,
 
             ])->post($marx_sandbox_url , $marxArgs);
 
@@ -590,7 +590,7 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             $marxArgs = ['merchantRID' => $mur];
 
             $marx_sandbox_url = 'https://payment.api.dev.marxpos.com/api/v4/ipg/orders';
-            $local_user_secret = '$2a$10$VWp.BxyYQ9k/6uE.QXJCPOw9vVaDl9GLMxejme/XNH.lE0RYQUusq';
+            $local_user_secret = '$2a$10$x1CAe9YuEz9G1X1ZQrTrLOJXFu2PSvrwLuBcWpgT2ecRAx5sxfOhW';
 
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
