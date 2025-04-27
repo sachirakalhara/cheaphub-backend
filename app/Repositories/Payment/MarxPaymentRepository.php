@@ -513,9 +513,8 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             $local_user_secret = '$2a$10$VWp.BxyYQ9k/6uE.QXJCPOw9vVaDl9GLMxejme/XNH.lE0RYQUusq';
             $marx_sandbox_url = 'https://payment.api.dev.marxpos.com/api/v4/ipg/orders';
             $response = Http::withHeaders([
-                'user_secret' => $local_user_secret,
                 'Content-Type' => 'application/json',
-                'merchant-api-key' => $order->order_id,
+                'merchant-api-key' => $local_user_secret,
 
             ])->post($marx_sandbox_url , $marxArgs);
 
@@ -591,10 +590,11 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             $marxArgs = ['merchantRID' => $mur];
 
             $marx_sandbox_url = 'https://payment.api.dev.marxpos.com/api/v4/ipg/orders';
+            $local_user_secret = '$2a$10$VWp.BxyYQ9k/6uE.QXJCPOw9vVaDl9GLMxejme/XNH.lE0RYQUusq';
 
             $response = Http::withHeaders([
-                'user_secret' => env('MARXPAY_LKR_USER_SECRET'),
                 'Content-Type' => 'application/json',
+                'merchant-api-key' => $local_user_secret,
             ])->put($marx_sandbox_url, $marxArgs);
 
             Log::info('Payment callback response: ', $response->json());
