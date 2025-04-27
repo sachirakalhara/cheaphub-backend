@@ -500,7 +500,10 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             'currency' => $data['currency'],
             'orderSummary' => $data['description'] ?? '',
             'customerReference' => $user->id . " " . ($data['email'] ?? ''),
+            "paymentMethod"=> $data['paymentMethod']
+
         ];
+
 
         try {
             // $currency = $data['currency'] ?? 'USD';
