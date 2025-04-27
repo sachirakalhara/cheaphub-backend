@@ -515,6 +515,8 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             $response = Http::withHeaders([
                 'user_secret' => $local_user_secret,
                 'Content-Type' => 'application/json',
+                'merchant-api-key' => $order->order_id,
+
             ])->post($marx_sandbox_url , $marxArgs);
 
             // $response = Http::withHeaders([
@@ -589,7 +591,7 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             $marxArgs = ['merchantRID' => $mur];
 
             $marx_sandbox_url = 'https://payment.api.dev.marxpos.com/api/v4/ipg/orders';
-            
+
             $response = Http::withHeaders([
                 'user_secret' => env('MARXPAY_LKR_USER_SECRET'),
                 'Content-Type' => 'application/json',
