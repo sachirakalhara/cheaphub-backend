@@ -514,7 +514,7 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             $marx_sandbox_url = 'https://payment.api.dev.marxpos.com/api/v4/ipg/orders';
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
-                'merchant-api-key' => $local_user_secret,
+                'merchant-api-key' => '$2a$10$M9yvJJgX5UX5s3towdFsneT8fO73IXoIjB0Y17.Ba/CBLS/EaAycm',
 
             ])->post($marx_sandbox_url , $marxArgs);
 
