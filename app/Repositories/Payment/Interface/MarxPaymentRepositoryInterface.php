@@ -4,7 +4,7 @@ namespace App\Repositories\Payment\Interface;
 
 interface MarxPaymentRepositoryInterface
 {
-    public function makePayment($request);
-    public function paymentCallback($request);
+    public function makePaymentV4($request);
+    public function paymentCallbackV4($request);
     
 }

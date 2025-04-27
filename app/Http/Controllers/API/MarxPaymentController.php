@@ -30,7 +30,7 @@ class MarxPaymentController extends Controller
             'is_wallet' => 'nullable|boolean',
         ]);
 
-        return $this->marxPaymentRepository->makePayment($request);
+        return $this->marxPaymentRepository->makePaymentV4($request);
     }    
 
     public function paymentCallback(Request $request)
@@ -38,6 +38,6 @@ class MarxPaymentController extends Controller
         $request->validate([
             'currency' => 'required|string'
         ]);
-        return $this->marxPaymentRepository->paymentCallback($request);
+        return $this->marxPaymentRepository->paymentCallbackV4($request);
     }
 }
