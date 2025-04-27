@@ -508,11 +508,11 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             // $config = $currencyConfig[$currency];
 
             // $local_user_secret = '$2a$10$VWp.BxyYQ9k/6uE.QXJCPOw9vVaDl9GLMxejme/XNH.lE0RYQUusq';
-
+            $marxurl = env('MARX_SANDBOX_URL');
             $response = Http::withHeaders([
                 'user_secret' => env('MARXPAY_LKR_USER_SECRET'),
                 'Content-Type' => 'application/json',
-            ])->post(env('MARX_SANDBOX_URL') , $marxArgs);
+            ])->post($marxurl , $marxArgs);
 
             // $response = Http::withHeaders([
             //     'user_secret' => $currencyConfig[$data['currency']]['user_secret'],
@@ -584,10 +584,11 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
 
             // Prepare API request
             $marxArgs = ['merchantRID' => $mur];
+            $marxurl = env('MARX_SANDBOX_URL');
             $response = Http::withHeaders([
                 'user_secret' => env('MARXPAY_LKR_USER_SECRET'),
                 'Content-Type' => 'application/json',
-            ])->put(env('MARX_SANDBOX_URL'), $marxArgs);
+            ])->put($marxurl, $marxArgs);
 
             Log::info('Payment callback response: ', $response->json());
 
