@@ -27,8 +27,8 @@ class OrderItemResource extends JsonResource
             // 'package'=> $this->package,
             'created_at'=>$this->created_at,
             
-            'bulk_product' => new BulkProductResource($this->whenLoaded('bulkProduct')),
-            'package' => new PackageResource($this->whenLoaded('package')),
+            'bulk_product' => new BulkProductResource($this->bulkProduct),
+            'package' => new PackageResource($this->package),
 
 
         ];
