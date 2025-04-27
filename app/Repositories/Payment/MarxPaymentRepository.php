@@ -19,6 +19,8 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\MailQueue;
+use App\Models\Product\Contribution\ProductReplacement;
+use App\Models\Product\Contribution\ProductReplacementSirial;
 use App\Models\User\User;
 use App\Notifications\OrderCreated;
 use NunoMaduro\Collision\Adapters\Phpunit\Subscribers\Subscriber;
@@ -314,6 +316,13 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                                 if ($subscription) {
                                     $subscription->available_serial_count -= $orderItem->quantity;
                                     $subscription->save();
+
+                                    $productReplacement = ProductReplacement::where('user_id',$order->user_id)->where('package_id',$package->id)->first();
+                                    if($productReplacement){
+                                        $productReplacement->avalable_replace_count = $subscription->available_serial_count;
+                                        $subscription->save();
+                                    }
+
                                 }
                             }
                         }
