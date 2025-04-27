@@ -26,10 +26,10 @@ class PackageResource extends JsonResource
             'replace_count' => $this->replace_count,
             'expiry_duration' => $this->expiry_duration,
             'payment_method' => $this->payment_method,
-            'subscription' => Subscription::find($this->subscription_id),
-            'contributionProduct' => ContributionProduct::find($this->contributionProduct->with($this->contributionProduct))
+            // 'subscription' => Subscription::find($this->subscription_id),
+            'contributionProduct' => ContributionProduct::find($this->contributionProduct->with($this->contributionProduct)),
             
-            // 'subscription' => new SubscriptionResource($this->subscription)
+            'subscription' => new SubscriptionResource($this->subscription)
         ];
     }
 
