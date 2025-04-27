@@ -2,7 +2,6 @@
 
 namespace App\Http\Resources\Subscription;
 
-use App\Models\Subscription\Subscription;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class SubscriptionResource extends JsonResource
@@ -25,7 +24,6 @@ class SubscriptionResource extends JsonResource
             'available_serial_count' => $this->available_serial_count,
             'gateway_fee' => $this->gateway_fee,
             'packages' => PublicPackageResource::collection($this->packages),
-            'subscription' => Subscription::find($this->contributionProduct->id)
 
         ];
     }
