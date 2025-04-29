@@ -510,7 +510,7 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
 
             // $config = $currencyConfig[$currency];
 
-            $local_user_secret = 'OTYwZTVkYmEtMGFiZi00OGQ0LTk5ZDctNGM1YWY2NjhkNWUwXzkxMjY';
+            $local_user_secret = 'OTYwZTVkYmEtMGFiZi00OGQ0LTk5ZDctNGM1YWY2NjhkNWUwXzkxMjY=';
             $marx_sandbox_url = 'https://payment.v4.api.marx.lk/api/v4/ipg/orders';
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
@@ -590,7 +590,7 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             $marxArgs = ['merchantRID' => $mur];
 
             $marx_sandbox_url = 'https://payment.v4.api.marx.lk/api/v4/ipg/orders';
-            $local_user_secret = 'OTYwZTVkYmEtMGFiZi00OGQ0LTk5ZDctNGM1YWY2NjhkNWUwXzkxMjY';
+            $local_user_secret = 'OTYwZTVkYmEtMGFiZi00OGQ0LTk5ZDctNGM1YWY2NjhkNWUwXzkxMjY=';
 
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
