@@ -491,7 +491,6 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
         $marxArgs = [
             'merchantRID' => $order->order_id,
             'amount' => floatval($amount),
-            // 'returnUrl' => route('marxpay.callback'),
             'returnUrl' => "https://cheaphub.io/marxpay",
             'validTimeLimit' => 30,
             'customerMail' => $data['email'] ?? '',
@@ -526,7 +525,7 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             $result = $response->json();
 
             Log::info('Payment initiation response: ', $result);
-            if ($response->successful() && isset($result['data']['payUrl'])) {
+            if ($response->successful() && isset($result['data']['payUrl']) && $result['status'] === 0 && $result['message'] === 'SUCCESS') {
                 $order->update([
                     'payment_status' => 'pending',
                     'transaction_id' => $result['data']['trId']
@@ -556,6 +555,9 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
 
     public function paymentCallbackV4($data)
     {
+        Log::error('111111111111111111111');
+        Log::error($data);
+
         try {
             $mur = $data['mur'] ?? null;
             $tr = $data['tr'] ?? null;
