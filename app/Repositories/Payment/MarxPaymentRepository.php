@@ -563,7 +563,7 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
 
         try {
           
-            $merchantRID = $data['merchantRID'] ?? null;
+            $merchantRID = $data['mur'] ?? null;
         
             if (!$merchantRID) {
                 return response()->json([
