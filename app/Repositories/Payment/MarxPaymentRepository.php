@@ -534,7 +534,9 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                 return response()->json([
                     'status' => 'success',
                     'redirect_url' => $result['data']['payUrl'],
-                    'transaction_id' => $result['data']['trId']
+                    'transaction_id' => $result['data']['trId'],
+                    'merchantRID' => $result['data']['merchantRID']
+                    
                 ]);
             }
 
@@ -560,11 +562,10 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
         Log::error($data);
 
         try {
-            $mur = $data['mur'] ?? null;
-            $tr = $data['tr'] ?? null;
-            $currency =$data['currency'];
-
-            if (!$mur || !$tr) {
+          
+            $merchantRID = $data['merchantRID'] ?? null;
+        
+            if (!$merchantRID) {
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Missing required parameters.',
@@ -590,7 +591,7 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             // }
 
             // Prepare API request
-            $marxArgs = ['merchantRID' => $mur];
+            $marxArgs = ['merchantRID' => $merchantRID];
 
             $marx_sandbox_url = 'https://payment.v4.api.marx.lk/api/v4/ipg/orders';
             $local_user_secret = 'OTYwZTVkYmEtMGFiZi00OGQ0LTk5ZDctNGM1YWY2NjhkNWUwXzkxMjY=';
