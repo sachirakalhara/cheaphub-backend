@@ -510,12 +510,15 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             // $config = $currencyConfig[$currency];
 
             $local_user_secret = 'OTYwZTVkYmEtMGFiZi00OGQ0LTk5ZDctNGM1YWY2NjhkNWUwXzkxMjY=';
-            $marx_sandbox_url = 'https://payment.v4.api.marx.lk/api/v4/ipg/orders';
+            $production_url = 'https://payment.v4.api.marx.lk/api/v4/ipg/orders';
+
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
                 'merchant-api-key' => $local_user_secret,
-
-            ])->post($marx_sandbox_url , $marxArgs);
+            ])->put($production_url, [
+                'merchantRID' => $marxArgs,
+            ]);
+        
 
             // $response = Http::withHeaders([
             //     'user_secret' => $currencyConfig[$data['currency']]['user_secret'],
