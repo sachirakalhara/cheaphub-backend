@@ -590,15 +590,23 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             // }
 
             // Prepare API request
-            $marxArgs = ['merchantRID' => $mur];
+            // $marxArgs = ['merchantRID' => $mur];
 
-            $marx_sandbox_url = 'https://payment.v4.api.marx.lk/api/v4/ipg/orders';
+            $production_url = 'https://payment.v4.api.marx.lk/api/v4/ipg/orders';
             $local_user_secret = 'OTYwZTVkYmEtMGFiZi00OGQ0LTk5ZDctNGM1YWY2NjhkNWUwXzkxMjY=';
 
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
                 'merchant-api-key' => $local_user_secret,
-            ])->put($marx_sandbox_url, $marxArgs);
+            ])->put($production_url, [
+                'merchantRID' => $mur,
+            ]);
+
+            
+            // $response = Http::withHeaders([
+            //     'Content-Type' => 'application/json',
+            //     'merchant-api-key' => $local_user_secret,
+            // ])->put($marx_sandbox_url, $marxArgs);
 
             Log::info('Payment callback response: ', $response->json() ?? []);
 
