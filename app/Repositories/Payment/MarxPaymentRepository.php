@@ -526,6 +526,7 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
 
             Log::info('Payment initiation response: ', $result);
             if ($response->successful() && isset($result['data']['payUrl']) && $result['status'] === 0 && $result['message'] === 'SUCCESS') {
+                
                 $order->update([
                     'payment_status' => 'pending',
                     'transaction_id' => $result['data']['trId']
@@ -599,7 +600,7 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                 'merchant-api-key' => $local_user_secret,
             ])->put($marx_sandbox_url, $marxArgs);
 
-            Log::info('Payment callback response: ', $response->json());
+            Log::info('Payment callback response: ', $response->json() ?? []);
 
             if (!$response->successful()) {
                 return response()->json([
@@ -610,7 +611,7 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             }
 
             $result = $response->json();
-            Log::info('Payment callback response: ', $result['data']);
+            Log::info('Payment callback responseccccccccccc: ', $result['data']);
 
             if (isset($result['data']['summaryResult']) && $result['data']['summaryResult'] === "SUCCESS") {
                 $gatewayResponse = $result['data']['gatewayResponse'] ?? [];
