@@ -510,15 +510,12 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             // $config = $currencyConfig[$currency];
 
             $local_user_secret = 'OTYwZTVkYmEtMGFiZi00OGQ0LTk5ZDctNGM1YWY2NjhkNWUwXzkxMjY=';
-            $production_url = 'https://payment.v4.api.marx.lk/api/v4/ipg/orders';
-
+            $marx_sandbox_url = 'https://payment.v4.api.marx.lk/api/v4/ipg/orders';
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
                 'merchant-api-key' => $local_user_secret,
-            ])->put($production_url, [
-                'merchantRID' => $marxArgs,
-            ]);
-        
+
+            ])->post($marx_sandbox_url , $marxArgs);
 
             // $response = Http::withHeaders([
             //     'user_secret' => $currencyConfig[$data['currency']]['user_secret'],
@@ -527,8 +524,7 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
 
             $result = $response->json();
 
-            Log::info('Payment initiation response: ', $result ?? []);
-
+            Log::info('Payment initiation response: ', $result);
             if ($response->successful() && isset($result['data']['payUrl']) && $result['status'] === 0 && $result['message'] === 'SUCCESS') {
                 
                 $order->update([
@@ -566,10 +562,9 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
         Log::error($data);
 
         try {
-          
-            $merchantRID = $data['mur'] ?? null;
-        
-            if (!$merchantRID) {
+            $mur = $data['mur'] ?? null;
+
+            if (!$mur) {
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Missing required parameters.',
@@ -595,7 +590,7 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             // }
 
             // Prepare API request
-            $marxArgs = ['merchantRID' => $merchantRID];
+            $marxArgs = ['merchantRID' => $mur];
 
             $marx_sandbox_url = 'https://payment.v4.api.marx.lk/api/v4/ipg/orders';
             $local_user_secret = 'OTYwZTVkYmEtMGFiZi00OGQ0LTk5ZDctNGM1YWY2NjhkNWUwXzkxMjY=';
