@@ -4,7 +4,7 @@ namespace App\Repositories\Product;
 
 use App\Helpers\Helper;
 use App\Models\Product\Contribution\ProductReplacement;
-use App\Models\Product\Contribution\ProductReplacementSirial;
+use App\Models\Product\Contribution\ProductReplacementSerial;
 use App\Models\Subscription\Package;
 use App\Repositories\Product\Interface\ProductReplacementRepositoryInterface;
 use Illuminate\Support\Facades\Storage;
@@ -82,7 +82,7 @@ class ProductReplacementRepository implements ProductReplacementRepositoryInterf
     //                 'updated_at' => $productReplacement->updated_at,
     //                 'created_at' => $productReplacement->created_at,
     //                 'id' => $productReplacement->id,
-    //                 'sirial' => $randomSerial,
+    //                 'serial' => $randomSerial,
     //             ]
     //         ]
     //     ], Response::HTTP_OK);
@@ -123,8 +123,8 @@ class ProductReplacementRepository implements ProductReplacementRepositoryInterf
         $allSerials = array_filter(explode("\n", $package->subscription->serial), 'trim');
 
         // Step 2: Get already used serials for this replacement
-        $usedSerials = ProductReplacementSirial::where('product_replacement_id', $productReplacement->id)
-            ->pluck('sirial')
+        $usedSerials = ProductReplacementSerial::where('product_replacement_id', $productReplacement->id)
+            ->pluck('serial')
             ->toArray();
 
         // Step 3: Get available (unused) serials
@@ -144,9 +144,9 @@ class ProductReplacementRepository implements ProductReplacementRepositoryInterf
         $randomSerial = $availableSerials[array_rand($availableSerials)];
 
         // (Optional) Save the selected serial
-        ProductReplacementSirial::create([
+        ProductReplacementSerial::create([
             'product_replacement_id' => $productReplacement->id,
-            'sirial' => $randomSerial,
+            'serial' => $randomSerial,
         ]);
 
         return response()->json([

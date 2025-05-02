@@ -20,7 +20,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\MailQueue;
 use App\Models\Product\Contribution\ProductReplacement;
-use App\Models\Product\Contribution\ProductReplacementSirial;
 use App\Models\User\User;
 use App\Notifications\OrderCreated;
 use NunoMaduro\Collision\Adapters\Phpunit\Subscribers\Subscriber;

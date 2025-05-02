@@ -2,16 +2,11 @@
 
 namespace App\Http\Resources\Payment;
 
-use App\Http\Resources\Category\CategoryResource;
 use App\Http\Resources\Product\Bulk\BulkProductResource;
-use App\Http\Resources\Subscription\PackageResource;
-use App\Http\Resources\Subscription\SubscriptionResource;
 use App\Models\Product\Contribution\ContributionProduct;
-use App\Models\Product\Contribution\ProductReplacementSirial;
 use App\Models\Subscription\Subscription;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class OrderItemResource extends JsonResource
@@ -64,7 +59,7 @@ class OrderItemResource extends JsonResource
                 'name' => $subscription->name,
                 'available_serial_count' => $subscription->available_serial_count,
                 'gateway_fee' => $subscription->gateway_fee,
-                'sirial' => $subscription->sirial
+                'serial' => $subscription->serial
             ] : null,
 
             'contribution_product' => $contributionProduct ? [
