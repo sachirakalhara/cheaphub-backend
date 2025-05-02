@@ -6,6 +6,7 @@ use App\Http\Resources\Category\CategoryResource;
 use App\Http\Resources\Product\Bulk\BulkProductResource;
 use App\Http\Resources\Subscription\PackageResource;
 use App\Http\Resources\Subscription\SubscriptionResource;
+use App\Models\Product\Contribution\ContributionProduct;
 use App\Models\Subscription\Subscription;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
@@ -26,9 +27,15 @@ class OrderItemResource extends JsonResource
 
         $disk = Storage::disk('s3');
 
-        $contributionProduct = optional(optional(optional($this->package)->subscription)->contributionProduct);
-        $image = $contributionProduct->image ? $disk->url($contributionProduct->image) : null;
+        // Safely get subscription and contribution product
         $subscription = Subscription::find($this->package->subscription_id);
+        $contributionProduct = $subscription ? ContributionProduct::find($subscription->contribution_product_id) : null;
+
+        // Safely get image
+        $image = $contributionProduct && $contributionProduct->image 
+            ? $disk->url($contributionProduct->image) 
+            : null;
+
         return [
             'id' => $this->id,
             'quantity' => $this->quantity,
@@ -44,15 +51,14 @@ class OrderItemResource extends JsonResource
                 'expiry_duration' => optional($this->package)->expiry_duration,
             ],
 
-            'subscription' => [
+            'subscription' => $subscription ? [
                 'id' => $subscription->id,
                 'name' => $subscription->name,
-                // 'serial' => $subscription->serial,
                 'available_serial_count' => $subscription->available_serial_count,
                 'gateway_fee' => $subscription->gateway_fee,
-            ],
+            ] : null,
 
-            'contribution_product' => [
+            'contribution_product' => $contributionProduct ? [
                 'id' => $contributionProduct->id,
                 'name' => $contributionProduct->name,
                 'tag_id' => $contributionProduct->tag_id,
@@ -60,8 +66,10 @@ class OrderItemResource extends JsonResource
                 'image' => $image,
                 'visibility' => $contributionProduct->visibility,
                 'service_info' => $contributionProduct->service_info,
-                'url' =>!empty(Auth::user()->id) ? "cheaphub.io/contribution/{$contributionProduct->id}/{$contributionProduct->name}" : null,
-            ],
+                'url' => Auth::check()
+                    ? "https://cheaphub.io/contribution/{$contributionProduct->id}/" . urlencode($contributionProduct->name)
+                    : null,
+            ] : null,
         ];
 
             // 'id'=>$this->id,
