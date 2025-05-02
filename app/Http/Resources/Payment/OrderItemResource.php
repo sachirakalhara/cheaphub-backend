@@ -37,6 +37,8 @@ class OrderItemResource extends JsonResource
                     $image = $disk->url($contributionProduct->image);
                 }
             }
+
+            $allSerials = array_filter(explode("\n", $package->subscription->serial), 'trim');
         }
      
         return [
@@ -59,7 +61,7 @@ class OrderItemResource extends JsonResource
                 'name' => $subscription->name,
                 'available_serial_count' => $subscription->available_serial_count,
                 'gateway_fee' => $subscription->gateway_fee,
-                'serial' => $subscription->serial
+                'serial' => $allSerials[0] ?? null,
             ] : null,
 
             'contribution_product' => $contributionProduct ? [
