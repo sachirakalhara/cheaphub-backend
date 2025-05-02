@@ -34,6 +34,18 @@ class OrderRepository implements OrderRepositoryInterface
         }
     }
 
+
+    public function getWalletOrdersByUserID($user_id, $perPage = 10)
+    {
+        $orders = Order::where('is_wallet',true)->where('user_id', $user_id)->paginate($perPage);
+
+        if ($orders->isNotEmpty()) {
+            return new OrderCollection($orders);
+        } else {
+            return Helper::error('No orders found for this user', Response::HTTP_NO_CONTENT);
+        }
+    }
+    
     
     public function totalCustomerCountWithSpend()
     {

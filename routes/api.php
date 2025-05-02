@@ -64,6 +64,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         
         Route::get('/order/{id}', [OrderController::class, 'getOrderByID']);
         Route::get('/orders/{user_id}', [OrderController::class, 'getOrdersByUserID']);
+        Route::get('/wallet-orders/{user_id}', [OrderController::class, 'getWalletOrdersByUserID']);
         Route::post('/order/filter', [OrderController::class, 'filter']);
         
         Route::post('/ticket/get-all', [TicketController::class, 'index']);

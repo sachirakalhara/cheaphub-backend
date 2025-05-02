@@ -33,6 +33,12 @@ class OrderController extends Controller
         return $this->orderRepository->getOrdersByUserID($user_id);
     }
 
+
+    public function getWalletOrdersByUserID($user_id)
+    {
+        return $this->orderRepository->getWalletOrdersByUserID($user_id);
+    }
+    
     
     public function filter(Request $request)
     {
