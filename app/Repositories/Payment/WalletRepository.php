@@ -128,6 +128,7 @@ class WalletRepository implements WalletRepositoryInterface
             $order = Order::create([
                 'user_id'        => $user->id,
                 'amount'         => $amount,
+                'amount_paid'         => $amount,
                 'discount'       => $discount,
                 'currency'       => $wallet->currency,
                 'description'    => $data['description'] ?? '',
