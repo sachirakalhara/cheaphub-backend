@@ -47,7 +47,7 @@ class OrderItemResource extends JsonResource
             'subscription' => [
                 'id' => $subscription->id,
                 'name' => $subscription->name,
-                'serial' => $subscription->serial,
+                // 'serial' => $subscription->serial,
                 'available_serial_count' => $subscription->available_serial_count,
                 'gateway_fee' => $subscription->gateway_fee,
             ],
