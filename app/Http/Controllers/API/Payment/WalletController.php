@@ -23,5 +23,16 @@ class WalletController extends Controller
     {
         return $this->walletRepository->show();
     }
+
+    public function processWalletPaymentForProduct(Request $request)
+    {
+        // Validate required fields
+        $request->validate([
+            'amount' => 'required|numeric',
+            'description' => 'nullable|string',
+        ]);
+
+        return $this->walletRepository->processWalletPaymentForProduct($request);
+    }    
     
 }

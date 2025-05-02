@@ -115,6 +115,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             Route::post('/marxpay/payment', [MarxPaymentController::class, 'makePayment']);
             Route::post('/marxpay/callback', [MarxPaymentController::class, 'paymentCallback'])->name('marxpay.callback');
 
+            Route::post('/wallet/product-payment', [WalletController::class, 'processWalletPaymentForProduct']);
+
             Route::get('/wallet/show', [WalletController::class, 'show']);
              
             Route::post('/cart-item/add', [CartItemController::class, 'addToCart']);

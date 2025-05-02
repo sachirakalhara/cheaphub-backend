@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('order_id')->unique();
             $table->decimal('amount_paid', 10, 2)->nullable();
             $table->decimal('discount', 10, 2)->nullable();
+            $table->string('payment_method')->nullable();// e.g., 'credit_card', 'wallet'
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
         });
