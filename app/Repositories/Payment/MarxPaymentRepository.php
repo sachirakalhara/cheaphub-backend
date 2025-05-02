@@ -472,22 +472,6 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             }
         }
 
-        // $currencyConfig = [
-        //     'LKR' => [
-        //         'user_secret' => env('MARXPAY_LKR_USER_SECRET'),
-        //         'url' => env('MARXPAY_LKR_URL'),
-        //     ],
-        //     'USD' => [
-        //         'user_secret' => env('MARXPAY_USD_USER_SECRET'),
-        //         'url' => env('MARXPAY_USD_URL'),
-        //     ],
-        // ];
-
-        // if (!isset($currencyConfig[$data['currency']])) {
-        //     $order->update(['payment_status' => 'failed']);
-        //     return response()->json(['status' => 'error', 'message' => 'Unsupported currency.'], 400);
-        // }
-
         $marxArgs = [
             'merchantRID' => $order->order_id,
             'amount' => floatval($amount),
@@ -505,10 +489,7 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
 
 
         try {
-            // $currency = $data['currency'] ?? 'USD';
-
-            // $config = $currencyConfig[$currency];
-
+           
             $local_user_secret = 'OTYwZTVkYmEtMGFiZi00OGQ0LTk5ZDctNGM1YWY2NjhkNWUwXzkxMjY=';
             $marx_sandbox_url = 'https://payment.v4.api.marx.lk/api/v4/ipg/orders';
             $response = Http::withHeaders([
@@ -516,11 +497,6 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                 'merchant-api-key' => $local_user_secret,
 
             ])->post($marx_sandbox_url , $marxArgs);
-
-            // $response = Http::withHeaders([
-            //     'user_secret' => $currencyConfig[$data['currency']]['user_secret'],
-            //     'Content-Type' => 'application/json',
-            // ])->post($currencyConfig[$data['currency']]['url'], $marxArgs);
 
             $result = $response->json();
 
@@ -558,9 +534,6 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
 
     public function paymentCallbackV4($data)
     {
-        Log::error('111111111111111111111');
-        Log::error($data);
-
         try {
             $mur = $data['mur'] ?? null;
             $tr = $data['tr'] ?? null;
@@ -571,38 +544,8 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                     'message' => 'Missing required parameters.',
                 ], Response::HTTP_BAD_REQUEST);
             }
-
-            // $currencyConfig = [
-            //     'LKR' => [
-            //         'user_secret' => env('MARXPAY_LKR_USER_SECRET'),
-            //         'url' => env('MARXPAY_LKR_URL') . "/{$tr}",
-            //     ],
-            //     'USD' => [
-            //         'user_secret' => env('MARXPAY_USD_USER_SECRET'),
-            //         'url' => env('MARXPAY_USD_URL') . "/{$tr}",
-            //     ],
-            // ];
-
-            // if (!isset($currencyConfig['LKR'])) {
-            //     return response()->json([
-            //         'status' => 'error',
-            //         'message' => 'Currency configuration not found.',
-            //     ], Response::HTTP_INTERNAL_SERVER_ERROR);
-            // }
-
-            // Prepare API request
-            // $marxArgs = ['merchantRID' => $mur];
-
             $production_url = 'https://payment.v4.api.marx.lk/api/v4/ipg/orders';
             $local_user_secret = 'OTYwZTVkYmEtMGFiZi00OGQ0LTk5ZDctNGM1YWY2NjhkNWUwXzkxMjY=';
-
-            // $response = Http::withHeaders([
-            //     'Content-Type' => 'application/json',
-            //     'merchant-api-key' => $local_user_secret,
-            // ])->put($production_url, [
-            //     'merchantRID' => $mur,
-            // ]);
-
 
             $check_url = "{$production_url}/{$tr}";
             $response = Http::withHeaders([
@@ -611,14 +554,6 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             ])->put($check_url, [
                 'merchantRID' => $mur,
             ]);
-
-            
-            // $response = Http::withHeaders([
-            //     'Content-Type' => 'application/json',
-            //     'merchant-api-key' => $local_user_secret,
-            // ])->put($marx_sandbox_url, $marxArgs);
-
-            Log::info('Payment callback response: ', $response->json() ?? []);
 
             if (!$response->successful()) {
                 return response()->json([
@@ -629,7 +564,6 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             }
 
             $result = $response->json();
-            Log::info('Payment callback responseccccccccccc: ', $result['data']);
 
             if (isset($result['data']['summaryResult']) && $result['data']['summaryResult'] === "SUCCESS") {
                 $gatewayResponse = $result['data']['gatewayResponse'] ?? [];

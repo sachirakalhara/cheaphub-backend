@@ -30,8 +30,6 @@ class OrderItemResource extends JsonResource
         $disk = Storage::disk('s3');
 
         $package = $this->package;
-        Log::info('package');
-        Log::info($package);
         $subscription = null;
         $contributionProduct = null;
         $image = null;
@@ -45,8 +43,7 @@ class OrderItemResource extends JsonResource
                 }
             }
         }
-        Log::info('packagesssssssss');
-        Log::info($package);
+     
         return [
             'id' => $this->id,
             'quantity' => $this->quantity,
@@ -67,7 +64,7 @@ class OrderItemResource extends JsonResource
                 'name' => $subscription->name,
                 'available_serial_count' => $subscription->available_serial_count,
                 'gateway_fee' => $subscription->gateway_fee,
-                'sirial' =>null
+                'sirial' => $subscription->sirial
             ] : null,
 
             'contribution_product' => $contributionProduct ? [
@@ -83,40 +80,6 @@ class OrderItemResource extends JsonResource
                     : null,
             ] : null,
         ];
-
-            // 'id'=>$this->id,
-            // // 'order'=>OrderResource::collection($this->order),
-            // 'quantity'=> $this->quantity,
-            // // 'bulkProduct'=> $this->bulkProduct,
-            // // 'package'=> $this->package,
-            // 'created_at'=>$this->created_at,
-            
-            // 'bulk_product' => new BulkProductResource($this->bulkProduct),
-            // // 'package' => new PackageResource($this->package),
-            // 'package' =>  [
-            //     'id' => $this->package->id,
-            //     'name' => $this->package->name,
-            //     'price' => $this->package->price,
-            //     'replace_count' => $this->package->replace_count,
-            //     'expiry_duration' => $this->package->expiry_duration,
-            //     'payment_method' => $this->package->payment_method,
-            //     'contributionProduct'=> [
-            //         'id' => $this->package->subscription->contributionProduct->id,
-            //         'name' => $this->package->subscription->contributionProduct->name,
-            //         'tag_id' => $this->package->subscription->contributionProduct->tag_id,
-            //         'description' => $this->package->subscription->contributionProduct->description,
-            //         'categories' => CategoryResource::collection($this->package->subscription->contributionProduct->categories),
-            //         'image' => $image,
-            //         'visibility' => $this->package->subscription->contributionProduct->visibility,
-            //         'service_info' => $this->package->subscription->contributionProduct->service_info,
-            //         'url' =>!empty(Auth::user()->id) ? "cheaphub.io/contribution/{$this->package->subscription->contributionProduct->id}/{$this->package->subscription->contributionProduct->name}" : null,
-            //         'subscriptions' => SubscriptionResource::collection($this->package->subscription->contributionProduct->subscriptions),
-        
-            //     ];
-            
-
-
-    
     }
 
 }
