@@ -27,14 +27,20 @@ class OrderItemResource extends JsonResource
 
         $disk = Storage::disk('s3');
 
-        // Safely get subscription and contribution product
-        $subscription = Subscription::find($this->package->subscription_id);
-        $contributionProduct = $subscription ? ContributionProduct::find($subscription->contribution_product_id) : null;
+        $package = $this->package;
+        $subscription = null;
+        $contributionProduct = null;
+        $image = null;
 
-        // Safely get image
-        $image = $contributionProduct && $contributionProduct->image 
-            ? $disk->url($contributionProduct->image) 
-            : null;
+        if ($package) {
+            $subscription = Subscription::find($package->subscription_id);
+            if ($subscription) {
+                $contributionProduct = ContributionProduct::find($subscription->contribution_product_id);
+                if ($contributionProduct && $contributionProduct->image) {
+                    $image = $disk->url($contributionProduct->image);
+                }
+            }
+        }
 
         return [
             'id' => $this->id,
@@ -44,11 +50,11 @@ class OrderItemResource extends JsonResource
             'bulk_product' => new BulkProductResource($this->bulkProduct),
 
             'package' => [
-                'id' => optional($this->package)->id,
-                'name' => optional($this->package)->name,
-                'price' => optional($this->package)->price,
-                'replace_count' => optional($this->package)->replace_count,
-                'expiry_duration' => optional($this->package)->expiry_duration,
+                'id' => optional($package)->id,
+                'name' => optional($package)->name,
+                'price' => optional($package)->price,
+                'replace_count' => optional($package)->replace_count,
+                'expiry_duration' => optional($package)->expiry_duration,
             ],
 
             'subscription' => $subscription ? [
@@ -67,7 +73,7 @@ class OrderItemResource extends JsonResource
                 'visibility' => $contributionProduct->visibility,
                 'service_info' => $contributionProduct->service_info,
                 'url' => Auth::check()
-                    ? "https://cheaphub.io/contribution/{$contributionProduct->id}/" . urlencode($contributionProduct->name)
+                    ? "https://cheaphub.io/contribution/{$contributionProduct->id}/{$contributionProduct->name}"
                     : null,
             ] : null,
         ];
