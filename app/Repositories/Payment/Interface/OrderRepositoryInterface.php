@@ -10,5 +10,6 @@ interface OrderRepositoryInterface
     public function filter($request);
     public function totalCustomerCountWithSpend();
     public function changeStatus($request);
+    public function walletHistory();
 
 }

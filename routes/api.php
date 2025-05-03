@@ -130,6 +130,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             Route::get('package/replace/{package_id}', [ProductReplacementController::class, 'getAvalableCount']);
             Route::post('package/replace/store', [ProductReplacementController::class, 'store']);
 
+            Route::get('/order/wallet/history', [OrderController::class, 'walletHistory']);
+
+
         });
 
 

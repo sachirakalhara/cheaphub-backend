@@ -33,6 +33,11 @@ class OrderController extends Controller
         return $this->orderRepository->getOrdersByUserID($user_id);
     }
 
+    public function walletHistory()
+    {
+        return $this->orderRepository->walletHistory();
+    }
+    
 
     public function getWalletOrdersByUserID($user_id)
     {
