@@ -152,6 +152,7 @@ class OrderRepository implements OrderRepositoryInterface
     }
 
     $orders = Order::where('user_id', $user->id)
+        ->where('payment_status', 'paid')
         ->where(function ($query) {
             $query->where('is_wallet', true)
                   ->orWhere('payment_method', 'wallet');
@@ -164,7 +165,7 @@ class OrderRepository implements OrderRepositoryInterface
     }
 
     $formatted = $orders->map(function ($order) {
-        $isCredit = $order->is_wallet === true; // Adjust logic based on your system
+        $isCredit = $order->is_wallet === true;
 
         return [
             'date'  => Carbon::parse($order->created_at)->format('D M d, Y'),
