@@ -168,7 +168,7 @@ class OrderRepository implements OrderRepositoryInterface
 
         return [
             'date'  => Carbon::parse($order->created_at)->format('D M d, Y'),
-            'value' => ($isCredit ? '+' : '-') . number_format($order->total, 2),
+            'value' => ($isCredit ? '+' : '-') . number_format($order->amount_paid, 2),
             'type'  => $isCredit ? 'credit' : 'debit',
         ];
     });
