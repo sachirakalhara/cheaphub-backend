@@ -9,6 +9,8 @@ use App\Models\Payment\Order;
 use App\Repositories\Payment\Interface\OrderRepositoryInterface;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class OrderRepository implements OrderRepositoryInterface
 {
@@ -139,6 +141,47 @@ class OrderRepository implements OrderRepositoryInterface
         $order->save();
 
         return Helper::success('Order status updated successfully', Response::HTTP_OK);
+    }
+
+    public function walletHistory($perPage = 10)
+    {
+        $user = Auth::user();
+
+    if (!$user) {
+        return Helper::error('User not authenticated', Response::HTTP_UNAUTHORIZED);
+    }
+
+    $orders = Order::where('user_id', $user->id)
+        ->where(function ($query) {
+            $query->where('is_wallet', true)
+                  ->orWhere('payment_method', 'wallet');
+        })
+        ->latest()
+        ->paginate($perPage);
+
+    if ($orders->isEmpty()) {
+        return Helper::error('No wallet-related orders found', Response::HTTP_NO_CONTENT);
+    }
+
+    $formatted = $orders->map(function ($order) {
+        $isCredit = $order->is_wallet === true; // Adjust logic based on your system
+
+        return [
+            'date'  => Carbon::parse($order->created_at)->format('D M d, Y'),
+            'value' => ($isCredit ? '+' : '-') . number_format($order->total, 2),
+            'type'  => $isCredit ? 'credit' : 'debit',
+        ];
+    });
+
+    return response()->json([
+        'data' => $formatted,
+        'pagination' => [
+            'current_page' => $orders->currentPage(),
+            'last_page'    => $orders->lastPage(),
+            'per_page'     => $orders->perPage(),
+            'total'        => $orders->total(),
+        ]
+    ]);
     }
 
 }
