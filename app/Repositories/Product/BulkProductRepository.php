@@ -31,10 +31,22 @@ class BulkProductRepository implements BulkProductRepositoryInterface
     public function getAllWithVisibility($request)
     {
 
-        if($request->input('all', '') == 1) {
-            $product_list = BulkProduct::all();
+        $query = BulkProduct::query();
+        $query->where('visibility','open');
+        if ($request->filled('products_name')) {
+            $query->where('name', 'like', '%' . $request->products_name . '%');
+        }
+
+        if ($request->filled('product_category_id')) {
+            $query->whereHas('categories', function ($q) use ($request) {
+                $q->where('categories.id', $request->product_category_id); // Specify the table name
+            });
+        }
+
+        if ($request->input('all', false)) {
+            $product_list = $query->get();
         } else {
-            $product_list = BulkProduct::orderBy('created_at', 'desc')->paginate(10);
+            $product_list = Helper::paginate($query->get());
         }
 
         if (count($product_list) > 0) {
