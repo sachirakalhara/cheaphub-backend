@@ -33,7 +33,6 @@ class ContributionProductRepository implements ContributionProductRepositoryInte
     public function getAllWithVisibility($request)
     {
         $query = ContributionProduct::query();
-        $query->where('visibility','open');
         if ($request->filled('products_name')) {
             $query->where('name', 'like', '%' . $request->products_name . '%');
         }
