@@ -32,7 +32,6 @@ class BulkProductRepository implements BulkProductRepositoryInterface
     {
 
         $query = BulkProduct::query();
-        $query->where('visibility','open');
         if ($request->filled('products_name')) {
             $query->where('name', 'like', '%' . $request->products_name . '%');
         }

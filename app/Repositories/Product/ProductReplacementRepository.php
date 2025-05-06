@@ -88,13 +88,10 @@ class ProductReplacementRepository implements ProductReplacementRepositoryInterf
     //     ], Response::HTTP_OK);
     // }
 
-
-
     public function store($request)
     {
         $userId = Auth::id();
 
-        // Step 1: Validate Package
         $package = Package::find($request->package_id);
         if (!$package) {
             return response()->json([
@@ -103,7 +100,6 @@ class ProductReplacementRepository implements ProductReplacementRepositoryInterf
             ], Response::HTTP_NOT_FOUND);
         }
 
-        // Step 2: Get or create a ProductReplacement record
         $productReplacement = ProductReplacement::firstOrNew([
             'user_id' => $userId,
             'package_id' => $request->package_id,
@@ -123,53 +119,47 @@ class ProductReplacementRepository implements ProductReplacementRepositoryInterf
 
         $productReplacement->save();
 
-        // Step 3: Get all serials from the subscription
+        // Step 1: Get all serials from the subscription
         $allSerials = array_filter(explode("\n", $package->subscription->serial), 'trim');
 
-        // Step 4: Ensure productReplacement ID is valid
-        if (!$productReplacement->id) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Failed to create product replacement record.',
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-
-        // Step 5: Get already used serials for this replacement
+        // Step 2: Get already used serials for this replacement
         $usedSerials = ProductReplacementSerial::where('product_replacement_id', $productReplacement->id)
             ->pluck('serial')
             ->toArray();
 
-        // Step 6: Get available (unused) serials
+        // Step 3: Get available (unused) serials
         $availableSerials = array_values(array_diff($allSerials, $usedSerials));
 
-        // Step 7: Check if no serials are available
+        // Step 4: Check if no serials are available
         if (empty($availableSerials)) {
+            $productReplacement->avalable_replace_count += 1;
+            $productReplacement->save();
             return response()->json([
                 'status' => false,
-                'message' => 'No available serials for replacement',
+                'message' => 'All serials have already been used for this package.',
             ], Response::HTTP_OK);
         }
 
-        // Step 8: Pick the first available serial
-        $replacementSerial = $availableSerials[0];
+        // Step 5: Randomly pick one from available serials
+        $randomSerial = $availableSerials[array_rand($availableSerials)];
 
-        // Step 9: Save the used serial
+        // (Optional) Save the selected serial
         ProductReplacementSerial::create([
             'product_replacement_id' => $productReplacement->id,
-            'serial' => $replacementSerial,
+            'serial' => $randomSerial,
         ]);
 
-        // Step 10: Return success response
         return response()->json([
             'status' => true,
-            'message' => 'Replacement successful',
+            'message' => 'Replacement updated successfully',
             'data' => [
-                'serial' => $replacementSerial,
-                'remaining_replacements' => $productReplacement->avalable_replace_count,
-            ]
+                'user_id' => $productReplacement->user_id,
+                'package_id' => $productReplacement->package_id,
+                'selected_serial' => $randomSerial,
+                'available_replace_count' => $productReplacement->avalable_replace_count,
+            ],
         ], Response::HTTP_OK);
     }
-
 
 
 }
