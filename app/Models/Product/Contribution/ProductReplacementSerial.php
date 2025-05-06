@@ -10,6 +10,6 @@ class ProductReplacementSerial extends Model
     protected $fillable = [
         'id',
         'product_replacement_id',
-        'sirial'
+        'serial'
     ];
 }
