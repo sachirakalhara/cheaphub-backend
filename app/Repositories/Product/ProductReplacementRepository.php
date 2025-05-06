@@ -132,34 +132,32 @@ class ProductReplacementRepository implements ProductReplacementRepositoryInterf
 
         // Step 4: Check if no serials are available
         if (empty($availableSerials)) {
-            $productReplacement->avalable_replace_count += 1;
-            $productReplacement->save();
             return response()->json([
                 'status' => false,
-                'message' => 'All serials have already been used for this package.',
+                'message' => 'No available serials for replacement',
             ], Response::HTTP_OK);
         }
 
-        // Step 5: Randomly pick one from available serials
-        $randomSerial = $availableSerials[array_rand($availableSerials)];
+        // Step 5: Use the first available serial
+        $replacementSerial = $availableSerials[0];
 
-        // (Optional) Save the selected serial
+        // Step 6: Store the serial for this replacement
         ProductReplacementSerial::create([
             'product_replacement_id' => $productReplacement->id,
-            'serial' => $randomSerial,
+            'serial' => $replacementSerial,
         ]);
 
+        // Step 7: Return a successful response
         return response()->json([
             'status' => true,
-            'message' => 'Replacement updated successfully',
+            'message' => 'Replacement successful',
             'data' => [
-                'user_id' => $productReplacement->user_id,
-                'package_id' => $productReplacement->package_id,
-                'selected_serial' => $randomSerial,
-                'available_replace_count' => $productReplacement->avalable_replace_count,
+                'serial' => $replacementSerial,
+                'remaining_replacements' => $productReplacement->avalable_replace_count,
             ],
         ], Response::HTTP_OK);
     }
+
 
 
 }
