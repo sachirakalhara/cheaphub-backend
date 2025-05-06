@@ -12,7 +12,6 @@ use App\Repositories\Product\Interface\ContributionProductRepositoryInterface;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-
 class ContributionProductRepository implements ContributionProductRepositoryInterface
 {
     public function all($request)
@@ -33,12 +32,23 @@ class ContributionProductRepository implements ContributionProductRepositoryInte
 
     public function getAllWithVisibility($request)
     {
-        if($request->input('all', '') == 1) {
-            $product_list = ContributionProduct::all();
-        } else {
-            $product_list = ContributionProduct::orderBy('created_at', 'desc')->paginate(10);
+        $query = ContributionProduct::query();
+        $query->where('visibility','open');
+        if ($request->filled('products_name')) {
+            $query->where('name', 'like', '%' . $request->products_name . '%');
         }
 
+        if ($request->filled('product_category_id')) {
+            $query->whereHas('categories', function ($q) use ($request) {
+                $q->where('categories.id', $request->product_category_id); // Specify the table name
+            });
+        }
+
+        if($request->input('all', '') == 1) {
+            $product_list = $query->get();
+        } else {
+            $product_list = Helper::paginate($query->get());
+        }
         if (count($product_list) > 0) {
             return new ContributionProductCollection($product_list);
         } else {
