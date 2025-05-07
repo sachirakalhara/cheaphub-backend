@@ -36,6 +36,8 @@ Route::post('/coinbase/callback', [CoinbasePaymentController::class, 'paymentCal
 Route::post('/v1/bulk/product/get-all', [BulkProductController::class, 'index']);
 // Route::get('/v1/bulk/slug-product/{slug_name}', [BulkProductController::class, 'findBySlug'])->name('api.slug-product.slug');
 Route::post('/v1/bulk/product/filter', [BulkProductController::class, 'filter']);
+Route::get('/v1/bulk/product/{id}', [BulkProductController::class, 'findById']);
+
 
 Route::post('/v1/tag/get-all', [TagController::class, 'index']);
 Route::get('/v1/tag/{id}', [TagController::class, 'findById']);
