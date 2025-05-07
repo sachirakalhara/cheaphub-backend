@@ -8,6 +8,8 @@ use App\Models\Subscription\Subscription;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Product\Contribution\ProductReplacement;
+use App\Models\Product\Contribution\ProductReplacementSerial;
 
 class OrderItemResource extends JsonResource
 {
@@ -38,7 +40,25 @@ class OrderItemResource extends JsonResource
                 }
             }
 
-            $allSerials = array_filter(explode("\n", $package->subscription->serial), 'trim');
+            $userId = Auth::id();
+
+            $productReplacement = ProductReplacement::where('user_id', $userId)
+                ->where('package_id', $package->id)
+                ->first();
+            
+            $lastSerial = null;
+            
+            if ($productReplacement) {
+                $lastSerialRecord = ProductReplacementSerial::where('product_replacement_id', $productReplacement->id)
+                    ->orderBy('id', 'desc')
+                    ->first();
+            
+                if ($lastSerialRecord) {
+                    $lastSerial = $lastSerialRecord->serial;
+                }
+            }
+
+
         }
      
         return [
@@ -61,7 +81,8 @@ class OrderItemResource extends JsonResource
                 'name' => $subscription->name,
                 'available_serial_count' => $subscription->available_serial_count,
                 'gateway_fee' => $subscription->gateway_fee,
-                'serial' => $allSerials[0] ?? null,
+                'serial' => $lastSerial ?? null,
+
             ] : null,
 
             'contribution_product' => $contributionProduct ? [

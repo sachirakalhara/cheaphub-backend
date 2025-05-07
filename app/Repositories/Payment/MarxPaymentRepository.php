@@ -18,11 +18,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\MailQueue;
 use App\Models\Product\Contribution\ProductReplacement;
+use App\Models\Product\Contribution\ProductReplacementSerial;
 use App\Models\User\User;
 use App\Notifications\OrderCreated;
-use NunoMaduro\Collision\Adapters\Phpunit\Subscribers\Subscriber;
 
 class MarxPaymentRepository implements MarxPaymentRepositoryInterface
 {
@@ -281,21 +280,44 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
 
                         if ($orderItem->package_id) {
                             $package = Package::find($orderItem->package_id);
+                        
                             if ($package) {
                                 $subscription = Subscription::find($package->subscription_id);
+                        
                                 if ($subscription) {
-                                    $subscription->available_serial_count -= $orderItem->quantity;
-                                    $subscription->save();
-
-                                    $productReplacement = ProductReplacement::where('user_id',$order->user_id)->where('package_id',$package->id)->first();
-                                    if($productReplacement){
-                                        $productReplacement->avalable_replace_count = $subscription->available_serial_count;
+                                    // Parse and clean serials
+                                    $allSerials = array_values(array_filter(explode("\n", $subscription->serial), 'trim'));
+                        
+                                    if (!empty($allSerials)) {
+                                        // Remove only the first serial
+                                        $removedSerial = array_shift($allSerials);
+                        
+                                        // Update subscription
+                                        $subscription->serial = implode("\n", $allSerials);
+                                        $subscription->available_serial_count = max(0, $subscription->available_serial_count - 1);
                                         $subscription->save();
-                                    }
+                        
+                                        // Find or create ProductReplacement
+                                        $productReplacement = ProductReplacement::firstOrCreate(
+                                            [
+                                                'user_id'    => $order->user_id,
+                                                'package_id' => $package->id
+                                            ],
+                                            [
+                                                'avalable_replace_count' => $subscription->available_serial_count
+                                            ]
+                                        );
 
+                                        // Save the removed serial to ProductReplacementSerial
+                                        ProductReplacementSerial::create([
+                                            'product_replacement_id' => $productReplacement->id,
+                                            'serial' => $removedSerial,
+                                        ]);
+                                    }
                                 }
                             }
                         }
+                        
                     }
                 }
 

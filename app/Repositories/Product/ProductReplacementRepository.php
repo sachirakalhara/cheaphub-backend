@@ -21,6 +21,7 @@ class ProductReplacementRepository implements ProductReplacementRepositoryInterf
         $data = [
             'user_id' => $user_id,
             'package_id' => $package_id,
+            // 'selected_serial' => ProductReplacementSerial::where('product_replacement_id',$productReplacement->id)->last()->serial,
             'available_count' => $productReplacement ? $productReplacement->avalable_replace_count : Package::find($package_id)->replace_count,
         ];
         return response()->json([

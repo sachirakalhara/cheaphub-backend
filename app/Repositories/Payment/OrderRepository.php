@@ -147,42 +147,42 @@ class OrderRepository implements OrderRepositoryInterface
     {
         $user = Auth::user();
 
-    if (!$user) {
-        return Helper::error('User not authenticated', Response::HTTP_UNAUTHORIZED);
-    }
+        if (!$user) {
+            return Helper::error('User not authenticated', Response::HTTP_UNAUTHORIZED);
+        }
 
-    $orders = Order::where('user_id', $user->id)
-        ->where('payment_status', 'paid')
-        ->where(function ($query) {
-            $query->where('is_wallet', true)
-                  ->orWhere('payment_method', 'wallet');
-        })
-        ->latest()
-        ->paginate($perPage);
+        $orders = Order::where('user_id', $user->id)
+            ->where('payment_status', 'paid')
+            ->where(function ($query) {
+                $query->where('is_wallet', true)
+                    ->orWhere('payment_method', 'wallet');
+            })
+            ->latest()
+            ->paginate($perPage);
 
-    if ($orders->isEmpty()) {
-        return Helper::error('No wallet-related orders found', Response::HTTP_NO_CONTENT);
-    }
+        if ($orders->isEmpty()) {
+            return Helper::error('No wallet-related orders found', Response::HTTP_NO_CONTENT);
+        }
 
-    $formatted = $orders->map(function ($order) {
-        $isCredit = $order->is_wallet === true;
+        $formatted = $orders->map(function ($order) {
+            $isCredit = $order->is_wallet === true;
 
-        return [
-            'date'  => Carbon::parse($order->updated_at)->format('D M d, Y'),
-            'value' => ($isCredit ? '-' : '+') . number_format($order->amount_paid, 2),
-            'type'  => $isCredit ? 'debit' : 'credit',
-        ];
-    });
+            return [
+                'date'  => Carbon::parse($order->updated_at)->format('D M d, Y'),
+                'value' => ($isCredit ? '-' : '+') . number_format($order->amount_paid, 2),
+                'type'  => $isCredit ? 'debit' : 'credit',
+            ];
+        });
 
-    return response()->json([
-        'data' => $formatted,
-        'pagination' => [
-            'current_page' => $orders->currentPage(),
-            'last_page'    => $orders->lastPage(),
-            'per_page'     => $orders->perPage(),
-            'total'        => $orders->total(),
-        ]
-    ]);
+        return response()->json([
+            'data' => $formatted,
+            'pagination' => [
+                'current_page' => $orders->currentPage(),
+                'last_page'    => $orders->lastPage(),
+                'per_page'     => $orders->perPage(),
+                'total'        => $orders->total(),
+            ]
+        ]);
     }
 
 }
