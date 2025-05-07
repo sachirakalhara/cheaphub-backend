@@ -5,6 +5,7 @@ namespace App\Repositories\Product;
 use App\Helpers\Helper;
 use App\Http\Resources\Product\Bulk\BulkProductCollection;
 use App\Http\Resources\Product\Bulk\BulkProductResource;
+use App\Http\Resources\Product\Bulk\PublicBulkProductResource;
 use App\Models\Product\Bulk\BulkProduct;
 use Illuminate\Support\Facades\Storage;
 use App\Repositories\Product\Interface\BulkProductRepositoryInterface;
@@ -87,7 +88,7 @@ class BulkProductRepository implements BulkProductRepositoryInterface
     {
         $product = BulkProduct::find($id);
         if ($product) {
-            return new BulkProductResource($product);
+            return new PublicBulkProductResource($product);
         } else {
             return Helper::success(Response::$statusTexts[Response::HTTP_NO_CONTENT], Response::HTTP_NO_CONTENT);
         }
