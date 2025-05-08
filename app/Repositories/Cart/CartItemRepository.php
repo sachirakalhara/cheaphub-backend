@@ -59,7 +59,7 @@ class CartItemRepository implements CartItemRepositoryInterface
             }
 
             $totalQty = $cartItemPackagesQty + $qty - $removeQty;
-            if ($totalQty < 0) {
+            if ($totalQty < 1) {
                 return response()->json(['message' => 'Quantity cannot be negative'], Response::HTTP_BAD_REQUEST);
             }
 
