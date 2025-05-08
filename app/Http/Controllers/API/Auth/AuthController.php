@@ -160,7 +160,7 @@ class AuthController extends Controller
             $token = Str::random(60);
            
             PasswordReset::updateOrCreate(['email' => $user->email], [
-                'email' => $user->email,
+            'email' => $user->email,
                 'token' => Hash::make($token)
             ]);
     
@@ -176,67 +176,6 @@ class AuthController extends Controller
             'message' => 'If the email address exists in our records, a password reset link has been sent to your email. Please check your inbox (or spam folder) for further instructions.'
         ]);
     }
-
-
-    // public function resetPassword($token,$user_id)
-    // {
-    //     if (!$token) {
-    //         return response()->json(['message' => 'Empty token.'], 400);
-    //     }
-
-    //     $user = User::find($user_id);
-    //     if (!$user) {
-    //         return response()->json(['message' => 'User not found.'], 404);
-    //     }
-
-
-    //     // Retrieve password reset record based on email (not token)
-    //     $passwordReset = PasswordReset::where('email',$user->email)->first();
-
-    //     if (!$passwordReset) {
-    //         return response()->json(['message' => 'Invalid or expired token.'], 400);
-    //     }
-
-    //     // Validate token using Hash::check()
-    //     if (!Hash::check($token, $passwordReset->token)) {
-    //         return response()->json(['message' => 'Invalid or expired token.'], 400);
-    //     }
-
-    //     // Check if the token is expired
-    //     if (Carbon::parse($passwordReset->created_at)->addMinutes(60)->isPast()) {
-    //         $passwordReset->delete();
-    //         return response()->json(['message' => 'Token expired.'], 400);
-    //     }
-
-    //     // Retrieve user
-    //     $user = User::where('email', $passwordReset->email)->first();
-
-    //     if (!$user) {
-    //         return response()->json(['message' => 'User not found.'], 404);
-    //     }
-
-    //     // Generate a temporary password
-    //     $newPassword = 'Preset-' . $user->fname;
-
-    //     // Update user password securely
-    //     $user->update(['password' => Hash::make($newPassword)]);
-
-    //     // Delete the used token
-    //     $passwordReset->delete();
-
-    //     // Send password reset email
-    //     try {
-    //         Mail::to($user->email)->send(new MailQueue([
-    //             'subject'  => 'Your Password Has Been Reset – Change It Immediately',
-    //             'template' => 'default_password_set',
-    //             'password' => $newPassword,
-    //             'user'     => $user,
-    //         ]));
-    //     } catch (\Exception $e) {
-    //         return response()->json(['message' => 'Password reset successful, but email could not be sent.'], 500);
-    //     }
-    //     return response()->json(['message' => 'A new password reset link has been sent to your email. Please check your inbox.']);
-    // }
 
     public function allPermissions()
     {
