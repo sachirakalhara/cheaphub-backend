@@ -387,7 +387,7 @@ class AuthController extends Controller
         if ($passwordReset->delete()) {
             Mail::to($user->email)->queue(new MailQueue([
                 'subject' => 'Password Reset Successfully',
-                'template' => 'password_reset_success',
+                'template' => 'password_reset_successful',
                 'user' => $user,
                 'login_link' => $this->login_link()
             ]));
