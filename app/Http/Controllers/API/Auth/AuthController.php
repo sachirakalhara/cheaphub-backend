@@ -161,7 +161,7 @@ class AuthController extends Controller
            
             PasswordReset::updateOrCreate(['email' => $user->email], [
             'email' => $user->email,
-                'token' => Hash::make($token)
+                'token' => $token
             ]);
     
              $reset_link = env('MAIN_SITE_URL') . "reset-password/".$token.'/'.$user->id;
