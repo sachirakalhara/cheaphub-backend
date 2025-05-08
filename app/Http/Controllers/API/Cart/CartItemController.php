@@ -22,7 +22,8 @@ class CartItemController extends Controller
         $request->validate([
             'bulk_product_id' => 'nullable|exists:bulk_products,id|required_without:package_id',
             'package_id' => 'nullable|exists:packages,id|required_without:bulk_product_id',        
-            'quantity' => 'required|integer|min:1',
+            'quantity' => 'required|integer|min:0',
+            'remove_qty' => 'required|integer|min:0',
         ]);
 
         return $this->cartItemRepository->addToCart($request);
