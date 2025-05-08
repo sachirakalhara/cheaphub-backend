@@ -164,7 +164,7 @@ class AuthController extends Controller
                 'token' => Hash::make($token)
             ]);
     
-             $reset_link = env('MAIN_SITE_URL') . "/reset-password/".$token.'/'.$user->id;
+             $reset_link = env('MAIN_SITE_URL') . "reset-password/".$token.'/'.$user->id;
             Mail::to($user->email)->send(new MailQueue([
                 'subject' => 'Reset Your Password',
                 'template' => 'password_reset',
