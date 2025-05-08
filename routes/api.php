@@ -26,7 +26,7 @@ Route::post('/v1/login', [AuthController::class, 'login']);
 Route::get('/v1/confirm-email/{user_id}/{key}', [AuthController::class, 'confirmMail']);
 
 Route::post('/v1/forgot-password', [AuthController::class, 'forgotPassword']);
-Route::post('/v1/reset-password', [AuthController::class, 'resetPassword'])->name('reset.password');
+Route::post('/v1/reset-password', [AuthController::class, 'password_reset'])->name('reset.password');
 // Route::get('/v1/reset-password/verify/{key}/{user_id}', [AuthController::class, 'resetPassword'])->name('reset.password');
 
 Route::post('/coinbase/payment', [CoinbasePaymentController::class, 'createPayment']);
