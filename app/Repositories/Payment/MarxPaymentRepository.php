@@ -170,7 +170,7 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
 
         try {
            
-            $local_user_secret = 'OTYwZTVkYmEtMGFiZi00OGQ0LTk5ZDctNGM1YWY2NjhkNWUwXzkxMjY=';
+            $local_user_secret = '$2a$10$x1CAe9YuEz9G1X1ZQrTrLOJXFu2PSvrwLuBcWpgT2ecRAx5sxfOhW';
             $marx_sandbox_url = 'https://payment.api.dev.marxpos.com/api/v4/ipg/orders';
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
@@ -225,7 +225,7 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                 ], Response::HTTP_BAD_REQUEST);
             }
             $production_url = 'https://payment.api.dev.marxpos.com/api/v4/ipg/orders';
-            $local_user_secret = 'OTYwZTVkYmEtMGFiZi00OGQ0LTk5ZDctNGM1YWY2NjhkNWUwXzkxMjY=';
+            $local_user_secret = '$2a$10$x1CAe9YuEz9G1X1ZQrTrLOJXFu2PSvrwLuBcWpgT2ecRAx5sxfOhW';
 
             $check_url = "{$production_url}/{$tr}";
             $response = Http::withHeaders([
