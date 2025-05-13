@@ -5,10 +5,6 @@ namespace App\Repositories\Payment;
 use App\Helpers\Helper;
 use App\Http\Resources\Payment\WalletResource;
 use App\Models\Cart\Cart;
-use App\Models\Cart\CartItem;
-use App\Models\Coupon\Coupon;
-use App\Models\Payment\Order;
-use App\Models\Payment\OrderItems;
 use App\Models\Payment\Wallet;
 use App\Models\Product\Bulk\BulkProduct;
 use App\Models\Product\Bulk\RemovedBulkProductSerial;
@@ -17,6 +13,8 @@ use Illuminate\Http\Response;
 use App\Repositories\Payment\Interface\WalletRepositoryInterface;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Models\Product\Contribution\ProductReplacement;
+use App\Models\Product\Contribution\ProductReplacementSerial;
 
 class WalletRepository implements WalletRepositoryInterface
 {
