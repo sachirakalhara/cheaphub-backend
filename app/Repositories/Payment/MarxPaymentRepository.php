@@ -356,35 +356,27 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                                     }
                                 }
                             }
-                        }
-
                         
+                        }
                     }
+
+                    $order->update([
+                        'payment_status' => 'paid',
+                        'amount_paid' => $amountPaid,
+                    ]);
+
+                    
+
+                    $user = User::find($order->user_id);
+                    $user->notify(new OrderCreated($order)); 
+
+                    return response()->json([
+                        'status' => 'success',
+                        'summaryResult' => 'SUCCESS',
+                        'order_id' => $order->id,
+                        'amount_paid' => $amountPaid,
+                    ]);
                 }
-
-
-
-
-
-
-
-                $order->update([
-                    'payment_status' => 'paid',
-                    'amount_paid' => $amountPaid,
-                ]);
-
-                
-
-                $user = User::find($order->user_id);
-                $user->notify(new OrderCreated($order)); 
-
-                return response()->json([
-                    'status' => 'success',
-                    'summaryResult' => 'SUCCESS',
-                    'order_id' => $order->id,
-                    'amount_paid' => $amountPaid,
-                ]);
-            }
 
             return response()->json([
                 'status' => 'error',
