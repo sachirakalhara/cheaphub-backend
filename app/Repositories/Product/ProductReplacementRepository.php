@@ -106,7 +106,7 @@ class ProductReplacementRepository implements ProductReplacementRepositoryInterf
 
         RemovedProductReplacementSerial::create([
             'removed_contribution_product_serial_id' =>$request->user_purchase_serial_id,
-            'product_replacement_serial_id' => $productReplacementSerial,
+            'product_replacement_serial_id' => $productReplacementSerial->id,
         ]);
 
         $package->subscription->serial = implode("\n", array_filter($allSerials, fn($serial) => $serial !== $randomSerial));
