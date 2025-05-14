@@ -75,7 +75,7 @@ class OrderRepository implements OrderRepositoryInterface
     public function filter($request)
     {
         $query = Order::query();
-        $query->where('is_wallet',  false );
+        // $query->where('is_wallet',  false );
 
         if ($request->filled('user_id')) {
             $query->where('user_id',  $request->user_id );
