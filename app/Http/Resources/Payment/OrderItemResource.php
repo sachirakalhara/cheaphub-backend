@@ -58,24 +58,23 @@ class OrderItemResource extends JsonResource
                     ->get();
         }
 
-     dd($this->bulkProduct);
         return [
             'id' => $this->id,
             'quantity' => $this->quantity,
             'user_purchase_serials' => $user_purchase_serials,
             'created_at' => $this->created_at,
             'bulk_product' =>[
-                'id' => $this->bulkProduct->id,
-                'name' => $this->bulkProduct->name,
-                'tag_id' => $this->bulkProduct->tag_id,
-                'description' => $this->bulkProduct->description,
-                'price' => $this->bulkProduct->price,
-                'gateway_fee' => $this->bulkProduct->gateway_fee,
-                'categories' => $this->bulkProduct->categories,
-                'image' => $disk->url($this->bulkProduct->image),
-                'visibility' => $this->bulkProduct->visibility,
-                'service_info' => $this->bulkProduct->service_info,
-                'url' => Auth::check()
+                'id' => optional($this->bulkProduct)->id,
+                'name' => optional($this->bulkProduct)->name,
+                'tag_id' => optional($this->bulkProduct)->tag_id,
+                'description' => optional($this->bulkProduct)->description,
+                'price' => optional($this->bulkProduct)->price,
+                'gateway_fee' => optional($this->bulkProduct)->gateway_fee,
+                'categories' => optional($this->bulkProduct)->categories,
+                'image' => $this->bulkProduct && $this->bulkProduct->image ? $disk->url($this->bulkProduct->image) : null,
+                'visibility' => optional($this->bulkProduct)->visibility,
+                'service_info' => optional($this->bulkProduct)->service_info,
+                'url' => $this->bulkProduct && Auth::check()
                     ? "https://cheaphub.io/bulk/{$this->bulkProduct->id}/{$this->bulkProduct->name}"
                     : null,
             ],
