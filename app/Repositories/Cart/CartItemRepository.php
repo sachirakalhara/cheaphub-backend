@@ -47,6 +47,16 @@ class CartItemRepository implements CartItemRepositoryInterface
                 return response()->json(['message' => 'Quantity cannot be negative'], Response::HTTP_BAD_REQUEST);
             }
 
+            //chec maximum quantity
+            if ($totalQty > $bulkProduct->maximum_quantity) {
+                return response()->json(['message' => 'Maximum quantity exceeded'], Response::HTTP_BAD_REQUEST);
+            }
+
+            //check minimum quantity
+            if ($totalQty < $bulkProduct->minimum_quantity) {
+                return response()->json(['message' => 'Minimum quantity not met'], Response::HTTP_BAD_REQUEST);
+            }
+
             if ($bulkProduct->serial_count < $totalQty) {
                 return response()->json(['message' => 'Not enough stock for the bulk product'], Response::HTTP_BAD_REQUEST);
             }
