@@ -19,8 +19,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
-use App\Models\Product\Contribution\ProductReplacement;
-use App\Models\Product\Contribution\ProductReplacementSerial;
+use App\Models\Product\Contribution\RemovedContributionProductSerial;
 use App\Models\User\User;
 use App\Notifications\OrderCreated;
 
@@ -309,7 +308,7 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                         }
                     }
 
-
+                    foreach ($orderItems as $orderItem) {
                        if ($orderItem->package_id) {
                             $package = Package::find($orderItem->package_id);
 
@@ -334,49 +333,38 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                                         $subscription->serial = implode("\n", $allSerials);
                                         $subscription->available_serial_count = max(0, $subscription->available_serial_count - $orderItem->quantity);
                                         $subscription->save();
-
-                                        // Find or create ProductReplacement
-                                        $productReplacement = ProductReplacement::firstOrCreate(
-                                            [
-                                                'user_id'    => $order->user_id,
-                                                'package_id' => $package->id
-                                            ],
-                                            [
-                                                'avalable_replace_count' => $subscription->available_serial_count
-                                            ]
-                                        );
-
-                                        // Loop through the removed serials and save them
+            
                                         foreach ($removedSerials as $serial) {
-                                            ProductReplacementSerial::create([
-                                                'product_replacement_id' => $productReplacement->id,
+                                            RemovedContributionProductSerial::create([
+                                                'package_id' => $package->id,
+                                                'order_item_id' => $orderItem->id,
                                                 'serial' => $serial,
                                             ]);
                                         }
                                     }
                                 }
                             }
-                        
                         }
                     }
-
-                    $order->update([
-                        'payment_status' => 'paid',
-                        'amount_paid' => $amountPaid,
-                    ]);
-
-                    
-
-                    $user = User::find($order->user_id);
-                    $user->notify(new OrderCreated($order)); 
-
-                    return response()->json([
-                        'status' => 'success',
-                        'summaryResult' => 'SUCCESS',
-                        'order_id' => $order->id,
-                        'amount_paid' => $amountPaid,
-                    ]);
                 }
+
+                $order->update([
+                    'payment_status' => 'paid',
+                    'amount_paid' => $amountPaid,
+                ]);
+
+                
+
+                $user = User::find($order->user_id);
+                $user->notify(new OrderCreated($order)); 
+
+                return response()->json([
+                    'status' => 'success',
+                    'summaryResult' => 'SUCCESS',
+                    'order_id' => $order->id,
+                    'amount_paid' => $amountPaid,
+                ]);
+            }
 
             return response()->json([
                 'status' => 'error',
