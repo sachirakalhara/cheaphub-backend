@@ -45,7 +45,7 @@ class OrderItemResource extends JsonResource
         return [
             'id' => $this->id,
             'quantity' => $this->quantity,
-            'user_purchase_serials' => $this->removedContributionProductSerials()->pluck('serial')->toArray(),
+            'user_purchase_serials' => $this->removedContributionProductSerials,
             'created_at' => $this->created_at,
             'bulk_product' => new BulkProductResource($this->bulkProduct),
             'package' => [
