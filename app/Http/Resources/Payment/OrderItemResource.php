@@ -36,11 +36,14 @@ class OrderItemResource extends JsonResource
             $subscription = Subscription::find($package->subscription_id);
             if ($subscription) {
 
-                
-                $user_purchase_serials = RemovedContributionProductSerial::with('removedProductReplacementSerials.product_replacement_serial')->where('order_item_id', $this->id)->get();
+
+                $user_purchase_serials = RemovedContributionProductSerial::with(['removedProductReplacementSerials' => function ($query) {
+                    $query->with('productReplacementSerial');
+                }])->where('order_item_id', $this->id)->get();
+
                 // Assign product_replacement_serial->serial to RemovedContributionProductSerial->serial with null handling
                 foreach ($user_purchase_serials as $serial) {
-                    $replacementSerial = $serial->removedProductReplacementSerials->product_replacement_serial ?? null;
+                    $replacementSerial = optional($serial->removedProductReplacementSerials->first())->productReplacementSerial ?? null;
                     $serial->serial = $replacementSerial ? $replacementSerial->serial : null;
                 }
 
