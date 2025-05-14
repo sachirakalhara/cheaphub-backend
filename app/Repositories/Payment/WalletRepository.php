@@ -169,6 +169,19 @@ class WalletRepository implements WalletRepositoryInterface
                 return response()->json(['message' => 'Not enough stock for the bulk product'], Response::HTTP_BAD_REQUEST);
             }
 
+            //maximum quantity check
+            if ($orderItem->quantity > $bulkProduct->maximum_quantity) {
+                $order->update(['payment_status' => 'failed']);
+                return response()->json(['message' => 'Maximum quantity exceeded'], Response::HTTP_BAD_REQUEST);
+            }
+
+
+            // Check minimum quantity
+            if ($orderItem->quantity < $bulkProduct->minimum_quantity) {
+                $order->update(['payment_status' => 'failed']);
+                return response()->json(['message' => 'Minimum quantity not met'], Response::HTTP_BAD_REQUEST);
+            }
+
             // Remove the required serials
             $removedSerials = array_splice($allSerials, 0, $orderItem->quantity);
 
