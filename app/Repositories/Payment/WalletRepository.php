@@ -13,6 +13,7 @@ use Illuminate\Http\Response;
 use App\Repositories\Payment\Interface\WalletRepositoryInterface;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Models\Payment\Order;
 use App\Models\Payment\OrderItems;
 use App\Models\Coupon\Coupon;
 use App\Models\Product\Contribution\RemovedContributionProductSerial;
