@@ -35,7 +35,7 @@ class OrderItemResource extends JsonResource
         if ($package) {
             $subscription = Subscription::find($package->subscription_id);
             if ($subscription) {
-                $user_purchase_serials = RemovedContributionProductSerial::where('order_item_id', $this->id)->get();
+                $user_purchase_serials = RemovedContributionProductSerial::with('removedProductReplacementSerials')->where('order_item_id', $this->id)->get();
                 $contributionProduct = ContributionProduct::find($subscription->contribution_product_id);
                 if ($contributionProduct && $contributionProduct->image) {
                     $image = $disk->url($contributionProduct->image);

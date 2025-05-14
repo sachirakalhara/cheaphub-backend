@@ -18,4 +18,10 @@ class RemovedContributionProductSerial extends Model
     {
         return $this->belongsTo(OrderItems::class, 'order_item_id');
     }
+
+    public function removedProductReplacementSerials()
+    {
+        return $this->hasMany(RemovedProductReplacementSerial::class, 'removed_contribution_product_serial_id');
+    }
+    
 }
