@@ -106,7 +106,10 @@ class OrderRepository implements OrderRepositoryInterface
         }
 
         if ($request->filled('from_date') && $request->filled('to_date')) {
-            $query->whereBetween('created_at', [$request->from_date, $request->to_date]);
+            $query->whereBetween('created_at', [
+            Carbon::parse($request->from_date)->startOfDay(),
+            Carbon::parse($request->to_date)->endOfDay()
+            ]);
         }
 
 
@@ -115,7 +118,6 @@ class OrderRepository implements OrderRepositoryInterface
         } else {
             $order_list = $query->orderBy('created_at', 'desc')->paginate(10);
         }
-dd($order_list);
         if ($order_list->isNotEmpty()) {
             return new OrderCollection($order_list);
         } else {
