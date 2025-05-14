@@ -44,7 +44,8 @@ class OrderItemResource extends JsonResource
                 // Assign product_replacement_serial->serial to RemovedContributionProductSerial->serial with null handling
                 foreach ($user_purchase_serials as $serial) {
                     $replacementSerial = optional($serial->removedProductReplacementSerials->first())->product_replacement_serial ?? null;
-                    $serial->serial = $replacementSerial ? $replacementSerial->serial : null;
+                    $serial->serial = $replacementSerial ? $replacementSerial->serial : $serial->serial;
+                        null;
                 }
 
      
