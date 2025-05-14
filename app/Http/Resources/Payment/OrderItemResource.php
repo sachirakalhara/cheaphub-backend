@@ -58,25 +58,25 @@ class OrderItemResource extends JsonResource
                     ->get();
         }
 
-     
+     dd($this->bulkProduct);
         return [
             'id' => $this->id,
             'quantity' => $this->quantity,
             'user_purchase_serials' => $user_purchase_serials,
             'created_at' => $this->created_at,
             'bulk_product' =>[
-                'id' => $this->bulkProduct['id'],
-                'name' => $this->bulkProduct['name'],
-                'tag_id' => $this->bulkProduct['tag_id'],
-                'description' => $this->bulkProduct['description'],
-                'price' => $this->bulkProduct['price'],
-                'gateway_fee' => $this->bulkProduct['gateway_fee'],
-                'categories' => $this->bulkProduct['categories'],
-                'image' => $disk->url($this->bulkProduct['image']),
-                'visibility' => $this->bulkProduct['visibility'],
-                'service_info' => $this->bulkProduct['service_info'],
+                'id' => $this->bulkProduct->id,
+                'name' => $this->bulkProduct->name,
+                'tag_id' => $this->bulkProduct->tag_id,
+                'description' => $this->bulkProduct->description,
+                'price' => $this->bulkProduct->price,
+                'gateway_fee' => $this->bulkProduct->gateway_fee,
+                'categories' => $this->bulkProduct->categories,
+                'image' => $disk->url($this->bulkProduct->image),
+                'visibility' => $this->bulkProduct->visibility,
+                'service_info' => $this->bulkProduct->service_info,
                 'url' => Auth::check()
-                    ? "https://cheaphub.io/bulk/{$this->bulkProduct['id']}/{$this->bulkProduct['name']}"
+                    ? "https://cheaphub.io/bulk/{$this->bulkProduct->id}/{$this->bulkProduct->name}"
                     : null,
             ],
             'package' => [
