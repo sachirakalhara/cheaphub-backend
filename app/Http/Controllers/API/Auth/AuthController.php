@@ -164,7 +164,7 @@ class AuthController extends Controller
                 'token' => $token
             ]);
     
-             $reset_link = env('MAIN_SITE_URL') . "reset-password/".$token.'/'.$user->id;
+             $reset_link = env('CLIENT_URL') . "reset-password/".$token.'/'.$user->id;
             Mail::to($user->email)->send(new MailQueue([
                 'subject' => 'Reset Your Password',
                 'template' => 'password_reset',
@@ -248,7 +248,7 @@ class AuthController extends Controller
 
     public function confirmationLink($user)
     {
-        return env('APP_URL') . 'api/v1/confirm-email/' . $user->id . '/' . $this->confirmKey($user);
+        return config('app.url') . 'api/v1/confirm-email/' . $user->id . '/' . $this->confirmKey($user);
     }
 
     public function confirmKey($user)
