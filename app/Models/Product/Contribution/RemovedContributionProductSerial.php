@@ -2,7 +2,7 @@
 
 namespace App\Models\Product\Contribution;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Payment\OrderItems;
 use Illuminate\Database\Eloquent\Model;
 
 class RemovedContributionProductSerial extends Model
@@ -12,6 +12,10 @@ class RemovedContributionProductSerial extends Model
         'package_id',
         'serial',
         'order_item_id',
-        
     ];
+
+    public function orderItem()
+    {
+        return $this->belongsTo(OrderItems::class, 'order_item_id');
+    }
 }

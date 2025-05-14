@@ -40,34 +40,14 @@ class OrderItemResource extends JsonResource
                 }
             }
 
-            $userId = Auth::id();
-
-            $productReplacement = ProductReplacement::where('user_id', $userId)
-                ->where('package_id', $package->id)
-                ->first();
-            
-            $lastSerial = null;
-            
-            if ($productReplacement) {
-                $lastSerialRecord = ProductReplacementSerial::where('product_replacement_id', $productReplacement->id)
-                    ->orderBy('id', 'desc')
-                    ->first();
-            
-                if ($lastSerialRecord) {
-                    $lastSerial = $lastSerialRecord->serial;
-                }
-            }
-
-
         }
      
         return [
             'id' => $this->id,
             'quantity' => $this->quantity,
+            'user_purchase_serials' => $this->removedContributionProductSerials()->pluck('serial')->toArray(),
             'created_at' => $this->created_at,
-
             'bulk_product' => new BulkProductResource($this->bulkProduct),
-
             'package' => [
                 'id' => optional($package)->id,
                 'name' => optional($package)->name,
@@ -81,7 +61,6 @@ class OrderItemResource extends JsonResource
                 'name' => $subscription->name,
                 'available_serial_count' => $subscription->available_serial_count,
                 'gateway_fee' => $subscription->gateway_fee,
-                'serial' => $lastSerial ?? null,
 
             ] : null,
 

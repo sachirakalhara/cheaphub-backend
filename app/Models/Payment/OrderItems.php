@@ -5,6 +5,7 @@ namespace App\Models\Payment;
 use App\Models\Payment\Order;
 use App\Models\Product\Bulk\BulkProduct;
 use App\Models\Product\Contribution\ContributionProduct;
+use App\Models\Product\Contribution\RemovedContributionProductSerial;
 use App\Models\Subscription\Package;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -28,5 +29,11 @@ class OrderItems extends Model
     public function order()
     {
         return $this->belongsTo(Order::class);
+    }
+
+     public function removedContributionProductSerials()
+    {
+        return $this->hasMany(RemovedContributionProductSerial::class);
+
     }
 }
