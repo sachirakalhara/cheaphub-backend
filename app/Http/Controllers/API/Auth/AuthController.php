@@ -240,9 +240,9 @@ class AuthController extends Controller
             $user->verification_code = null;
             $user->email_verified_at = now();
             $user->save();
-            return redirect(env('CLIENT_URL') . '/login');
+            return redirect(config('app.client_url') . '/login');
         } else {
-            return redirect(env('CLIENT_URL') . '/404');
+            return redirect(config('app.client_url') . '/404');
         }
     }
 

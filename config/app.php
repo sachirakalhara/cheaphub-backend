@@ -57,6 +57,8 @@ return [
 
     'url' => env('APP_URL', 'https://api.cheaphub.io/'),
 
+    'client_url' => env('CLIENT_URL', 'https://cheaphub.io/'),
+
     'asset_url' => env('ASSET_URL'),
 
     /*
