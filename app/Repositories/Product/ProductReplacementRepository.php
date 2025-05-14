@@ -5,6 +5,8 @@ namespace App\Repositories\Product;
 use App\Helpers\Helper;
 use App\Models\Product\Contribution\ProductReplacement;
 use App\Models\Product\Contribution\ProductReplacementSerial;
+use App\Models\Product\Contribution\RemovedContributionProductSerial;
+use App\Models\Product\Contribution\RemovedProductReplacementSerial;
 use App\Models\Subscription\Package;
 use App\Repositories\Product\Interface\ProductReplacementRepositoryInterface;
 use Illuminate\Support\Facades\Storage;
@@ -96,11 +98,16 @@ class ProductReplacementRepository implements ProductReplacementRepositoryInterf
         $randomSerial = $availableSerials[array_rand($availableSerials)];
 
         // (Optional) Save the selected serial
-        ProductReplacementSerial::create([
+        $productReplacementSerial = ProductReplacementSerial::create([
             'product_replacement_id' => $productReplacement->id,
             'serial' => $randomSerial,
         ]);
 
+
+        RemovedProductReplacementSerial::create([
+            'removed_contribution_product_serial_id' =>$request->user_purchase_serial_id,
+            'product_replacement_serial_id' => $productReplacementSerial,
+        ]);
 
         $package->subscription->serial = implode("\n", array_filter($allSerials, fn($serial) => $serial !== $randomSerial));
         $package->subscription->available_serial_count -= 1;
@@ -112,6 +119,7 @@ class ProductReplacementRepository implements ProductReplacementRepositoryInterf
             'data' => [
                 'user_id' => $productReplacement->user_id,
                 'package_id' => $productReplacement->package_id,
+                'user_purchase_serial'=> RemovedContributionProductSerial::find($request->user_purchase_serial_id)->serial,
                 'selected_serial' => $randomSerial,
                 'available_replace_count' => $productReplacement->avalable_replace_count,
             ],
