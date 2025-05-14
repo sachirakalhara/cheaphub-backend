@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Product\Contribution\ProductReplacement;
 use App\Models\Product\Contribution\ProductReplacementSerial;
+use App\Models\Product\Contribution\RemovedContributionProductSerial;
 
 class OrderItemResource extends JsonResource
 {
@@ -30,22 +31,22 @@ class OrderItemResource extends JsonResource
         $subscription = null;
         $contributionProduct = null;
         $image = null;
-
+        $user_purchase_serials = null;
         if ($package) {
             $subscription = Subscription::find($package->subscription_id);
             if ($subscription) {
+                $user_purchase_serials = RemovedContributionProductSerial::where('order_item_id', $this->id)->get();
                 $contributionProduct = ContributionProduct::find($subscription->contribution_product_id);
                 if ($contributionProduct && $contributionProduct->image) {
                     $image = $disk->url($contributionProduct->image);
                 }
             }
-
         }
      
         return [
             'id' => $this->id,
             'quantity' => $this->quantity,
-            'user_purchase_serials' => $this->removedContributionProductSerials,
+            'user_purchase_serials' => $user_purchase_serials,
             'created_at' => $this->created_at,
             'bulk_product' => new BulkProductResource($this->bulkProduct),
             'package' => [
