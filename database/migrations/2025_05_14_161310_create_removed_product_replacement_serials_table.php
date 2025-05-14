@@ -15,10 +15,17 @@ return new class extends Migration
             $table->id();
 
             $table->unsignedBigInteger('removed_contribution_product_serial_id');
-            $table->foreign('removed_contribution_product_serial_id')->references('id')->on('removed_contribution_product_serials');
-
             $table->unsignedBigInteger('product_replacement_serial_id');
-            $table->foreign('product_replacement_serial_id')->references('id')->on('product_replacement_serials');
+
+            // Add foreign keys with shorter constraint names
+            $table->foreign('removed_contribution_product_serial_id', 'fk_removed_contribution_id')
+                  ->references('id')
+                  ->on('removed_contribution_product_serials');
+
+            $table->foreign('product_replacement_serial_id', 'fk_product_replacement_id')
+                  ->references('id')
+                  ->on('product_replacement_serials');
+
             $table->timestamps();
         });
     }
