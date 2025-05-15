@@ -34,13 +34,16 @@ class OrderItemResource extends JsonResource
         $contributionProduct = null;
         $image = null;
         $user_purchase_serials = null;
+        
         if ($package) {
             $subscription = Subscription::find($package->subscription_id);
             if ($subscription) {
                 $order_id = OrderItems::where('package_id', $package->id)->first()->order_id;
 
-                $available_replace_count = ProductReplacement::where('order_id',$order_id)
-                ->where('package_id',$package->id)->first()->avalable_replace_count;
+                $productReplacement = ProductReplacement::where('order_id', $order_id)
+                    ->where('package_id', $package->id)
+                    ->first();
+                $available_replace_count = $productReplacement ? $productReplacement->available_replace_count : optional($package)->replace_count;
 
                 $user_purchase_serials = RemovedContributionProductSerial::with(['removedProductReplacementSerials.product_replacement_serial'])
                     ->where('order_item_id', $this->id)
