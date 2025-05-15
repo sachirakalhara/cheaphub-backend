@@ -34,7 +34,7 @@ class OrderItemResource extends JsonResource
         $contributionProduct = null;
         $image = null;
         $user_purchase_serials = null;
-        
+        $available_replace_count = null;
         if ($package) {
             $subscription = Subscription::find($package->subscription_id);
             if ($subscription) {
