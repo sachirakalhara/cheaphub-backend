@@ -21,18 +21,21 @@ class ProductReplacementRepository implements ProductReplacementRepositoryInterf
     public function getAvalableCount($package_id)
     {
         $user_id = Auth::user()->id;
-        $order_id = OrderItems::where('package_id', $package_id)->first()->order_id;
-        $productReplacement = ProductReplacement::where('order_id',$order_id)->where('user_id',$user_id)->where('package_id',$package_id)->first();
-        $data = [
-            'user_id' => $user_id,
-            'package_id' => $package_id,
-            // 'selected_serial' => ProductReplacementSerial::where('product_replacement_id',$productReplacement->id)->last()->serial,
-            'available_count' => $productReplacement ? $productReplacement->avalable_replace_count : Package::find($package_id)->replace_count,
-        ];
+        // Get all order IDs for the given package ID for the current user
+        $order_ids = OrderItems::where('package_id', $package_id)
+            ->where('user_id', $user_id)
+            ->pluck('order_id')
+            ->toArray();
+
+        $productReplacements = ProductReplacement::whereIn('order_id', $order_ids)
+            ->where('user_id', $user_id)
+            ->where('package_id', $package_id)
+            ->get();
+      
         return response()->json([
             'status' => true,
             'message' => 'Product found',
-            'data' => $data,
+            'data' => $productReplacements,
         ], Response::HTTP_OK);
         
     }  
@@ -57,7 +60,7 @@ class ProductReplacementRepository implements ProductReplacementRepositoryInterf
         }
 
         $productReplacement = ProductReplacement::firstOrNew([
-            'order_id' => OrderItems::where('package_id', $request->package_id)->first()->order_id,
+            'order_id' => $request->order_id,
             'user_id' => $userId,
             'package_id' => $request->package_id,
         ]);

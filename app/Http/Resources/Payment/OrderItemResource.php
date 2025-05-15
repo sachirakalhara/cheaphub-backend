@@ -42,11 +42,6 @@ class OrderItemResource extends JsonResource
                 $available_replace_count = ProductReplacement::where('order_id',$order_id)
                 ->where('package_id',$package->id)->first()->avalable_replace_count;
 
-
-
-
-
-
                 $user_purchase_serials = RemovedContributionProductSerial::with(['removedProductReplacementSerials.product_replacement_serial'])
                     ->where('order_item_id', $this->id)
                     ->get();
