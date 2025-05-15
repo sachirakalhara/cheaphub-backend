@@ -70,15 +70,15 @@ class ProductReplacementRepository implements ProductReplacementRepositoryInterf
         ]);
 
         if ($productReplacement->exists) {
-            if ($productReplacement->avalable_replace_count <= 0) {
+            if ($productReplacement->available_replace_count <= 0) {
                 return response()->json([
                     'status' => false,
                     'message' => 'No available replacement count',
                 ], Response::HTTP_OK);
             }
-            $productReplacement->avalable_replace_count -= 1;
+            $productReplacement->available_replace_count -= 1;
         } else {
-            $productReplacement->avalable_replace_count = max($package->replace_count - 1, 0);
+            $productReplacement->available_replace_count = max($package->replace_count - 1, 0);
         }
 
         $productReplacement->save();
@@ -96,7 +96,7 @@ class ProductReplacementRepository implements ProductReplacementRepositoryInterf
 
         // Step 4: Check if no serials are available
         if (empty($availableSerials)) {
-            $productReplacement->avalable_replace_count += 1;
+            $productReplacement->available_replace_count += 1;
             $productReplacement->save();
 
             return response()->json([
@@ -132,7 +132,7 @@ class ProductReplacementRepository implements ProductReplacementRepositoryInterf
                 'package_id' => $productReplacement->package_id,
                 'user_purchase_serial'=> RemovedContributionProductSerial::find($request->user_purchase_serial_id)->serial,
                 'selected_serial' => $randomSerial,
-                'available_replace_count' => $productReplacement->avalable_replace_count,
+                'available_replace_count' => $productReplacement->available_replace_count,
             ],
         ], Response::HTTP_OK);
     }

@@ -23,7 +23,7 @@ return new class extends Migration
             $table->unsignedBigInteger('package_id')->nullable();
             $table->foreign('package_id')->references('id')->on('packages');
 
-            $table->integer('avalable_replace_count')->default(0);
+            $table->integer('available_replace_count')->default(0);
                         
             $table->timestamps();
         });

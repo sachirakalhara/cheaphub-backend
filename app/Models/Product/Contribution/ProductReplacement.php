@@ -11,7 +11,7 @@ class ProductReplacement extends Model
         'user_id',
         'order_id',
         'package_id',
-        'avalable_replace_count'
+        'available_replace_count'
     ];
 
 }
