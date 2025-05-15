@@ -38,9 +38,9 @@ class OrderItemResource extends JsonResource
         if ($package) {
             $subscription = Subscription::find($package->subscription_id);
             if ($subscription) {
-                $order_id = OrderItems::where('package_id', $package->id)->first()->order_id;
+                // $order_id = OrderItems::where('package_id', $package->id)->first()->order_id;
 
-                $productReplacement = ProductReplacement::where('order_id', $order_id)
+                $productReplacement = ProductReplacement::where('order_id', $this->order_id)
                     ->where('package_id', $package->id)
                     ->first();
                 $available_replace_count = $productReplacement ? $productReplacement->available_replace_count : optional($package)->replace_count;
