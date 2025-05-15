@@ -16,7 +16,8 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Payment\Order;
 use App\Models\Subscription\Subscription;
 use App\Models\Payment\OrderItems;
-
+use App\Models\User\User;
+use App\Notifications\OrderCreated;
 use App\Models\Coupon\Coupon;
 use App\Models\Product\Contribution\RemovedContributionProductSerial;
 
@@ -147,6 +148,9 @@ class WalletRepository implements WalletRepositoryInterface
             $cart->cartItems()->delete(); // Clear the cart
 
             DB::commit();
+                
+            $user = User::find($order->user_id);
+            $user->notify(new OrderCreated($order)); 
 
             return response()->json(['message' => 'Payment successful', 'order_id' => $order->order_id], Response::HTTP_OK);
         } catch (\Exception $e) {
