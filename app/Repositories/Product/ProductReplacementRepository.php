@@ -57,7 +57,7 @@ class ProductReplacementRepository implements ProductReplacementRepositoryInterf
         }
 
         $productReplacement = ProductReplacement::firstOrNew([
-            'order_id' => OrderItem::where('package_id', $request->package_id)->first()->order_id,
+            'order_id' => OrderItems::where('package_id', $request->package_id)->first()->order_id,
             'user_id' => $userId,
             'package_id' => $request->package_id,
         ]);
