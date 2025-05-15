@@ -103,14 +103,15 @@ class BulkProductRepository implements BulkProductRepositoryInterface
         $product->description = $request->description;
         $product->price = $request->price;
         $product->gateway_fee = $request->gateway_fee;
+        $product->bulk_type = $request->bulk_type;
         $product->tag_id = $request->tag_id;
         $product->payment_method = $request->payment_method;
-        $product->minimum_quantity = $request->minimum_quantity;
-        $product->maximum_quantity = $request->maximum_quantity;
+        $product->minimum_quantity = $request->minimum_quantity ?? 0;
+        $product->maximum_quantity = $request->maximum_quantity ?? 0;
         $product->service_info = $request->service_info;
         $product->visibility = $request->visibility;
-        $product->serial = $request->serial;
-        $product->serial_count = count(array_filter(explode("\n", $request->serial), 'trim'));
+        $product->serial = $request->serial ?? null;
+        $product->serial_count = $request->serial ? count(array_filter(explode("\n", $request->serial), 'trim')) : 0;
 
 
         if ($request->hasFile('image')) {
@@ -145,14 +146,16 @@ class BulkProductRepository implements BulkProductRepositoryInterface
         $product->gateway_fee = $request->gateway_fee;
         $product->tag_id = $request->tag_id;
         $product->payment_method = $request->payment_method;
-        $product->minimum_quantity = $request->minimum_quantity;
-        $product->maximum_quantity = $request->maximum_quantity;
         $product->service_info = $request->service_info;
         $product->visibility = $request->visibility;
-        $product->serial = $request->serial;
-        $product->serial_count = count(array_filter(explode("\n", $request->serial), 'trim'));
 
-
+        if($product->bulk_type == 'serial_based'){
+            $product->minimum_quantity = $request->minimum_quantity ?? 0;
+            $product->maximum_quantity = $request->maximum_quantity ?? 0;
+            $product->serial = $request->serial;
+            $product->serial_count = count(array_filter(explode("\n", $request->serial), 'trim'));
+        }
+        
         if ($request->hasFile('image')) {
             $image = $product->file('image');
             $disk = Storage::disk('s3');

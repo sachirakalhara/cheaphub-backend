@@ -48,6 +48,9 @@ class CartRepository implements CartRepositoryInterface
 
         $bulkProductsTotalPrice = $cart->cartItems->whereNotNull('bulk_product_id')->sum(function ($item) {
             $bulkProduct = BulkProduct::find($item->bulk_product_id);
+            if ($bulkProduct && $bulkProduct->bulk_type == 'service_based') {
+                return $bulkProduct->price;
+            }
             return $bulkProduct ? $bulkProduct->price * $item->quantity : 0;
         });
 
@@ -111,8 +114,13 @@ class CartRepository implements CartRepositoryInterface
 
         $bulkProductsTotalPrice = $cart->cartItems->whereNotNull('bulk_product_id')->sum(function ($item) {
             $bulkProduct = BulkProduct::find($item->bulk_product_id);
+            if ($bulkProduct && $bulkProduct->bulk_type == 'service_based') {
+                return $bulkProduct->price;
+            }
             return $bulkProduct ? $bulkProduct->price * $item->quantity : 0;
         });
+
+
 
         $totalPrice = $packagesTotalPrice + $bulkProductsTotalPrice;
         $discount = 0;

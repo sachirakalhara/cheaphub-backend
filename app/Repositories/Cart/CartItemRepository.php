@@ -41,24 +41,25 @@ class CartItemRepository implements CartItemRepositoryInterface
             if (!$bulkProduct) {
                 return response()->json(['message' => 'Bulk product not found'], Response::HTTP_NOT_FOUND);
             }
+            if ($bulkProduct && $bulkProduct->bulk_type == 'serial_based') {
+                $totalQty = $cartItemBulkProductsQty + $qty - $removeQty;
+                if ($totalQty < 0) {
+                    return response()->json(['message' => 'Quantity cannot be negative'], Response::HTTP_BAD_REQUEST);
+                }
 
-            $totalQty = $cartItemBulkProductsQty + $qty - $removeQty;
-            if ($totalQty < 0) {
-                return response()->json(['message' => 'Quantity cannot be negative'], Response::HTTP_BAD_REQUEST);
-            }
+                //chec maximum quantity
+                if ($totalQty > $bulkProduct->maximum_quantity) {
+                    return response()->json(['message' => 'Maximum quantity exceeded'], Response::HTTP_BAD_REQUEST);
+                }
 
-            //chec maximum quantity
-            if ($totalQty > $bulkProduct->maximum_quantity) {
-                return response()->json(['message' => 'Maximum quantity exceeded'], Response::HTTP_BAD_REQUEST);
-            }
+                //check minimum quantity
+                if ($totalQty < $bulkProduct->minimum_quantity) {
+                    return response()->json(['message' => 'Minimum quantity not met'], Response::HTTP_BAD_REQUEST);
+                }
 
-            //check minimum quantity
-            if ($totalQty < $bulkProduct->minimum_quantity) {
-                return response()->json(['message' => 'Minimum quantity not met'], Response::HTTP_BAD_REQUEST);
-            }
-
-            if ($bulkProduct->serial_count < $totalQty) {
-                return response()->json(['message' => 'Not enough stock for the bulk product'], Response::HTTP_BAD_REQUEST);
+                if ($bulkProduct->serial_count < $totalQty) {
+                    return response()->json(['message' => 'Not enough stock for the bulk product'], Response::HTTP_BAD_REQUEST);
+                }
             }
         }
 

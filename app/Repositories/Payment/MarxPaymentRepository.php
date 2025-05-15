@@ -68,15 +68,18 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                     return response()->json(['message' => 'Bulk product not found'], Response::HTTP_NOT_FOUND);
                 }
 
-                if ($bulkProduct->serial_count < $cartItemBulkProduct->quantity) {
-                    return response()->json(['message' => 'Not enough stock for the bulk product'], Response::HTTP_BAD_REQUEST);
-                }
+                if($bulkProduct->bulk_type == 'serial_based') {
 
-                if ($bulkProduct->minimum_quantity > $cartItemBulkProduct->quantity) {
-                    return response()->json(['message' => 'Minimum quantity not met for the bulk product'], Response::HTTP_BAD_REQUEST);
-                }
-                if ($bulkProduct->maximum_quantity < $cartItemBulkProduct->quantity) {
-                    return response()->json(['message' => 'Maximum quantity exceeded for the bulk product'], Response::HTTP_BAD_REQUEST);
+                    if ($bulkProduct->serial_count < $cartItemBulkProduct->quantity) {
+                        return response()->json(['message' => 'Not enough stock for the bulk product'], Response::HTTP_BAD_REQUEST);
+                    }
+
+                    if ($bulkProduct->minimum_quantity > $cartItemBulkProduct->quantity) {
+                        return response()->json(['message' => 'Minimum quantity not met for the bulk product'], Response::HTTP_BAD_REQUEST);
+                    }
+                    if ($bulkProduct->maximum_quantity < $cartItemBulkProduct->quantity) {
+                        return response()->json(['message' => 'Maximum quantity exceeded for the bulk product'], Response::HTTP_BAD_REQUEST);
+                    }
                 }
             }
 
@@ -277,32 +280,36 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                             $bulkProduct = BulkProduct::find($orderItem->bulk_product_id);
 
                             if ($bulkProduct) {
-                                // Parse the serials into an array
-                                $allSerials = array_values(array_filter(explode("\n", $bulkProduct->serial), 'trim'));
 
-                                // Check stock
-                                if (count($allSerials) < $orderItem->quantity) {
-                                    $order->update([
-                                        'payment_status' => 'failed',
-                                    ]);
-                                    return response()->json(['message' => 'Not enough stock for the bulk product'], Response::HTTP_BAD_REQUEST);
-                                }
+                                if($bulkProduct->bulk_type == 'serial_based') {
 
-                                // Remove the needed number of serials
-                                $removedSerials = array_splice($allSerials, 0, $orderItem->quantity);
+                                    // Parse the serials into an array
+                                    $allSerials = array_values(array_filter(explode("\n", $bulkProduct->serial), 'trim'));
 
-                                // Update bulk product
-                                $bulkProduct->serial = implode("\n", $allSerials);
-                                $bulkProduct->serial_count = count($allSerials);
-                                $bulkProduct->save();
+                                    // Check stock
+                                    if (count($allSerials) < $orderItem->quantity) {
+                                        $order->update([
+                                            'payment_status' => 'failed',
+                                        ]);
+                                        return response()->json(['message' => 'Not enough stock for the bulk product'], Response::HTTP_BAD_REQUEST);
+                                    }
 
-                                // Save each removed serial individually
-                                foreach ($removedSerials as $serial) {
-                                    RemovedBulkProductSerial::create([
-                                        'bulk_product_id' => $orderItem->bulk_product_id,
-                                        'order_item_id'   => $orderItem->id,
-                                        'serial'          => $serial,
-                                    ]);
+                                    // Remove the needed number of serials
+                                    $removedSerials = array_splice($allSerials, 0, $orderItem->quantity);
+
+                                    // Update bulk product
+                                    $bulkProduct->serial = implode("\n", $allSerials);
+                                    $bulkProduct->serial_count = count($allSerials);
+                                    $bulkProduct->save();
+
+                                    // Save each removed serial individually
+                                    foreach ($removedSerials as $serial) {
+                                        RemovedBulkProductSerial::create([
+                                            'bulk_product_id' => $orderItem->bulk_product_id,
+                                            'order_item_id'   => $orderItem->id,
+                                            'serial'          => $serial,
+                                        ]);
+                                    }
                                 }
                             }
                         }

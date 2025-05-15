@@ -161,42 +161,47 @@ class WalletRepository implements WalletRepositoryInterface
         $bulkProduct = BulkProduct::find($orderItem->bulk_product_id);
 
         if ($bulkProduct) {
-            // Parse the serials into an array
-            $allSerials = array_values(array_filter(explode("\n", $bulkProduct->serial), 'trim'));
 
-            if (count($allSerials) < $orderItem->quantity) {
-                $order->update(['payment_status' => 'failed']);
-                return response()->json(['message' => 'Not enough stock for the bulk product'], Response::HTTP_BAD_REQUEST);
-            }
+            if($bulkProduct->bulk_type == 'serial_based') {
+                
+                // Parse the serials into an array
+                $allSerials = array_values(array_filter(explode("\n", $bulkProduct->serial), 'trim'));
 
-            //maximum quantity check
-            if ($orderItem->quantity > $bulkProduct->maximum_quantity) {
-                $order->update(['payment_status' => 'failed']);
-                return response()->json(['message' => 'Maximum quantity exceeded'], Response::HTTP_BAD_REQUEST);
-            }
+                if (count($allSerials) < $orderItem->quantity) {
+                    $order->update(['payment_status' => 'failed']);
+                    return response()->json(['message' => 'Not enough stock for the bulk product'], Response::HTTP_BAD_REQUEST);
+                }
+
+                //maximum quantity check
+                if ($orderItem->quantity > $bulkProduct->maximum_quantity) {
+                    $order->update(['payment_status' => 'failed']);
+                    return response()->json(['message' => 'Maximum quantity exceeded'], Response::HTTP_BAD_REQUEST);
+                }
 
 
-            // Check minimum quantity
-            if ($orderItem->quantity < $bulkProduct->minimum_quantity) {
-                $order->update(['payment_status' => 'failed']);
-                return response()->json(['message' => 'Minimum quantity not met'], Response::HTTP_BAD_REQUEST);
-            }
+                // Check minimum quantity
+                if ($orderItem->quantity < $bulkProduct->minimum_quantity) {
+                    $order->update(['payment_status' => 'failed']);
+                    return response()->json(['message' => 'Minimum quantity not met'], Response::HTTP_BAD_REQUEST);
+                }
 
-            // Remove the required serials
-            $removedSerials = array_splice($allSerials, 0, $orderItem->quantity);
+                // Remove the required serials
+                $removedSerials = array_splice($allSerials, 0, $orderItem->quantity);
 
-            // Update the bulk product stock
-            $bulkProduct->serial = implode("\n", $allSerials);
-            $bulkProduct->serial_count = count($allSerials);
-            $bulkProduct->save();
+                // Update the bulk product stock
+                $bulkProduct->serial = implode("\n", $allSerials);
+                $bulkProduct->serial_count = count($allSerials);
+                $bulkProduct->save();
 
-            // Record removed serials
-            foreach ($removedSerials as $serial) {
-                RemovedBulkProductSerial::create([
-                    'bulk_product_id' => $orderItem->bulk_product_id,
-                    'order_item_id'   => $orderItem->id,
-                    'serial'          => $serial,
-                ]);
+                // Record removed serials
+                foreach ($removedSerials as $serial) {
+                    RemovedBulkProductSerial::create([
+                        'bulk_product_id' => $orderItem->bulk_product_id,
+                        'order_item_id'   => $orderItem->id,
+                        'serial'          => $serial,
+                    ]);
+                }
+                
             }
         }
     }

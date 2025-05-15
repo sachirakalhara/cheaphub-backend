@@ -38,6 +38,7 @@ class PublicBulkProductResource extends JsonResource
             'maximum_quantity' => $this->maximum_quantity,
             'available_serial_count' => $this->serial_count,
             'payment_method' => $this->payment_method,
+            'bulk_type' => $this->bulk_type,
 
         ];
     }
