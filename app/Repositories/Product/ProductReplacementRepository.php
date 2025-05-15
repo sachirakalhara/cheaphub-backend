@@ -4,6 +4,7 @@ namespace App\Repositories\Product;
 
 use App\Helpers\Helper;
 use App\Models\Product\Contribution\ProductReplacement;
+use App\Models\Payment\Order;
 use App\Models\Payment\OrderItems;
 
 use App\Models\Product\Contribution\ProductReplacementSerial;
@@ -22,9 +23,12 @@ class ProductReplacementRepository implements ProductReplacementRepositoryInterf
     {
         $user_id = Auth::user()->id;
         // Get all order IDs for the given package ID for the current user
-        $order_ids = OrderItems::where('package_id', $package_id)
+        $order_ids = Order::with('orderItems')
             ->where('user_id', $user_id)
-            ->pluck('order_id')
+            ->whereHas('orderItems', function ($query) use ($package_id) {
+                $query->where('package_id', $package_id);
+            })
+            ->pluck('id')
             ->toArray();
 
         $productReplacements = ProductReplacement::whereIn('order_id', $order_ids)
