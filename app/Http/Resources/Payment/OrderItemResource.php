@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\Product\Contribution\ProductReplacement;
 use App\Models\Product\Contribution\ProductReplacementSerial;
 use App\Models\Product\Contribution\RemovedContributionProductSerial;
+use App\Models\Payment\OrderItems;
 
 class OrderItemResource extends JsonResource
 {
@@ -36,6 +37,14 @@ class OrderItemResource extends JsonResource
         if ($package) {
             $subscription = Subscription::find($package->subscription_id);
             if ($subscription) {
+                $order_id = OrderItems::where('package_id', $package->id)->first()->order_id;
+
+                $available_replace_count = ProductReplacement::where('order_id',$order_id)
+                ->where('package_id',$package->id)->first()->avalable_replace_count;
+
+
+
+
 
 
                 $user_purchase_serials = RemovedContributionProductSerial::with(['removedProductReplacementSerials.product_replacement_serial'])
@@ -62,6 +71,7 @@ class OrderItemResource extends JsonResource
             'id' => $this->id,
             'quantity' => $this->quantity,
             'user_purchase_serials' => $user_purchase_serials,
+            'available_replace_count' => $available_replace_count,
             'created_at' => $this->created_at,
             'bulk_product' =>[
                 'id' => optional($this->bulkProduct)->id,

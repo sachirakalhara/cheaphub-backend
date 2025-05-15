@@ -9,6 +9,7 @@ class ProductReplacement extends Model
     protected $fillable = [
         'id',
         'user_id',
+        'order_id',
         'package_id',
         'avalable_replace_count'
     ];

@@ -4,6 +4,8 @@ namespace App\Repositories\Product;
 
 use App\Helpers\Helper;
 use App\Models\Product\Contribution\ProductReplacement;
+use App\Models\Payment\OrderItems;
+
 use App\Models\Product\Contribution\ProductReplacementSerial;
 use App\Models\Product\Contribution\RemovedContributionProductSerial;
 use App\Models\Product\Contribution\RemovedProductReplacementSerial;
@@ -19,7 +21,8 @@ class ProductReplacementRepository implements ProductReplacementRepositoryInterf
     public function getAvalableCount($package_id)
     {
         $user_id = Auth::user()->id;
-        $productReplacement = ProductReplacement::where('user_id',$user_id)->where('package_id',$package_id)->first();
+        $order_id = OrderItems::where('package_id', $package_id)->first()->order_id;
+        $productReplacement = ProductReplacement::where('order_id',$order_id)->where('user_id',$user_id)->where('package_id',$package_id)->first();
         $data = [
             'user_id' => $user_id,
             'package_id' => $package_id,
@@ -54,6 +57,7 @@ class ProductReplacementRepository implements ProductReplacementRepositoryInterf
         }
 
         $productReplacement = ProductReplacement::firstOrNew([
+            'order_id' => OrderItem::where('package_id', $request->package_id)->first()->order_id,
             'user_id' => $userId,
             'package_id' => $request->package_id,
         ]);
