@@ -68,6 +68,7 @@ class OrderItemResource extends JsonResource
                 'name' => optional($this->bulkProduct)->name,
                 'tag_id' => optional($this->bulkProduct)->tag_id,
                 'description' => optional($this->bulkProduct)->description,
+                'bulk_type' => optional($this->bulkProduct)->bulk_type,
                 'price' => optional($this->bulkProduct)->price,
                 'gateway_fee' => optional($this->bulkProduct)->gateway_fee,
                 'categories' => optional($this->bulkProduct)->categories,
