@@ -38,7 +38,6 @@ class OrderItemResource extends JsonResource
         if ($package) {
             $subscription = Subscription::find($package->subscription_id);
             if ($subscription) {
-                // $order_id = OrderItems::where('package_id', $package->id)->first()->order_id;
 
                 $productReplacement = ProductReplacement::where('order_id', $this->order_id)
                     ->where('package_id', $package->id)
@@ -50,7 +49,7 @@ class OrderItemResource extends JsonResource
                     ->get();
 
                 foreach ($user_purchase_serials as $serial) {
-                    $replacementSerial = optional($serial->removedProductReplacementSerials->first())->product_replacement_serial ?? null;
+                    $replacementSerial = optional($serial->removedProductReplacementSerials->last())->product_replacement_serial ?? null;
                     $serial->serial = $replacementSerial ? $replacementSerial->serial : $serial->serial;
                         null;
                 }
