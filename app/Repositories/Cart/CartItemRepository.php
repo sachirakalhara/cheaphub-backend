@@ -61,6 +61,10 @@ class CartItemRepository implements CartItemRepositoryInterface
                     return response()->json(['message' => 'Not enough stock for the bulk product'], Response::HTTP_BAD_REQUEST);
                 }
             }
+            
+            if($bulkProduct && $bulkProduct->bulk_type == 'service_based') {
+                $totalQty = $cartItemBulkProductsQty + $qty - $removeQty;
+            }
         }
 
         if ($request->package_id) {
