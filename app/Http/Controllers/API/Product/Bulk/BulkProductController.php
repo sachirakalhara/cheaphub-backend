@@ -69,7 +69,7 @@ class BulkProductController extends Controller
         if ($request->has('serial')) {
             $serial_count = count(array_filter(explode("\n", $request->serial), 'trim'));
             if ($serial_count < $request->minimum_quantity) {
-            return Helper::error('Serial count is less than the minimum quantity required', Response::HTTP_BAD_REQUEST);
+                return Helper::error('Serial count is less than the minimum quantity required', Response::HTTP_BAD_REQUEST);
             }
         }
 
@@ -103,17 +103,18 @@ class BulkProductController extends Controller
             'price' => 'required',
             'gateway_fee' => 'required',
             'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
-            'serial' => 'required',
             'tag_id' => 'required',
             'payment_method' => 'required',
-            'minimum_quantity' => 'required',
 
         ]);
         
-        $serial_count = count(array_filter(explode("\n", $request->serial), 'trim'));
-        if ($serial_count < $request->minimum_quantity) {
-            return Helper::error('Serial count is less than the minimum quantity required', Response::HTTP_BAD_REQUEST);
+        if ($request->has('serial')) {
+            $serial_count = count(array_filter(explode("\n", $request->serial), 'trim'));
+            if ($serial_count < $request->minimum_quantity) {
+                return Helper::error('Serial count is less than the minimum quantity required', Response::HTTP_BAD_REQUEST);
+            }
         }
+        
         return $this->bulkProductRepository->update($request);
     }
 
