@@ -59,7 +59,14 @@ class TicketRepository implements TicketRepositoryInterface
             'subject' => $data->subject,
             'description' => $data->description,
         ]);
-
+        
+        if (isset($data->message) && !empty($data->message)) {
+            $comment = $ticket->comments()->create([
+                'user_id' => $user->id,
+                'message' => $data->message,
+            ]);
+            $ticket->load('comments.user');
+        }
         return response()->json($ticket, 201);
     }
 
