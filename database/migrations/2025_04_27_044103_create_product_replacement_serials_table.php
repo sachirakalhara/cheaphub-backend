@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('product_replacement_id');
             $table->foreign('product_replacement_id')->references('id')->on('product_replacements');
-            $table->string('serial');
+            $table->longText('serial');
             $table->timestamps();
         });
     }

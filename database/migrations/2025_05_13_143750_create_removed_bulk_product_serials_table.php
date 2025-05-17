@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreign('bulk_product_id')->references('id')->on('bulk_products');
             $table->unsignedBigInteger('order_item_id');
             $table->foreign('order_item_id')->references('id')->on('order_items');
-            $table->string('serial');
+            $table->longText('serial');
             $table->timestamps();
         });
     }

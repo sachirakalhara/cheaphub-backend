@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('contribution_product_id');
             $table->text('name');
-            $table->text('serial');
+            $table->longText('serial');
             $table->integer('available_serial_count');
             $table->double('gateway_fee');
             $table->foreign('contribution_product_id')->references('id')->on('contribution_products');

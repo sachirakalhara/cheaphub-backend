@@ -22,7 +22,7 @@ return new class extends Migration
             $table->double('gateway_fee');
             $table->text('image');
             $table->text('payment_method');
-            $table->text('serial')->nullable();
+            $table->longText('serial')->nullable();
             $table->integer('serial_count')->default(0);
             $table->integer('minimum_quantity')->default(0);
             $table->integer('maximum_quantity')->nullable();
