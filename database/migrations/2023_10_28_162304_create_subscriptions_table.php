@@ -17,7 +17,7 @@ return new class extends Migration
             $table->text('name');
             $table->longText('serial');
             $table->integer('available_serial_count');
-            $table->double('gateway_fee');
+            $table->integer('gateway_fee');
             $table->foreign('contribution_product_id')->references('id')->on('contribution_products');
             $table->timestamps();
         });

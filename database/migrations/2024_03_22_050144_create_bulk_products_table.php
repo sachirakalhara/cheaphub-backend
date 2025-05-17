@@ -19,7 +19,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->double('price');
             $table->string('bulk_type')->default('serial_based');//service_based
-            $table->double('gateway_fee');
+            $table->integer('gateway_fee');
             $table->text('image');
             $table->text('payment_method');
             $table->longText('serial')->nullable();

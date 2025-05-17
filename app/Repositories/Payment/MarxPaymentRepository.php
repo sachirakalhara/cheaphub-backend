@@ -31,6 +31,7 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
         $user = Auth::user();
         $amount = $data['amount'] ?? 0;
         $discount = 0;
+        $gateway_fee = 0;
 
         if ($amount <= 0) {
             return response()->json(['message' => 'Invalid amount'], Response::HTTP_BAD_REQUEST);
@@ -53,6 +54,8 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
 
             foreach ($cartItemPackages as $cartItemPackage) {
                 $package = Package::find($cartItemPackage->package_id);
+                $gateway_fee = $package->subscription->gateway_fee ?? 0;
+
                 if (!$package) {
                     return response()->json(['message' => 'Package not found'], Response::HTTP_NOT_FOUND);
                 }
@@ -64,6 +67,7 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
 
             foreach ($cartItemBulkProducts as $cartItemBulkProduct) {
                 $bulkProduct = BulkProduct::find($cartItemBulkProduct->bulk_product_id);
+                $gateway_fee = $bulkProduct->gateway_fee ?? 0;
                 if (!$bulkProduct) {
                     return response()->json(['message' => 'Bulk product not found'], Response::HTTP_NOT_FOUND);
                 }
@@ -153,7 +157,8 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                 $cart->delete();
             }
         }
-
+        $gateway_fee = $amount * $gateway_fee / 100;
+        $amount = $amount + $gateway_fee;
         $marxArgs = [
             'merchantRID' => $order->order_id,
             'amount' => floatval($amount),
@@ -269,7 +274,7 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                         ], Response::HTTP_NOT_FOUND);
                     }
 
-                    $wallet->increment('balance', $amountPaid);
+                    $wallet->increment('balance', $order->amount);
                 }
 
                 if (!$order->is_wallet || $order->is_wallet === 0) {
@@ -369,7 +374,8 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                     'status' => 'success',
                     'summaryResult' => 'SUCCESS',
                     'order_id' => $order->id,
-                    'amount_paid' => $amountPaid,
+                    'amount' => $order->amount,
+                    'amount_paid' => $amountPaid
                 ]);
             }
 
