@@ -28,7 +28,7 @@ class TicketRepository implements TicketRepositoryInterface
         }
 
         if ($request->input('all', false)) {
-            $order_list = $query->with(['order', 'order.items', 'customer', 'comments.user'])->get();
+            $order_list = $query->with(['order', 'order.items', 'customer', 'comments.user'])->orderBy('created_at', 'desc')->get();
         } else {
             $order_list = $query->with(['order', 'order.items', 'customer', 'comments.user'])->orderBy('created_at', 'desc')->paginate(10);
         }
