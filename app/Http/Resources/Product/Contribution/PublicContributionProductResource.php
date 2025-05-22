@@ -32,7 +32,7 @@ class PublicContributionProductResource extends JsonResource
             'categories' => CategoryResource::collection($this->categories),
             'image' => $image,
             'visibility' => $this->visibility,
-            'service_info' => $this->service_info,
+            'service_info' => str_replace("\n", "<br>", $this->service_info),
             'subscriptions' => PublicSubscriptionResource::collection($this->subscriptions),
 
         ];
