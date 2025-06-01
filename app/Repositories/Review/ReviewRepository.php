@@ -26,7 +26,7 @@ class ReviewRepository implements ReviewRepositoryInterface
             activity('review')
                 ->performedOn($review)
                 ->causedBy(auth()->user())
-                ->withProperties(['name' => $review->product_type == 'bulk' ? $review->bulkProduct->name : $review->contributionProduct->name])
+                ->withProperties(['name' => $review->product_type])
                 ->log('created');
 
             return Helper::success(Response::$statusTexts[Response::HTTP_OK], Response::HTTP_OK);
@@ -46,7 +46,7 @@ class ReviewRepository implements ReviewRepositoryInterface
             activity('review')
                 ->performedOn($review)
                 ->causedBy(auth()->user())
-                ->withProperties(['name' => $review->product_type == 'bulk' ? $review->bulkProduct->name : $review->contributionProduct->name])
+                ->withProperties(['name' => $review->product_type])
                 ->log('updated');
 
             return Helper::success(Response::$statusTexts[Response::HTTP_OK], Response::HTTP_OK);
@@ -66,7 +66,7 @@ class ReviewRepository implements ReviewRepositoryInterface
                 activity('review')
                     ->performedOn($temp)
                     ->causedBy(auth()->user())
-                    ->withProperties(['name' => $temp->product_type == 'bulk' ? $temp->bulkProduct->name : $temp->contributionProduct->name])
+                    ->withProperties(['name' => $temp->product_type])
                     ->log('deleted');
 
                 return Helper::success(Response::$statusTexts[Response::HTTP_OK], Response::HTTP_OK);

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreign('user_id')->references('id')->on('users');
             $table->unsignedBigInteger('product_id');
             $table->string('product_type');
-            $table->text('review');
+            $table->text('review')->nullable();
             $table->unsignedTinyInteger('rating');
             $table->timestamps();
         });
