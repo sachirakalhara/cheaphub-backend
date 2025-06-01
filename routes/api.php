@@ -77,6 +77,11 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('/ticket/comment', [TicketController::class, 'addComment']);
         Route::post('/ticket/status-change', [TicketController::class, 'statusChange']);
 
+        Route::post('/review/create', [ReviewController::class, 'store']);
+        Route::put('/review/update', [ReviewController::class, 'update']);
+        Route::delete('/review/{id}', [ReviewController::class, 'deleteReview']);
+
+
         Route::group(['prefix' => 'super-admin','middleware' =>['super_admin']], function () {
             
             Route::get('/total-customer-spend', [OrderController::class, 'totalCustomerWithSpend']);

@@ -33,6 +33,8 @@ use App\Repositories\Coupon\CouponRepository;
 use App\Repositories\Coupon\Interface\CouponRepositoryInterface;
 use App\Repositories\Product\Interface\ProductReplacementRepositoryInterface;
 use App\Repositories\Product\ProductReplacementRepository;
+use App\Repositories\Review\Interface\ReviewRepositoryInterface;
+use App\Repositories\Review\ReviewRepository;
 use App\Repositories\Ticket\Interface\TicketRepositoryInterface;
 use App\Repositories\Ticket\TicketRepository;
 
@@ -59,6 +61,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(TicketRepositoryInterface::class, TicketRepository::class);
         $this->app->bind(CartItemRepositoryInterface::class, CartItemRepository::class);
         $this->app->bind(ProductReplacementRepositoryInterface::class, ProductReplacementRepository::class);
+        $this->app->bind(ReviewRepositoryInterface::class, ReviewRepository::class);
         
     }
 
