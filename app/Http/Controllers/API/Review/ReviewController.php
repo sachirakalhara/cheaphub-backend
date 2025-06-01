@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers\API\Review;
 
+use App\Repositories\Review\Interface\ReviewRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
