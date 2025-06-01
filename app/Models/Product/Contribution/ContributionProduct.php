@@ -32,4 +32,9 @@ class ContributionProduct extends Model
     {
         return $this->belongsToMany(Category::class, 'contribution_product_categories');
     }
+
+    public function reviews()
+    {
+        return $this->hasMany('App\Models\Review\Review');
+    }
 }

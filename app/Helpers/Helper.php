@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use App\Models\User\User;
+use App\Models\Review\Review;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Auth;
@@ -57,6 +58,25 @@ class Helper
         $page = $page ?: (Paginator::resolveCurrentPage() ?: 1);
         $items = $items instanceof Collection ? $items : Collection::make($items);
         return new LengthAwarePaginator($items->forPage($page, $perPage), $items->count(), $perPage, $page, $options);
+    }
+
+
+
+     public static function getCalculateAverageRating($productType, $productId)
+    {
+        $sumOfRatings = Review::where('product_type', $productType)
+            ->where('product_id', $productId)
+            ->selectRaw('SUM(rating) as total_rating')
+            ->get()->first();
+        $reviewCount = Review::where('product_type', $productType)
+            ->where('product_id', $productId)
+            ->count();
+
+        if($sumOfRatings->total_rating > 0){
+            return ($sumOfRatings->total_rating / $reviewCount);
+        }else{
+            return 0;
+        }
     }
 
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Product\Contribution;
 
+use App\Helpers\Helper;
 use App\Http\Resources\Category\CategoryResource;
 use App\Http\Resources\Serial\SerialResource;
 use App\Http\Resources\Subscription\PublicSubscriptionResource;
@@ -34,8 +35,30 @@ class PublicContributionProductResource extends JsonResource
             'visibility' => $this->visibility,
             'service_info' => str_replace("\n", "<br>", $this->service_info),
             'subscriptions' => PublicSubscriptionResource::collection($this->subscriptions),
+            'reviews' => $this->review(),
 
         ];
+    }
+
+     public function review()
+    {
+        $final_review = [];
+        foreach ($this->reviews as $review) {
+            $review =
+                [
+                    'id' => $review->id,
+                    'review' => $review->review,
+                    'rating_avg' => Helper::getCalculateAverageRating($review->product_type,$review->product_id),
+                    'rating_count' => $review->rating,
+                    'user_id' => $review->user_id,
+                    'user_name' => $review->user->display_name,
+                    "created_at" => $review->created_at,
+                    "updated_at" => $review->updated_at
+
+                ];
+            array_push($final_review, $review);
+        }
+        return $final_review;
     }
 
 }
