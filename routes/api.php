@@ -18,6 +18,7 @@ use App\Http\Controllers\API\Notification\NotificationController;
 use App\Http\Controllers\API\Payment\OrderController;
 use App\Http\Controllers\API\Payment\WalletController;
 use App\Http\Controllers\API\Product\Contribution\ProductReplacementController;
+use App\Http\Controllers\API\Review\ReviewController;
 use App\Http\Controllers\API\Ticket\TicketController;
 use App\Models\Product\Contribution\ProductReplacement;
 
