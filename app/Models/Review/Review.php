@@ -23,12 +23,12 @@ class Review extends Model
 
     public function bulkProduct()
     {
-        return $this->belongsTo('App\Models\Product\Bulk\BulkProduct');
+        return $this->belongsTo('App\Models\Product\Bulk\BulkProduct', 'product_id');
     }
 
     public function contributionProduct()
     {
-        return $this->belongsTo('App\Models\Product\Contribution\ContributionProduct');
+        return $this->belongsTo('App\Models\Product\Contribution\ContributionProduct', 'product_id');
     }
 
 }
