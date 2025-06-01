@@ -29,4 +29,9 @@ class BulkProduct extends Model
     {
         return $this->belongsToMany(Category::class, 'bulk_product_categories');
     }
+
+    public function reviews()
+    {
+        return $this->hasMany('App\Models\Review\Review');
+    }
 }
