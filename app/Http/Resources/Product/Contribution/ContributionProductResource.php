@@ -55,7 +55,7 @@ class ContributionProductResource extends JsonResource
                     "updated_at" => $review->updated_at
 
                 ];
-            array_push($final_review, $review);
+            $final_review[] = $review;
         }
         return $final_review;
     }
