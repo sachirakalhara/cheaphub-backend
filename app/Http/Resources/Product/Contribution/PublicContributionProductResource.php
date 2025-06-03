@@ -25,7 +25,7 @@ class PublicContributionProductResource extends JsonResource
     {
         $disk = Storage::disk('s3');
         $image = $this->image ? $disk->url($this->image) : null;
-        $rating_avg = 0;
+        $rating_avg = Helper::getCalculateAverageRating('contribution', $this->id) ?? 0;
         return [
             'id' => $this->id,
             'name' => $this->name,
@@ -36,8 +36,8 @@ class PublicContributionProductResource extends JsonResource
             'visibility' => $this->visibility,
             'service_info' => str_replace("\n", "<br>", $this->service_info),
             'subscriptions' => PublicSubscriptionResource::collection($this->subscriptions),
-            'reviews' => $this->review(),
             'rating_avg' =>  $rating_avg,
+            'reviews' => $this->review(),
 
         ];
     }
@@ -46,12 +46,10 @@ class PublicContributionProductResource extends JsonResource
     {
         $final_review = [];
         foreach ($this->reviews as $review) {
-            $rating_avg = Helper::getCalculateAverageRating($review->product_type,$review->product_id);
             $review =
                 [
                     'id' => $review->id,
                     'review' => $review->review,
-                    'rating_avg' => $rating_avg,
                     'rating_count' => $review->rating,
                     'user_id' => $review->user_id,
                     'user_name' => $review->user->display_name,
