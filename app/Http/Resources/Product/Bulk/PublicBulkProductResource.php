@@ -22,6 +22,7 @@ class PublicBulkProductResource extends JsonResource
     {
         $disk = Storage::disk('s3');
         $image = $this->image ? $disk->url($this->image) : null;
+        $rating_avg = 0;
 
         return [
             'id' => $this->id,
@@ -41,6 +42,7 @@ class PublicBulkProductResource extends JsonResource
             'payment_method' => $this->payment_method,
             'bulk_type' => $this->bulk_type,
             'reviews' => $this->review(),
+            'rating_avg' =>  $rating_avg,
 
         ];
     }
@@ -49,11 +51,12 @@ class PublicBulkProductResource extends JsonResource
     {
         $final_review = [];
         foreach ($this->reviews as $review) {
+            $rating_avg = Helper::getCalculateAverageRating($review->product_type,$review->product_id);
             $review =
                 [
                     'id' => $review->id,
                     'review' => $review->review,
-                    'rating_avg' => Helper::getCalculateAverageRating($review->product_type,$review->product_id),
+                    'rating_avg' => $rating_avg,
                     'rating_count' => $review->rating,
                     'user_id' => $review->user_id,
                     'user_name' => $review->user->display_name,
