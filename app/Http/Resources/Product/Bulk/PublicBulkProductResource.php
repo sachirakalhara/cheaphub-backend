@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Product\Bulk;
 
+use App\Helpers\Helper;
 use App\Http\Resources\Category\CategoryResource;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -21,6 +22,7 @@ class PublicBulkProductResource extends JsonResource
     {
         $disk = Storage::disk('s3');
         $image = $this->image ? $disk->url($this->image) : null;
+        $rating_avg = Helper::getCalculateAverageRating('bulk', $this->id) ?? 0;
 
         return [
             'id' => $this->id,
@@ -39,8 +41,31 @@ class PublicBulkProductResource extends JsonResource
             'available_serial_count' => $this->serial_count,
             'payment_method' => $this->payment_method,
             'bulk_type' => $this->bulk_type,
+            'rating_avg' =>  $rating_avg,
+            'reviews' => $this->review(),
 
         ];
     }
+
+    public function review()
+    {
+        $final_review = [];
+        foreach ($this->reviews as $review) {
+            $review =
+                [
+                    'id' => $review->id,
+                    'review' => $review->review,
+                    'rating_count' => $review->rating,
+                    'user_id' => $review->user_id,
+                    'user_name' => $review->user->display_name,
+                    "created_at" => $review->created_at,
+                    "updated_at" => $review->updated_at
+
+                ];
+            $final_review[] = $review;
+        }
+        return $final_review;
+    }
+
 
 }

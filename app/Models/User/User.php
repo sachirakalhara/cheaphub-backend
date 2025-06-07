@@ -77,4 +77,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(Order::class);
     }
+
+     public function reviews()
+    {
+        return $this->hasMany('App\Models\Review\Review');
+    }
 }

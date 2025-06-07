@@ -3,6 +3,7 @@
 namespace App\Models\Product\Bulk;
 
 use App\Models\Category\Category;
+use App\Models\Review\Review;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
@@ -28,5 +29,10 @@ class BulkProduct extends Model
     public function categories(): BelongsToMany
     {
         return $this->belongsToMany(Category::class, 'bulk_product_categories');
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class, 'product_id', 'id');
     }
 }

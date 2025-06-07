@@ -18,6 +18,7 @@ use App\Http\Controllers\API\Notification\NotificationController;
 use App\Http\Controllers\API\Payment\OrderController;
 use App\Http\Controllers\API\Payment\WalletController;
 use App\Http\Controllers\API\Product\Contribution\ProductReplacementController;
+use App\Http\Controllers\API\Review\ReviewController;
 use App\Http\Controllers\API\Ticket\TicketController;
 use App\Models\Product\Contribution\ProductReplacement;
 
@@ -76,6 +77,11 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('/ticket', [TicketController::class, 'store']);
         Route::post('/ticket/comment', [TicketController::class, 'addComment']);
         Route::post('/ticket/status-change', [TicketController::class, 'statusChange']);
+
+        Route::post('/review/create', [ReviewController::class, 'store']);
+        Route::put('/review/update', [ReviewController::class, 'update']);
+        Route::delete('/review/{id}', [ReviewController::class, 'deleteReview']);
+
 
         Route::group(['prefix' => 'super-admin','middleware' =>['super_admin']], function () {
             
