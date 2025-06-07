@@ -63,7 +63,7 @@ class TicketRepository implements TicketRepositoryInterface
         ]);
         $user->notify(new TickerNotification($ticket));
 
-        $admins = User::where('userLevel->scope', 'super_admin')->get();
+        $admins = User::where('user_level_id', 1)->get();
         foreach ($admins as $admin) {
             $admin->notify(new TickerNotification($ticket));
         }
