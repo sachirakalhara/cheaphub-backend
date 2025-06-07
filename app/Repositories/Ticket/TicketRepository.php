@@ -8,6 +8,7 @@ use App\Models\Ticket\Ticket;
 use App\Notifications\TickerNotification;
 use App\Repositories\Ticket\Interface\TicketRepositoryInterface;
 use Illuminate\Http\Response;
+use App\Models\User\User;
 
 class TicketRepository implements TicketRepositoryInterface
 {
