@@ -5,6 +5,7 @@ namespace App\Repositories\Ticket;
 use App\Helpers\Helper;
 use App\Models\Payment\Order;
 use App\Models\Ticket\Ticket;
+use App\Notifications\TickerNotification;
 use App\Repositories\Ticket\Interface\TicketRepositoryInterface;
 use Illuminate\Http\Response;
 
@@ -59,7 +60,13 @@ class TicketRepository implements TicketRepositoryInterface
             'subject' => $data->subject,
             'description' => $data->description,
         ]);
-        
+        $user->notify(new TickerNotification($ticket));
+
+        $admins = User::where('userLevel->scope', 'super_admin')->get();
+        foreach ($admins as $admin) {
+            $admin->notify(new TickerNotification($ticket));
+        }
+
         if (isset($data->message) && !empty($data->message)) {
             $comment = $ticket->comments()->create([
                 'user_id' => $user->id,
