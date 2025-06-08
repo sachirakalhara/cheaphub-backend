@@ -7,15 +7,17 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class TickerNotification extends Notification
+class TicketNotification extends Notification
 {
     use Queueable;
 
     protected $ticket;
+    protected $userType;
 
-    public function __construct($ticket)
+    public function __construct($ticket, $userType)
     {
         $this->ticket = $ticket;
+        $this->userType = $userType;
     }
 
     /**
@@ -25,7 +27,7 @@ class TickerNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['database'];
+        return ['mail', 'database'];
     }
 
     /**
@@ -33,10 +35,19 @@ class TickerNotification extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
+
+        $url = "https://cheaphub.io/tickets/chat-box/" . $this->ticket->ticket_number;
+
+        if ($this->userType === 'admin') {
+            $url = "https://admin.cheaphub.io/tickets/chat-box/" . $this->ticket->ticket_number;
+        }
+
         return (new MailMessage)
-                    ->line('The introduction to the notification.')
-                    ->action('Notification Action', url('/'))
-                    ->line('Thank you for using our application!');
+            ->subject('New Ticket Created - #' . $this->ticket->ticket_number)
+            ->greeting('Hello ' . $notifiable->name . ',')
+            ->line('A new ticket has been created with ID #' . $this->ticket->ticket_number . '.')
+            ->action('View Ticket', $url)
+            ->line('Thank you for using our support system!');
     }
 
     /**
@@ -46,11 +57,17 @@ class TickerNotification extends Notification
      */
     public function toArray(object $notifiable): array
     {
+        $url = "https://cheaphub.io/tickets/chat-box/" . $this->ticket->ticket_number;
+
+        if ($this->userType === 'admin') {
+            $url = "https://admin.cheaphub.io/tickets/chat-box/" . $this->ticket->ticket_number;
+        }
+        
         return [
             'title' => 'Ticket Created',
             'message' => 'Ticket #' . $this->ticket->id . ' has been created.',
             'ticket_id' => $this->ticket->id,
-            'url' => url('/ticket/get-all'),
+            'url' => $url,
             'icon' => 'ticket',
         ];
     }

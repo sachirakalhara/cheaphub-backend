@@ -5,7 +5,7 @@ namespace App\Repositories\Ticket;
 use App\Helpers\Helper;
 use App\Models\Payment\Order;
 use App\Models\Ticket\Ticket;
-use App\Notifications\TickerNotification;
+use App\Notifications\TicketNotification;
 use App\Repositories\Ticket\Interface\TicketRepositoryInterface;
 use Illuminate\Http\Response;
 use App\Models\User\User;
@@ -61,11 +61,11 @@ class TicketRepository implements TicketRepositoryInterface
             'subject' => $data->subject,
             'description' => $data->description,
         ]);
-        $user->notify(new TickerNotification($ticket));
+        $user->notify(new TicketNotification($ticket,'customer'));
 
         $admins = User::where('user_level_id', 1)->get();
         foreach ($admins as $admin) {
-            $admin->notify(new TickerNotification($ticket));
+            $admin->notify(new TicketNotification($ticket,'admin'));
         }
 
         if (isset($data->message) && !empty($data->message)) {
@@ -86,6 +86,14 @@ class TicketRepository implements TicketRepositoryInterface
             'user_id' => auth()->id(),
             'message' => $data->message,
         ]);
+        $user = User::find(auth()->id());
+        $user->notify(new TicketReplyNotification($ticket,'customer'));
+
+        $admins = User::where('user_level_id', 1)->get();
+        foreach ($admins as $admin) {
+            $admin->notify(new TicketReplyNotification($ticket,'admin'));
+        }
+
 
         return response()->json([
             'comment' => $comment->load('user'),
