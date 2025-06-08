@@ -9,6 +9,7 @@ use App\Notifications\TicketNotification;
 use App\Repositories\Ticket\Interface\TicketRepositoryInterface;
 use Illuminate\Http\Response;
 use App\Models\User\User;
+use App\Notifications\TicketReplyNotification;
 
 class TicketRepository implements TicketRepositoryInterface
 {
