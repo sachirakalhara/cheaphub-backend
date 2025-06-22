@@ -87,7 +87,9 @@ class TicketRepository implements TicketRepositoryInterface
             'user_id' => auth()->id(),
             'message' => $data->message,
         ]);
-        $user = User::find(auth()->id());
+        
+        
+        $user = User::find($ticket->order->use_id);
         $user->notify(new TicketReplyNotification($ticket,'customer'));
 
         $admins = User::where('user_level_id', 1)->get();
