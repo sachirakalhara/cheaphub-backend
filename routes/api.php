@@ -90,6 +90,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             Route::post('/order/status-change', [OrderController::class, 'changeStatus']);
 
             Route::post('/order/add-note', [OrderNoteController::class, 'addNote']);
+            Route::get('/order/notes/{order_id}', [OrderNoteController::class, 'getNotesByOrderID']);
 
             Route::post('/coupon/create', [CouponController::class, 'store']);
             Route::put('/coupon/update', [CouponController::class, 'update']);
