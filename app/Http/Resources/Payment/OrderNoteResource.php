@@ -19,6 +19,7 @@ class OrderNoteResource extends JsonResource
         return [
             'id'=>$this->id,
             'order_id'=>$this->order_id,
+            'order'=> new OrderResource($this->whenLoaded('order')),
             'user_id'=>$this->user_id,
             'note'=>$this->note,
             'created_at'=>$this->created_at,
