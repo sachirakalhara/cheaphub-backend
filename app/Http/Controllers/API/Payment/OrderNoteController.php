@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\API\Payment;
 
+use App\Http\Controllers\Controller;
+use App\Repositories\Payment\Interface\OrderNoteRepositoryInterface;
 use Illuminate\Http\Request;
 
 class OrderNoteController extends Controller
@@ -23,7 +25,7 @@ class OrderNoteController extends Controller
 
     public function addNote(Request $request)
     {
-        return $this->orderRepository->addNote($request);
+        return $this->noteRepository->addNote($request);
     }
 
     public function getNotesByOrderID($order_id)
