@@ -15,6 +15,7 @@ use App\Http\Controllers\API\User\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\MarxPaymentController;
 use App\Http\Controllers\API\Notification\NotificationController;
+use App\Http\Controllers\API\Payment\OrderNoteController;
 use App\Http\Controllers\API\Payment\OrderController;
 use App\Http\Controllers\API\Payment\WalletController;
 use App\Http\Controllers\API\Product\Contribution\ProductReplacementController;
@@ -87,6 +88,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             
             Route::get('/total-customer-spend', [OrderController::class, 'totalCustomerWithSpend']);
             Route::post('/order/status-change', [OrderController::class, 'changeStatus']);
+
+            Route::post('/order/add-note', [OrderNoteController::class, 'addNote']);
 
             Route::post('/coupon/create', [CouponController::class, 'store']);
             Route::put('/coupon/update', [CouponController::class, 'update']);

@@ -31,6 +31,8 @@ use App\Repositories\User\UserRepository;
 use Illuminate\Support\ServiceProvider;
 use App\Repositories\Coupon\CouponRepository;
 use App\Repositories\Coupon\Interface\CouponRepositoryInterface;
+use App\Repositories\Payment\Interface\OrderNoteRepositoryInterface;
+use App\Repositories\Payment\OrderNoteRepository;
 use App\Repositories\Product\Interface\ProductReplacementRepositoryInterface;
 use App\Repositories\Product\ProductReplacementRepository;
 use App\Repositories\Review\Interface\ReviewRepositoryInterface;
@@ -62,7 +64,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(CartItemRepositoryInterface::class, CartItemRepository::class);
         $this->app->bind(ProductReplacementRepositoryInterface::class, ProductReplacementRepository::class);
         $this->app->bind(ReviewRepositoryInterface::class, ReviewRepository::class);
-        
+        $this->app->bind(OrderNoteRepositoryInterface::class, OrderNoteRepository::class);
     }
 
     /**
