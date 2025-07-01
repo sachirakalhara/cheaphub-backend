@@ -17,7 +17,7 @@ class OrderNoteCollection extends ResourceCollection
     public function toArray($request)
     {
         return [
-            'order_notes'=> OrderNoteResource::collection($this->collection)
+            'order_notes_list'=> OrderNoteResource::collection($this->collection)
         ];
     }
 
