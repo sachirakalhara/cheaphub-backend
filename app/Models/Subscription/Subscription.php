@@ -12,7 +12,8 @@ class Subscription extends Model
         'contribution_product_id',
         'serial',
         'available_serial_count',
-        'gateway_fee'
+        'gateway_fee',
+        'service_type'
     ];
 
 

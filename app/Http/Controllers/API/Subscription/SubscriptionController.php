@@ -39,7 +39,7 @@ class SubscriptionController extends Controller
         $request->validate([
             'contribution_product_id' => 'required',
             'name' => 'required|string',
-            'serial' => 'required',
+            'service_type' => 'required',
             'gateway_fee' => 'required'
         ]);
         return $this->subscriptionRepository->store($request);
@@ -68,7 +68,7 @@ class SubscriptionController extends Controller
     {
         $request->validate([
             'name' => 'required|string',
-            'serial' => 'required',
+            'service_type' => 'required',
             'gateway_fee' => 'required'
         ]);
         return $this->subscriptionRepository->update($request);
