@@ -218,29 +218,32 @@ class WalletRepository implements WalletRepositoryInterface
         if ($package) {
             $subscription = Subscription::find($package->subscription_id);
 
-            if ($subscription && $orderItem->quantity > $subscription->available_serial_count) {
-                $order->update(['payment_status' => 'failed']);
-                return response()->json(['message' => 'Not enough stock for the subscription'], Response::HTTP_BAD_REQUEST);
-            }
+            if($subscription->service_type == 'serial_based') {
 
-            $allSerials = array_values(array_filter(explode("\n", $subscription->serial), 'trim'));
+                if ($subscription && $orderItem->quantity > $subscription->available_serial_count) {
+                    $order->update(['payment_status' => 'failed']);
+                    return response()->json(['message' => 'Not enough stock for the subscription'], Response::HTTP_BAD_REQUEST);
+                }
 
-            if (!empty($allSerials)) {
-                // Remove the first $orderItem->quantity serials
-                $removedSerials = array_splice($allSerials, 0, $orderItem->quantity);
+                $allSerials = array_values(array_filter(explode("\n", $subscription->serial), 'trim'));
 
-                // Update subscription stock
-                $subscription->serial = implode("\n", $allSerials);
-                $subscription->available_serial_count = max(0, $subscription->available_serial_count - $orderItem->quantity);
-                $subscription->save();
+                if (!empty($allSerials)) {
+                    // Remove the first $orderItem->quantity serials
+                    $removedSerials = array_splice($allSerials, 0, $orderItem->quantity);
 
-                // Record removed serials
-                foreach ($removedSerials as $serial) {
-                    RemovedContributionProductSerial::create([
-                        'package_id' => $package->id,
-                        'order_item_id' => $orderItem->id,
-                        'serial' => $serial,
-                    ]);
+                    // Update subscription stock
+                    $subscription->serial = implode("\n", $allSerials);
+                    $subscription->available_serial_count = max(0, $subscription->available_serial_count - $orderItem->quantity);
+                    $subscription->save();
+
+                    // Record removed serials
+                    foreach ($removedSerials as $serial) {
+                        RemovedContributionProductSerial::create([
+                            'package_id' => $package->id,
+                            'order_item_id' => $orderItem->id,
+                            'serial' => $serial,
+                        ]);
+                    }
                 }
             }
         }

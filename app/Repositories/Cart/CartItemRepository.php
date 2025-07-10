@@ -73,13 +73,20 @@ class CartItemRepository implements CartItemRepositoryInterface
                 return response()->json(['message' => 'Package not found'], Response::HTTP_NOT_FOUND);
             }
 
-            $totalQty = $cartItemPackagesQty + $qty - $removeQty;
-            if ($totalQty < 1) {
-                return response()->json(['message' => 'Quantity cannot be negative'], Response::HTTP_BAD_REQUEST);
+            if ($package->subscription && $package->subscription->service_type == 'serial_based') {
+
+                $totalQty = $cartItemPackagesQty + $qty - $removeQty;
+                if ($totalQty < 1) {
+                    return response()->json(['message' => 'Quantity cannot be negative'], Response::HTTP_BAD_REQUEST);
+                }
+
+                if ($package->subscription->available_serial_count < $totalQty) {
+                    return response()->json(['message' => 'Not enough stock for the package'], Response::HTTP_BAD_REQUEST);
+                }
             }
 
-            if ($package->subscription->available_serial_count < $totalQty) {
-                return response()->json(['message' => 'Not enough stock for the package'], Response::HTTP_BAD_REQUEST);
+            if ($package->subscription && $package->subscription->service_type == 'service_based') {
+                $totalQty = $cartItemPackagesQty + $qty - $removeQty;
             }
         }
 
