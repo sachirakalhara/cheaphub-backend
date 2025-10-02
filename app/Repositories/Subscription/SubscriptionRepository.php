@@ -39,8 +39,10 @@ class SubscriptionRepository implements SubscriptionRepositoryInterface
         $subscription = new Subscription();
         $subscription->name = $request->name;
         $subscription->contribution_product_id = $request->contribution_product_id;
-        $subscription->serial = $request->serial;
-        $subscription->available_serial_count = count(array_filter(explode("\n", $request->serial), 'trim'));
+        $subscription->service_type = $request->service_type;
+        $subscription->serial = $request->serial ?? null;
+        $subscription->available_serial_count = $request->serial ? count(array_filter(explode("\n", $request->serial), 'trim')) : 0;
+
         $subscription->gateway_fee = $request->gateway_fee;
 
         if ($subscription->save()) {
@@ -60,8 +62,11 @@ class SubscriptionRepository implements SubscriptionRepositoryInterface
         }
 
         $subscription->name = $request->name;
-        $subscription->serial = $request->serial;
-        $subscription->available_serial_count = count(array_filter(explode("\n", $request->serial), 'trim'));
+        if($subscription->service_type == 'serial_based'){
+            $subscription->serial = $request->serial;
+            $subscription->available_serial_count = count(array_filter(explode("\n", $request->serial), 'trim'));
+        }
+
         $subscription->gateway_fee = $request->gateway_fee;
 
         if ($subscription->save()) {

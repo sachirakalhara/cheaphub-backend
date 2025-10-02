@@ -59,9 +59,10 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                 if (!$package) {
                     return response()->json(['message' => 'Package not found'], Response::HTTP_NOT_FOUND);
                 }
-
-                if ($package->subscription->available_serial_count < $cartItemPackage->quantity) {
-                    return response()->json(['message' => 'Not enough stock for the package'], Response::HTTP_BAD_REQUEST);
+                if($package->subscription->service_type == 'serial_based') {
+                    if ($package->subscription->available_serial_count < $cartItemPackage->quantity) {
+                        return response()->json(['message' => 'Not enough stock for the package'], Response::HTTP_BAD_REQUEST);
+                    }
                 }
             }
 
@@ -335,23 +336,25 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                                         return response()->json(['message' => 'Not enough stock for the bulk product'], Response::HTTP_BAD_REQUEST);
                                     }
 
-                                    $allSerials = array_values(array_filter(explode("\n", $subscription->serial), 'trim'));
+                                    if($subscription->service_type == 'serial_based') {
+                                        $allSerials = array_values(array_filter(explode("\n", $subscription->serial), 'trim'));
 
-                                    if (!empty($allSerials)) {
-                                        // Remove the first $orderItem->quantity serials
-                                        $removedSerials = array_splice($allSerials, 0, $orderItem->quantity);
+                                        if (!empty($allSerials)) {
+                                            // Remove the first $orderItem->quantity serials
+                                            $removedSerials = array_splice($allSerials, 0, $orderItem->quantity);
 
-                                        // Update subscription
-                                        $subscription->serial = implode("\n", $allSerials);
-                                        $subscription->available_serial_count = max(0, $subscription->available_serial_count - $orderItem->quantity);
-                                        $subscription->save();
-            
-                                        foreach ($removedSerials as $serial) {
-                                            RemovedContributionProductSerial::create([
-                                                'package_id' => $package->id,
-                                                'order_item_id' => $orderItem->id,
-                                                'serial' => $serial,
-                                            ]);
+                                            // Update subscription
+                                            $subscription->serial = implode("\n", $allSerials);
+                                            $subscription->available_serial_count = max(0, $subscription->available_serial_count - $orderItem->quantity);
+                                            $subscription->save();
+                
+                                            foreach ($removedSerials as $serial) {
+                                                RemovedContributionProductSerial::create([
+                                                    'package_id' => $package->id,
+                                                    'order_item_id' => $orderItem->id,
+                                                    'serial' => $serial,
+                                                ]);
+                                            }
                                         }
                                     }
                                 }
