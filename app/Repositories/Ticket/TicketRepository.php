@@ -29,6 +29,9 @@ class TicketRepository implements TicketRepositoryInterface
         if ($request->filled('user_id')) {
             $query->where('customer_id',  $request->user_id );
         }
+         if ($request->filled('status')) {
+            $query->where('status',  $request->status );
+        }
 
         if ($request->input('all', false)) {
             $order_list = $query->with(['order', 'order.items', 'customer', 'comments.user'])->orderBy('created_at', 'desc')->get();
