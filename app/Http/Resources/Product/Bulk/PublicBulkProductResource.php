@@ -51,18 +51,20 @@ class PublicBulkProductResource extends JsonResource
     {
         $final_review = [];
         foreach ($this->reviews as $review) {
-            $review =
-                [
-                    'id' => $review->id,
-                    'review' => $review->review,
-                    'rating_count' => $review->rating,
-                    'user_id' => $review->user_id,
-                    'user_name' => $review->user->display_name,
-                    "created_at" => $review->created_at,
-                    "updated_at" => $review->updated_at
+            if($review->product_type == 'bulk'){
+                $review =
+                    [
+                        'id' => $review->id,
+                        'review' => $review->review,
+                        'rating_count' => $review->rating,
+                        'user_id' => $review->user_id,
+                        'user_name' => $review->user->display_name,
+                        "created_at" => $review->created_at,
+                        "updated_at" => $review->updated_at
 
-                ];
-            $final_review[] = $review;
+                    ];
+                $final_review[] = $review;
+            }
         }
         return $final_review;
     }
