@@ -35,12 +35,6 @@ class Order extends Model
     public function orderItems()
     {
         return $this->hasMany(OrderItems::class);
-
-    }
-    
-    public function items()
-    {
-        return $this->hasMany(OrderItems::class, 'order_id');
     }
     
     public function tickets()
