@@ -16,6 +16,7 @@ use App\Models\Product\Bulk\RemovedBulkProductSerial;
 use App\Models\Subscription\Package;
 use App\Models\Subscription\Subscription;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -128,35 +129,44 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             }
         }
 
-        $order = Order::create([
-            'amount' => $amount,
-            'discount' => $discount,
-            'currency' => $data['currency'] ?? 'LKR',
-            'description' => $data['description'] ?? '',
-            'payment_status' => 'pending',
-            'is_wallet' => $data['is_wallet'] ?? false,
-            'user_id' => $user->id,
-            'order_id' => 'order_' . now()->format('YmdHis'),
-            'payment_method' => 'credit_card',
+        DB::beginTransaction();
+        try {
+            $order = Order::create([
+                'amount' => $amount,
+                'discount' => $discount,
+                'currency' => $data['currency'] ?? 'LKR',
+                'description' => $data['description'] ?? '',
+                'payment_status' => 'pending',
+                'is_wallet' => $data['is_wallet'] ?? false,
+                'user_id' => $user->id,
+                'order_id' => 'order_' . now()->format('YmdHis'),
+                'payment_method' => 'credit_card',
+            ]);
 
-        ]);
-
-        if (!$data['is_wallet'] || $data['is_wallet'] === 0) {
-            $cart = Cart::where('user_id',$user->id)->first();
-            if ($cart) {
-                CartItem::where('cart_id', $cart->id)->get()->each(function ($cartItem) use ($order) {
-                    OrderItems::create([
-                        'order_id' => $order->id,
-                        'bulk_product_id' => $cartItem->bulk_product_id,
-                        'package_id' => $cartItem->package_id,
-                        'quantity' => $cartItem->quantity,
-                    ]);
-                });
-
-                $cart->cartItems()->delete();
-                $cart->delete();
+            if (!$data['is_wallet'] || $data['is_wallet'] === 0) {
+                if ($cart) {
+                    foreach ($cart->cartItems as $cartItem) {
+                        OrderItems::create([
+                            'order_id' => $order->id,
+                            'bulk_product_id' => $cartItem->bulk_product_id,
+                            'package_id' => $cartItem->package_id,
+                            'quantity' => $cartItem->quantity,
+                        ]);
+                    }
+                }
             }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Order creation error: ' . $e->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to create order.',
+                'error' => $e->getMessage(),
+            ], 500);
         }
+
         $gateway_fee = $amount * $gateway_fee / 100;
         $amount = $amount + $gateway_fee;
         $marxArgs = [
@@ -171,35 +181,37 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             'orderSummary' => $data['description'] ?? '',
             'customerReference' => $user->id . " " . ($data['email'] ?? ''),
             "paymentMethod"=> $data['paymentMethod']
-
         ];
 
-
         try {
-           
             $local_user_secret = 'OTYwZTVkYmEtMGFiZi00OGQ0LTk5ZDctNGM1YWY2NjhkNWUwXzkxMjY=';
             $marx_sandbox_url = 'https://payment.v4.api.marx.lk/api/v4/ipg/orders';
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
                 'merchant-api-key' => $local_user_secret,
-
-            ])->post($marx_sandbox_url , $marxArgs);
+            ])->post($marx_sandbox_url, $marxArgs);
 
             $result = $response->json();
 
             Log::info('Payment initiation response: ', $result);
             if ($response->successful() && isset($result['data']['payUrl']) && $result['status'] === 0 && $result['message'] === 'SUCCESS') {
-                
+
                 $order->update([
                     'payment_status' => 'pending',
                     'transaction_id' => $result['data']['trId']
                 ]);
+
+                // Clear cart only after gateway accepts the payment
+                if ((!$data['is_wallet'] || $data['is_wallet'] === 0) && $cart) {
+                    $cart->cartItems()->delete();
+                    $cart->delete();
+                }
+
                 return response()->json([
                     'status' => 'success',
                     'redirect_url' => $result['data']['payUrl'],
                     'transaction_id' => $result['data']['trId'],
                     'merchantRID' => $result['data']['merchantRID']
-                    
                 ]);
             }
 
@@ -277,98 +289,103 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                     $wallet->increment('balance', $order->amount);
                 }
 
-                if (!$order->is_wallet || $order->is_wallet === 0) {
-                    $orderItems = OrderItems::where('order_id', $order->id)->get();
+                DB::beginTransaction();
+                try {
+                    if (!$order->is_wallet || $order->is_wallet === 0) {
+                        $orderItems = OrderItems::where('order_id', $order->id)->get();
 
-                    foreach ($orderItems as $orderItem) {
-                        if ($orderItem->bulk_product_id) {
-                            $bulkProduct = BulkProduct::find($orderItem->bulk_product_id);
+                        foreach ($orderItems as $orderItem) {
+                            if ($orderItem->bulk_product_id) {
+                                $bulkProduct = BulkProduct::find($orderItem->bulk_product_id);
 
-                            if ($bulkProduct) {
+                                if ($bulkProduct) {
 
-                                if($bulkProduct->bulk_type == 'serial_based') {
+                                    if($bulkProduct->bulk_type == 'serial_based') {
 
-                                    // Parse the serials into an array
-                                    $allSerials = array_values(array_filter(explode("\n", $bulkProduct->serial), 'trim'));
+                                        // Parse the serials into an array
+                                        $allSerials = array_values(array_filter(explode("\n", $bulkProduct->serial), 'trim'));
 
-                                    // Check stock
-                                    if (count($allSerials) < $orderItem->quantity) {
-                                        $order->update([
-                                            'payment_status' => 'failed',
-                                        ]);
-                                        return response()->json(['message' => 'Not enough stock for the bulk product'], Response::HTTP_BAD_REQUEST);
-                                    }
+                                        // Check stock
+                                        if (count($allSerials) < $orderItem->quantity) {
+                                            throw new \Exception('Not enough stock for the bulk product');
+                                        }
 
-                                    // Remove the needed number of serials
-                                    $removedSerials = array_splice($allSerials, 0, $orderItem->quantity);
-
-                                    // Update bulk product
-                                    $bulkProduct->serial = implode("\n", $allSerials);
-                                    $bulkProduct->serial_count = count($allSerials);
-                                    $bulkProduct->save();
-
-                                    // Save each removed serial individually
-                                    foreach ($removedSerials as $serial) {
-                                        RemovedBulkProductSerial::create([
-                                            'bulk_product_id' => $orderItem->bulk_product_id,
-                                            'order_item_id'   => $orderItem->id,
-                                            'serial'          => $serial,
-                                        ]);
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    foreach ($orderItems as $orderItem) {
-                       if ($orderItem->package_id) {
-                            $package = Package::find($orderItem->package_id);
-
-                            if ($package) {
-                                $subscription = Subscription::find($package->subscription_id);
-
-                                if ($subscription) {
-                                    if ($orderItem->quantity > $subscription->available_serial_count) {
-                                        $order->update([
-                                            'payment_status' => 'failed',
-                                        ]);
-                                        return response()->json(['message' => 'Not enough stock for the bulk product'], Response::HTTP_BAD_REQUEST);
-                                    }
-
-                                    $allSerials = array_values(array_filter(explode("\n", $subscription->serial), 'trim'));
-
-                                    if (!empty($allSerials)) {
-                                        // Remove the first $orderItem->quantity serials
+                                        // Remove the needed number of serials
                                         $removedSerials = array_splice($allSerials, 0, $orderItem->quantity);
 
-                                        // Update subscription
-                                        $subscription->serial = implode("\n", $allSerials);
-                                        $subscription->available_serial_count = max(0, $subscription->available_serial_count - $orderItem->quantity);
-                                        $subscription->save();
-            
+                                        // Update bulk product
+                                        $bulkProduct->serial = implode("\n", $allSerials);
+                                        $bulkProduct->serial_count = count($allSerials);
+                                        $bulkProduct->save();
+
+                                        // Save each removed serial individually
                                         foreach ($removedSerials as $serial) {
-                                            RemovedContributionProductSerial::create([
-                                                'package_id' => $package->id,
-                                                'order_item_id' => $orderItem->id,
-                                                'serial' => $serial,
+                                            RemovedBulkProductSerial::create([
+                                                'bulk_product_id' => $orderItem->bulk_product_id,
+                                                'order_item_id'   => $orderItem->id,
+                                                'serial'          => $serial,
                                             ]);
                                         }
                                     }
                                 }
                             }
                         }
+
+                        foreach ($orderItems as $orderItem) {
+                           if ($orderItem->package_id) {
+                                $package = Package::find($orderItem->package_id);
+
+                                if ($package) {
+                                    $subscription = Subscription::find($package->subscription_id);
+
+                                    if ($subscription) {
+                                        if ($orderItem->quantity > $subscription->available_serial_count) {
+                                            throw new \Exception('Not enough stock for the subscription');
+                                        }
+
+                                        $allSerials = array_values(array_filter(explode("\n", $subscription->serial), 'trim'));
+
+                                        if (!empty($allSerials)) {
+                                            // Remove the first $orderItem->quantity serials
+                                            $removedSerials = array_splice($allSerials, 0, $orderItem->quantity);
+
+                                            // Update subscription
+                                            $subscription->serial = implode("\n", $allSerials);
+                                            $subscription->available_serial_count = max(0, $subscription->available_serial_count - $orderItem->quantity);
+                                            $subscription->save();
+
+                                            foreach ($removedSerials as $serial) {
+                                                RemovedContributionProductSerial::create([
+                                                    'package_id' => $package->id,
+                                                    'order_item_id' => $orderItem->id,
+                                                    'serial' => $serial,
+                                                ]);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
+
+                    $order->update([
+                        'payment_status' => 'paid',
+                        'amount_paid' => $amountPaid,
+                    ]);
+
+                    DB::commit();
+                } catch (\Exception $e) {
+                    DB::rollBack();
+                    $order->update(['payment_status' => 'failed']);
+                    Log::error('Payment callback processing error: ' . $e->getMessage());
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => $e->getMessage(),
+                    ], Response::HTTP_BAD_REQUEST);
                 }
 
-                $order->update([
-                    'payment_status' => 'paid',
-                    'amount_paid' => $amountPaid,
-                ]);
-
-                
-
                 $user = User::find($order->user_id);
-                $user->notify(new OrderCreated($order)); 
+                $user->notify(new OrderCreated($order));
 
                 return response()->json([
                     'status' => 'success',

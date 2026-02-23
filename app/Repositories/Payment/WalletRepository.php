@@ -104,53 +104,52 @@ class WalletRepository implements WalletRepositoryInterface
             $amount = $totalPrice - $discount;
         }
 
-        // Create order
-        $order = Order::create([
-            'user_id'        => $user->id,
-            'amount'         => $amount,
-            'amount_paid'    => $amount,
-            'discount'       => $discount,
-            'currency'       => $wallet->currency,
-            'description'    => $data['description'] ?? '',
-            'payment_status' => 'pending',
-            'is_wallet'      => true,
-            'order_id'       => 'order_' . now()->format('YmdHis'),
-            'payment_method' => 'wallet',
-        ]);
-
-        // Create order items
-        foreach ($cart->cartItems as $cartItem) {
-            OrderItems::create([
-                'order_id'        => $order->id,
-                'bulk_product_id' => $cartItem->bulk_product_id,
-                'package_id'      => $cartItem->package_id,
-                'quantity'        => $cartItem->quantity,
-                'price'           => $cartItem->price,
-            ]);
-        }
-
-        // Process each item in the order
-        foreach ($order->orderItems as $orderItem) {
-            if ($orderItem->bulk_product_id) {
-                $this->processBulkProductStock($order, $orderItem);
-            }
-
-            if ($orderItem->package_id) {
-                $this->processPackageStock($order, $orderItem);
-            }
-        }
-
-        // Begin transaction for payment processing
         DB::beginTransaction();
         try {
+            // Create order
+            $order = Order::create([
+                'user_id'        => $user->id,
+                'amount'         => $amount,
+                'amount_paid'    => $amount,
+                'discount'       => $discount,
+                'currency'       => $wallet->currency,
+                'description'    => $data['description'] ?? '',
+                'payment_status' => 'pending',
+                'is_wallet'      => true,
+                'order_id'       => 'order_' . now()->format('YmdHis'),
+                'payment_method' => 'wallet',
+            ]);
+
+            // Create order items
+            foreach ($cart->cartItems as $cartItem) {
+                OrderItems::create([
+                    'order_id'        => $order->id,
+                    'bulk_product_id' => $cartItem->bulk_product_id,
+                    'package_id'      => $cartItem->package_id,
+                    'quantity'        => $cartItem->quantity,
+                ]);
+            }
+
+            // Process each item in the order
+            foreach ($order->orderItems as $orderItem) {
+                if ($orderItem->bulk_product_id) {
+                    $this->processBulkProductStock($order, $orderItem);
+                }
+
+                if ($orderItem->package_id) {
+                    $this->processPackageStock($order, $orderItem);
+                }
+            }
+
+            // Finalize payment
             $order->update(['payment_status' => 'paid']);
-            $wallet->decrement('balance', $amount); // Deduct wallet balance
-            $cart->cartItems()->delete(); // Clear the cart
+            $wallet->decrement('balance', $amount);
+            $cart->cartItems()->delete();
 
             DB::commit();
-                
+
             $user = User::find($order->user_id);
-            $user->notify(new OrderCreated($order)); 
+            $user->notify(new OrderCreated($order));
 
             return response()->json(['message' => 'Payment successful', 'order_id' => $order->order_id], Response::HTTP_OK);
         } catch (\Exception $e) {
@@ -167,26 +166,20 @@ class WalletRepository implements WalletRepositoryInterface
         if ($bulkProduct) {
 
             if($bulkProduct->bulk_type == 'serial_based') {
-                
+
                 // Parse the serials into an array
                 $allSerials = array_values(array_filter(explode("\n", $bulkProduct->serial), 'trim'));
 
                 if (count($allSerials) < $orderItem->quantity) {
-                    $order->update(['payment_status' => 'failed']);
-                    return response()->json(['message' => 'Not enough stock for the bulk product'], Response::HTTP_BAD_REQUEST);
+                    throw new \Exception('Not enough stock for the bulk product');
                 }
 
-                //maximum quantity check
                 if ($orderItem->quantity > $bulkProduct->maximum_quantity) {
-                    $order->update(['payment_status' => 'failed']);
-                    return response()->json(['message' => 'Maximum quantity exceeded'], Response::HTTP_BAD_REQUEST);
+                    throw new \Exception('Maximum quantity exceeded');
                 }
 
-
-                // Check minimum quantity
                 if ($orderItem->quantity < $bulkProduct->minimum_quantity) {
-                    $order->update(['payment_status' => 'failed']);
-                    return response()->json(['message' => 'Minimum quantity not met'], Response::HTTP_BAD_REQUEST);
+                    throw new \Exception('Minimum quantity not met');
                 }
 
                 // Remove the required serials
@@ -205,7 +198,7 @@ class WalletRepository implements WalletRepositoryInterface
                         'serial'          => $serial,
                     ]);
                 }
-                
+
             }
         }
     }
@@ -219,8 +212,7 @@ class WalletRepository implements WalletRepositoryInterface
             $subscription = Subscription::find($package->subscription_id);
 
             if ($subscription && $orderItem->quantity > $subscription->available_serial_count) {
-                $order->update(['payment_status' => 'failed']);
-                return response()->json(['message' => 'Not enough stock for the subscription'], Response::HTTP_BAD_REQUEST);
+                throw new \Exception('Not enough stock for the subscription');
             }
 
             $allSerials = array_values(array_filter(explode("\n", $subscription->serial), 'trim'));
