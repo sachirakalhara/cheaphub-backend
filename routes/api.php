@@ -4,7 +4,7 @@ use App\Http\Controllers\API\Auth\AuthController;
 use App\Http\Controllers\API\Cart\CartController;
 use App\Http\Controllers\API\Cart\CartItemController;
 use App\Http\Controllers\API\Category\CategoryController;
-use App\Http\Controllers\API\CoinbasePaymentController;
+use App\Http\Controllers\API\HeleketPaymentController;
 use App\Http\Controllers\API\Coupon\CouponController;
 use App\Http\Controllers\API\Product\Bulk\BulkProductController;
 use App\Http\Controllers\API\Product\Contribution\ContributionProductController;
@@ -30,8 +30,8 @@ Route::get('/v1/confirm-email/{user_id}/{key}', [AuthController::class, 'confirm
 Route::post('/v1/forgot-password', [AuthController::class, 'forgotPassword']);
 Route::post('/v1/reset-password', [AuthController::class, 'password_reset'])->name('reset.password');
 
-Route::post('/coinbase/payment', [CoinbasePaymentController::class, 'createPayment']);
-Route::post('/coinbase/callback', [CoinbasePaymentController::class, 'paymentCallback'])->name('coinbase.callback');
+// Heleket crypto webhook — public (server-to-server, signature-verified)
+Route::post('/v1/heleket/webhook', [HeleketPaymentController::class, 'handleWebhook']);
 
 // Route::post('payment',[MarxPaymentController::class, 'createPayment']);
 // Route::get('cancel',[MarxPaymentController::class, 'cancel']);
@@ -131,6 +131,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             Route::post('/marxpay/callback', [MarxPaymentController::class, 'paymentCallback'])->name('marxpay.callback');
 
             Route::post('/wallet/product-payment', [WalletController::class, 'processWalletPaymentForProduct']);
+
+            Route::post('/heleket/create-invoice', [HeleketPaymentController::class, 'createInvoice']);
 
             Route::get('/wallet/show', [WalletController::class, 'show']);
              
