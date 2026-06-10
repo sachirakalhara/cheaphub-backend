@@ -23,6 +23,11 @@ return [
     // Invoice lifetime in seconds (Heleket allows 300 - 43200).
     'lifetime' => env('HELEKET_INVOICE_LIFETIME', 3600),
 
+    // Acceptable underpayment in percent (0 - 5). Covers exchange withdrawal
+    // fees being deducted from the amount the customer sends, which would
+    // otherwise reject the payment with a "wrong_amount" status.
+    'accuracy_payment_percent' => env('HELEKET_ACCURACY_PERCENT', 2),
+
     // Currency the invoice amount is denominated in. Heleket converts to the
     // crypto chosen by the customer on their hosted payment page.
     'currency' => env('HELEKET_CURRENCY', 'USD'),

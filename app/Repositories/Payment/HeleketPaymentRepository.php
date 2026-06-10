@@ -186,6 +186,7 @@ class HeleketPaymentRepository implements HeleketPaymentRepositoryInterface
             'url_success' => config('heleket.url_success') ?: null,
             'url_callback' => config('heleket.url_callback') ?: null,
             'lifetime' => (int) config('heleket.lifetime', 3600),
+            'accuracy_payment_percent' => min(5, max(0, (float) config('heleket.accuracy_payment_percent', 2))),
             'is_payment_multiple' => false,
         ], function ($value) {
             return $value !== null;
