@@ -36,7 +36,8 @@ class ContributionProductResource extends JsonResource
             'url' =>!empty(Auth::user()->id) ? "cheaphub.io/contribution/{$this->id}/{$this->name}" : null,
             'subscriptions' => SubscriptionResource::collection($this->subscriptions),
             'rating_avg' =>  $rating_avg,
-            'reviews' => $this->review(),
+            'reviews' => $reviews = $this->review(),
+            'review_count' => count($reviews),
 
         ];
     }

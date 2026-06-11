@@ -37,7 +37,8 @@ class PublicContributionProductResource extends JsonResource
             'service_info' => str_replace("\n", "<br>", $this->service_info),
             'subscriptions' => PublicSubscriptionResource::collection($this->subscriptions),
             'rating_avg' =>  $rating_avg,
-            'reviews' => $this->review(),
+            'reviews' => $reviews = $this->review(),
+            'review_count' => count($reviews),
 
         ];
     }

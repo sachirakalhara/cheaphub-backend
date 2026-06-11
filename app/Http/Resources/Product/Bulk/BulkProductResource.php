@@ -43,7 +43,8 @@ class BulkProductResource extends JsonResource
             'payment_method' => $this->payment_method,
             'bulk_type' => $this->bulk_type,
             'rating_avg' =>  $rating_avg,
-            'reviews' => $this->review(),
+            'reviews' => $reviews = $this->review(),
+            'review_count' => count($reviews),
         ];
     }
 

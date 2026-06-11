@@ -20,7 +20,10 @@ class ReviewController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'rating' => 'required|numeric|min:0|max:5',
+            'rating' => 'required|numeric|min:1|max:5',
+            'product_type' => 'required|in:bulk,contribution',
+            'product_id' => 'required|integer',
+            'review' => 'nullable|string|max:2000',
         ]);
         return $this->reviewRepository->store($request);
     }
@@ -37,7 +40,8 @@ class ReviewController extends Controller
      {
          $request->validate([
              'id' => 'required',
-             'rating' => 'required|numeric|min:0|max:5',
+             'rating' => 'required|numeric|min:1|max:5',
+             'review' => 'nullable|string|max:2000',
          ]);
          return $this->reviewRepository->update($request);
      }
