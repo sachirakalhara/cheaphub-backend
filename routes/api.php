@@ -55,6 +55,9 @@ Route::get('/v1/category/trending', [CategoryController::class, 'trendingCategor
 Route::post('/v1/package/get-all', [PackageController::class, 'index']);
 Route::post('/v1/subscription/get-all', [SubscriptionController::class, 'index']);
 
+// Latest customer reviews — public (homepage feedback section)
+Route::get('/v1/review/latest', [ReviewController::class, 'latest']);
+
 Route::post('/v1/contribution/product/get-all', [ContributionProductController::class, 'index']);
 // Route::get('/v1/contribution/slug-contribution-product/{slug_name}', [ContributionProductController::class, 'findBySlug'])->name('api.slug-contribution-product.slug');
 Route::get('/v1/contribution/product/{id}', [ContributionProductController::class, 'findById']);

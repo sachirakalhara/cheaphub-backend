@@ -31,6 +31,14 @@ class ReviewController extends Controller
     public function deleteReview($id){
         return $this->reviewRepository->deleteReview($id);
     }
+
+    /**
+     * Latest reviews for the public homepage feedback section.
+     */
+    public function latest()
+    {
+        return $this->reviewRepository->latest(5);
+    }
     
 
     /**

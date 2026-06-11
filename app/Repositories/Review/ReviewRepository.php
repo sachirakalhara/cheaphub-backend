@@ -104,6 +104,34 @@ class ReviewRepository implements ReviewRepositoryInterface
     }
 
     /**
+     * Latest reviews for the public homepage feedback section.
+     */
+    public function latest($limit)
+    {
+        $reviews = Review::with(['user', 'bulkProduct', 'contributionProduct'])
+            ->orderBy('created_at', 'desc')
+            ->take($limit)
+            ->get()
+            ->map(function ($review) {
+                $product = $review->product_type === 'bulk'
+                    ? $review->bulkProduct
+                    : $review->contributionProduct;
+
+                return [
+                    'id' => $review->id,
+                    'review' => $review->review,
+                    'rating_count' => $review->rating,
+                    'user_name' => $review->user->display_name ?? 'Customer',
+                    'product_name' => $product->name ?? null,
+                    'product_type' => $review->product_type,
+                    'created_at' => $review->created_at,
+                ];
+            });
+
+        return response()->json(['reviews' => $reviews], Response::HTTP_OK);
+    }
+
+    /**
      * Check the user has at least one paid order containing this product.
      */
     private function hasPurchased($user_id, $product_type, $product_id)
