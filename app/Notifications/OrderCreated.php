@@ -11,9 +11,6 @@ class OrderCreated extends Notification
 {
     use Queueable;
 
-    /**
-     * Create a new notification instance.
-     */
     protected $order;
 
     public function __construct($order)
@@ -21,39 +18,33 @@ class OrderCreated extends Notification
         $this->order = $order;
     }
 
-    /**
-     * Get the notification's delivery channels.
-     *
-     * @return array<int, string>
-     */
     public function via(object $notifiable): array
     {
-        return ['database'];
+        return ['mail', 'database'];
     }
 
-    /**
-     * Get the mail representation of the notification.
-     */
     public function toMail(object $notifiable): MailMessage
     {
+        $url = rtrim(config('app.client_url'), '/') . '/order-details/' . $this->order->id;
+
         return (new MailMessage)
-                    ->line('The introduction to the notification.')
-                    ->action('Notification Action', url('/'))
-                    ->line('Thank you for using our application!');
+            ->subject('Payment Confirmed - Order #' . $this->order->order_id)
+            ->greeting('Hi ' . $notifiable->display_name . ',')
+            ->line('Your payment for order **#' . $this->order->order_id . '** has been confirmed.')
+            ->line('**Amount Paid:** $' . number_format($this->order->amount_paid, 2))
+            ->action('View Order', $url)
+            ->line('Your order details and serials are available on your dashboard.');
     }
 
-    /**
-     * Get the array representation of the notification.
-     *
-     * @return array<string, mixed>
-     */
     public function toArray(object $notifiable): array
     {
+        $url = rtrim(config('app.client_url'), '/') . '/order-details/' . $this->order->id;
+
         return [
-            'title' => 'Order Created',
-            'message' => 'Order #' . $this->order->order_id . ' has been placed.',
+            'title' => 'Payment Confirmed',
+            'message' => 'Order #' . $this->order->order_id . ' has been paid.',
             'order_id' => $this->order->id,
-            'url' => url('/order/' . $this->order->id),
+            'url' => $url,
             'icon' => 'shopping-cart',
         ];
     }
