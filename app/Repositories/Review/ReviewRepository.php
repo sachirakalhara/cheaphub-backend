@@ -17,7 +17,7 @@ class ReviewRepository implements ReviewRepositoryInterface
         if (!$this->hasPurchased($user_id, $request->product_type, $request->product_id)) {
             return response()->json([
                 'message' => 'You can only review products you have purchased.'
-            ], Response::HTTP_FORBIDDEN);
+            ], Response::HTTP_BAD_REQUEST);
         }
 
         $review = Review::updateOrCreate(
@@ -56,7 +56,7 @@ class ReviewRepository implements ReviewRepositoryInterface
         if ($review->user_id !== auth()->user()->id) {
             return response()->json([
                 'message' => 'You can only update your own reviews.'
-            ], Response::HTTP_FORBIDDEN);
+            ], Response::HTTP_BAD_REQUEST);
         }
 
         $review->review = $request->review;
@@ -86,7 +86,7 @@ class ReviewRepository implements ReviewRepositoryInterface
         if ($review->user_id !== auth()->user()->id) {
             return response()->json([
                 'message' => 'You can only delete your own reviews.'
-            ], Response::HTTP_FORBIDDEN);
+            ], Response::HTTP_BAD_REQUEST);
         }
 
         $temp = $review;
