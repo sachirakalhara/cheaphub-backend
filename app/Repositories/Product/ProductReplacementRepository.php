@@ -122,7 +122,15 @@ class ProductReplacementRepository implements ProductReplacementRepositoryInterf
         ]);
 
         $oldSubCount = $package->subscription->available_serial_count;
-        $package->subscription->serial = implode("\n", array_filter($allSerials, fn($serial) => $serial !== $randomSerial));
+
+        // Remove exactly ONE occurrence of the issued serial. Removing by value
+        // (array_filter with !==) deletes ALL identical lines when duplicate
+        // serial strings exist in stock, desyncing the text from the counter.
+        $idx = array_search($randomSerial, $allSerials, true);
+        if ($idx !== false) {
+            unset($allSerials[$idx]);
+        }
+        $package->subscription->serial = implode("\n", $allSerials);
         $package->subscription->available_serial_count -= 1;
         $package->subscription->save();
 
