@@ -20,6 +20,7 @@ use App\Models\User\User;
 use App\Notifications\OrderCreated;
 use App\Models\Coupon\Coupon;
 use App\Models\Product\Contribution\RemovedContributionProductSerial;
+use App\Services\StockNotificationService;
 
 class WalletRepository implements WalletRepositoryInterface
 {
@@ -186,9 +187,14 @@ class WalletRepository implements WalletRepositoryInterface
                 $removedSerials = array_splice($allSerials, 0, $orderItem->quantity);
 
                 // Update the bulk product stock
+                $oldCount = $bulkProduct->serial_count;
                 $bulkProduct->serial = implode("\n", $allSerials);
                 $bulkProduct->serial_count = count($allSerials);
                 $bulkProduct->save();
+
+                StockNotificationService::checkAndNotify(
+                    $bulkProduct->name, 'Bulk Product', $bulkProduct->serial_count, $oldCount, $bulkProduct->id
+                );
 
                 // Record removed serials
                 foreach ($removedSerials as $serial) {
@@ -215,6 +221,7 @@ class WalletRepository implements WalletRepositoryInterface
                 throw new \Exception('Not enough stock for the subscription');
             }
 
+            $oldSubCount = $subscription->available_serial_count;
             $allSerials = array_values(array_filter(explode("\n", $subscription->serial), 'trim'));
 
             if (!empty($allSerials)) {
@@ -225,6 +232,10 @@ class WalletRepository implements WalletRepositoryInterface
                 $subscription->serial = implode("\n", $allSerials);
                 $subscription->available_serial_count = max(0, $subscription->available_serial_count - $orderItem->quantity);
                 $subscription->save();
+
+                StockNotificationService::checkAndNotify(
+                    $subscription->name, 'Subscription', $subscription->available_serial_count, $oldSubCount, $subscription->id
+                );
 
                 // Record removed serials
                 foreach ($removedSerials as $serial) {

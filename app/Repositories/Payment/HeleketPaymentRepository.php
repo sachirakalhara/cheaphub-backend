@@ -22,6 +22,7 @@ use Illuminate\Support\Str;
 use App\Models\Product\Contribution\RemovedContributionProductSerial;
 use App\Models\User\User;
 use App\Notifications\OrderCreated;
+use App\Services\StockNotificationService;
 
 class HeleketPaymentRepository implements HeleketPaymentRepositoryInterface
 {
@@ -323,11 +324,16 @@ class HeleketPaymentRepository implements HeleketPaymentRepositoryInterface
                             throw new \Exception('Not enough stock for the bulk product');
                         }
 
+                        $oldCount = $bulkProduct->serial_count;
                         $removedSerials = array_splice($allSerials, 0, $orderItem->quantity);
 
                         $bulkProduct->serial = implode("\n", $allSerials);
                         $bulkProduct->serial_count = count($allSerials);
                         $bulkProduct->save();
+
+                        StockNotificationService::checkAndNotify(
+                            $bulkProduct->name, 'Bulk Product', $bulkProduct->serial_count, $oldCount, $bulkProduct->id
+                        );
 
                         foreach ($removedSerials as $serial) {
                             RemovedBulkProductSerial::create([
@@ -352,6 +358,7 @@ class HeleketPaymentRepository implements HeleketPaymentRepositoryInterface
                                 throw new \Exception('Not enough stock for the subscription');
                             }
 
+                            $oldSubCount = $subscription->available_serial_count;
                             $allSerials = array_values(array_filter(explode("\n", $subscription->serial), 'trim'));
 
                             if (!empty($allSerials)) {
@@ -360,6 +367,10 @@ class HeleketPaymentRepository implements HeleketPaymentRepositoryInterface
                                 $subscription->serial = implode("\n", $allSerials);
                                 $subscription->available_serial_count = max(0, $subscription->available_serial_count - $orderItem->quantity);
                                 $subscription->save();
+
+                                StockNotificationService::checkAndNotify(
+                                    $subscription->name, 'Subscription', $subscription->available_serial_count, $oldSubCount, $subscription->id
+                                );
 
                                 foreach ($removedSerials as $serial) {
                                     RemovedContributionProductSerial::create([
