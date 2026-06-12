@@ -10,23 +10,15 @@ class StockNotificationService
 {
     public static function checkAndNotify(string $productName, string $productType, int $newStock, int $oldStock, int $productId): void
     {
-        $threshold = (int) env('LOW_STOCK_THRESHOLD', 5);
+        $threshold = (int) config('app.low_stock_threshold', 5);
 
         if ($threshold <= 0) {
             return;
         }
 
-        $shouldNotify = false;
-
-        if ($oldStock > $threshold && $newStock <= $threshold) {
-            $shouldNotify = true;
-        }
-
-        if ($oldStock > 0 && $newStock === 0) {
-            $shouldNotify = true;
-        }
-
-        if (!$shouldNotify) {
+        // Notify on any stock decrease that leaves the product at or below
+        // the threshold (covers products already at/below it before the sale).
+        if ($newStock >= $oldStock || $newStock > $threshold) {
             return;
         }
 

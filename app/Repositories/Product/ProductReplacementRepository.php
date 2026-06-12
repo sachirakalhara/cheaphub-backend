@@ -12,6 +12,7 @@ use App\Models\Product\Contribution\RemovedContributionProductSerial;
 use App\Models\Product\Contribution\RemovedProductReplacementSerial;
 use App\Models\Subscription\Package;
 use App\Repositories\Product\Interface\ProductReplacementRepositoryInterface;
+use App\Services\StockNotificationService;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -120,9 +121,14 @@ class ProductReplacementRepository implements ProductReplacementRepositoryInterf
             'product_replacement_serial_id' => $productReplacementSerial->id,
         ]);
 
+        $oldSubCount = $package->subscription->available_serial_count;
         $package->subscription->serial = implode("\n", array_filter($allSerials, fn($serial) => $serial !== $randomSerial));
         $package->subscription->available_serial_count -= 1;
         $package->subscription->save();
+
+        StockNotificationService::checkAndNotify(
+            $package->subscription->name, 'Subscription', $package->subscription->available_serial_count, $oldSubCount, $package->subscription->id
+        );
 
         return response()->json([
             'status' => true,

@@ -59,6 +59,8 @@ return [
 
     'client_url' => env('CLIENT_URL', 'https://cheaphub.io/'),
 
+    'low_stock_threshold' => env('LOW_STOCK_THRESHOLD', 5),
+
     'asset_url' => env('ASSET_URL'),
 
     /*

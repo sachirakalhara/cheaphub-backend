@@ -16,7 +16,7 @@ class CheckLowStock extends Command
 
     public function handle()
     {
-        $threshold = $this->option('threshold') ?? (int) env('LOW_STOCK_THRESHOLD', 5);
+        $threshold = $this->option('threshold') ?? (int) config('app.low_stock_threshold', 5);
         $threshold = (int) $threshold;
 
         $this->info("Checking stock levels (threshold: {$threshold})...");
