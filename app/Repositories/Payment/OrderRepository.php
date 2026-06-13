@@ -74,7 +74,7 @@ class OrderRepository implements OrderRepositoryInterface
 
     public function filter($request)
     {
-        $query = Order::query();
+        $query = Order::query()->with(['orderItems.bulkProduct', 'orderItems.package']);
         // $query->where('is_wallet',  false );
 
         if ($request->filled('user_id')) {
