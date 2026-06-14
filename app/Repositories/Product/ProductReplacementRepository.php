@@ -16,6 +16,7 @@ use App\Services\StockNotificationService;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class ProductReplacementRepository implements ProductReplacementRepositoryInterface
 {
@@ -55,6 +56,25 @@ class ProductReplacementRepository implements ProductReplacementRepositoryInterf
                 'status' => false,
                 'message' => 'Package not found',
             ], Response::HTTP_NOT_FOUND);
+        }
+
+        // Block replacements once the subscription period for this order has ended.
+        // Expiry = order purchase date + package expiry_duration (in months), mirroring
+        // the frontend's checkOrderValidStatus()/afterDateTimeConverter() logic.
+        $order = Order::find($request->order_id);
+        if (!$order) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Order not found',
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        $expiryDate = Carbon::parse($order->created_at)->addMonths((int) $package->expiry_duration);
+        if (now()->greaterThan($expiryDate)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'This subscription has expired. Replacements are no longer available for this product.',
+            ], Response::HTTP_OK);
         }
 
         if ($package->subscription->available_serial_count <= 0) {
