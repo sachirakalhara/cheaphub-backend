@@ -153,6 +153,16 @@ class HeleketPaymentRepository implements HeleketPaymentRepositoryInterface
 
         DB::beginTransaction();
         try {
+            $cart = Cart::with('cartItems')
+                ->where('user_id', $user->id)
+                ->lockForUpdate()
+                ->first();
+
+            if (!$isWallet && (!$cart || !$cart->cartItems || $cart->cartItems->isEmpty())) {
+                DB::rollBack();
+                return response()->json(['message' => 'Cart is empty'], Response::HTTP_BAD_REQUEST);
+            }
+
             $order = Order::create([
                 'amount' => $amount,
                 'discount' => $discount,
@@ -175,6 +185,8 @@ class HeleketPaymentRepository implements HeleketPaymentRepositoryInterface
                             'quantity' => $cartItem->quantity,
                         ]);
                     }
+                    $cart->cartItems()->delete();
+                    $cart->delete();
                 }
             }
 
@@ -219,12 +231,6 @@ class HeleketPaymentRepository implements HeleketPaymentRepositoryInterface
                     'payment_status' => 'pending',
                     'transaction_id' => $result['result']['uuid'] ?? null,
                 ]);
-
-                // Clear cart only after the gateway accepts the invoice.
-                if (!$isWallet && $cart) {
-                    $cart->cartItems()->delete();
-                    $cart->delete();
-                }
 
                 return response()->json([
                     'status' => 'success',

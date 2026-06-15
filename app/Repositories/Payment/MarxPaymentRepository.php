@@ -142,6 +142,19 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
 
         DB::beginTransaction();
         try {
+            // Lock the cart row so a concurrent request from the same user blocks
+            // here until this transaction finishes. After commit the second request
+            // will find no cart and get "Cart is empty".
+            $cart = Cart::with('cartItems')
+                ->where('user_id', $user->id)
+                ->lockForUpdate()
+                ->first();
+
+            if (!($data['is_wallet'] ?? false) && (!$cart || !$cart->cartItems || $cart->cartItems->isEmpty())) {
+                DB::rollBack();
+                return response()->json(['message' => 'Cart is empty'], Response::HTTP_BAD_REQUEST);
+            }
+
             $order = Order::create([
                 'amount' => $amount,
                 'discount' => $discount,
@@ -164,6 +177,8 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                             'quantity' => $cartItem->quantity,
                         ]);
                     }
+                    $cart->cartItems()->delete();
+                    $cart->delete();
                 }
             }
 
@@ -211,12 +226,6 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                     'payment_status' => 'pending',
                     'transaction_id' => $result['data']['trId']
                 ]);
-
-                // Clear cart only after gateway accepts the payment
-                if ((!$data['is_wallet'] || $data['is_wallet'] === 0) && $cart) {
-                    $cart->cartItems()->delete();
-                    $cart->delete();
-                }
 
                 return response()->json([
                     'status' => 'success',
