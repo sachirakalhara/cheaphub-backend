@@ -53,6 +53,16 @@ class HeleketPaymentRepository implements HeleketPaymentRepositoryInterface
 
         $cart = Cart::with('cartItems')->where('user_id', $user->id)->first();
 
+        // A product purchase MUST have a non-empty cart. Without this guard a
+        // null cart (e.g. a duplicate/retried submit after the first call has
+        // already cleared the cart) silently creates a PAID order with zero
+        // items and no delivery. Reject before any order is created.
+        if (!$isWallet) {
+            if (!$cart || !$cart->cartItems || $cart->cartItems->isEmpty()) {
+                return response()->json(['message' => 'Cart is empty'], Response::HTTP_BAD_REQUEST);
+            }
+        }
+
         if ($cart && !$isWallet) {
             if (!$cart->cartItems || $cart->cartItems->isEmpty()) {
                 return response()->json(['message' => 'Cart is empty'], Response::HTTP_BAD_REQUEST);
