@@ -6,6 +6,8 @@ use App\Helpers\Helper;
 use App\Http\Resources\Payment\OrderCollection;
 use App\Http\Resources\Payment\OrderResource;
 use App\Models\Payment\Order;
+use App\Models\Payment\Wallet;
+use App\Models\Payment\OrderNote;
 use App\Repositories\Payment\Interface\OrderRepositoryInterface;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
@@ -143,6 +145,70 @@ class OrderRepository implements OrderRepositoryInterface
         $order->save();
 
         return Helper::success('Order status updated successfully', Response::HTTP_OK);
+    }
+
+    /**
+     * Refund a paid order.
+     *
+     * Two refund types:
+     *  - 'wallet'  : credits the refund amount back to the customer's wallet balance.
+     *  - 'gateway' : only marks the order as refunded; the admin processes the actual
+     *                money return manually (Marx dashboard / own crypto wallet).
+     *
+     * Serials are NOT returned to stock — the customer keeps whatever was delivered.
+     */
+    public function refund($data)
+    {
+        $order = Order::find($data->id);
+
+        if (!$order) {
+            return Helper::error('Order not found', Response::HTTP_NOT_FOUND);
+        }
+
+        $refundType = $data->refund_type ?? null;
+        if (!in_array($refundType, ['wallet', 'gateway'])) {
+            return Helper::error('Invalid refund type. Use "wallet" or "gateway".', Response::HTTP_BAD_REQUEST);
+        }
+
+        if ($order->payment_status !== 'paid') {
+            return Helper::error('Only paid orders can be refunded.', Response::HTTP_BAD_REQUEST);
+        }
+
+        // Refund the amount actually paid; fall back to the order total if not recorded.
+        $refundAmount = ($order->amount_paid && $order->amount_paid > 0)
+            ? $order->amount_paid
+            : $order->amount;
+
+        DB::beginTransaction();
+        try {
+            if ($refundType === 'wallet') {
+                $wallet = Wallet::firstOrCreate(
+                    ['user_id' => $order->user_id],
+                    ['balance' => 0, 'currency' => $order->currency ?? 'USD']
+                );
+                $wallet->increment('balance', $refundAmount);
+            }
+
+            $order->payment_status = 'refunded';
+            $order->save();
+
+            $noteText = $refundType === 'wallet'
+                ? 'Refund issued to customer wallet: ' . number_format($refundAmount, 2) . ' ' . ($order->currency ?? 'USD') . '. Order marked as refunded.'
+                : 'Payment gateway refund marked. Admin will process the actual refund manually (Marx / crypto). Amount: ' . number_format($refundAmount, 2) . ' ' . ($order->currency ?? 'USD') . '.';
+
+            $note = new OrderNote();
+            $note->order_id = $order->id;
+            $note->user_id = Auth::id();
+            $note->note = $noteText;
+            $note->save();
+
+            DB::commit();
+
+            return Helper::success('Order refunded successfully', Response::HTTP_OK);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return Helper::error('Refund failed: ' . $e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     public function walletHistory($perPage = 10)

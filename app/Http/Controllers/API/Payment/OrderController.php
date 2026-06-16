@@ -61,6 +61,15 @@ class OrderController extends Controller
         return $this->orderRepository->changeStatus($request);
     }
 
+    public function refund(Request $request)
+    {
+        $request->validate([
+            'id' => 'required',
+            'refund_type' => 'required|in:wallet,gateway',
+        ]);
+        return $this->orderRepository->refund($request);
+    }
+
     /**
      * Store a newly created resource in storage.
      */
