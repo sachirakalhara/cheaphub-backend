@@ -35,11 +35,12 @@ class TicketNotification extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-
-        $url = "https://cheaphub.io/tickets/chat-box/" . $this->ticket->ticket_number;
+        $baseUrl = rtrim(config('app.client_url'), '/');
+        $url = $baseUrl . "/tickets/chat-box/" . $this->ticket->ticket_number;
 
         if ($this->userType === 'admin') {
-            $url = "https://admin.cheaphub.io/tickets/chat-box/" . $this->ticket->ticket_number;
+            $baseUrl = rtrim(config('app.admin_url'), '/');
+            $url = $baseUrl . "/tickets/chat-box/" . $this->ticket->ticket_number;
         }
 
         return (new MailMessage)
@@ -57,10 +58,12 @@ class TicketNotification extends Notification
      */
     public function toArray(object $notifiable): array
     {
-        $url = "https://cheaphub.io/tickets/chat-box/" . $this->ticket->ticket_number;
+        $baseUrl = rtrim(config('app.client_url'), '/');
+        $url = $baseUrl . "/tickets/chat-box/" . $this->ticket->ticket_number;
 
         if ($this->userType === 'admin') {
-            $url = "https://admin.cheaphub.io/tickets/chat-box/" . $this->ticket->ticket_number;
+            $baseUrl = rtrim(config('app.admin_url'), '/');
+            $url = $baseUrl . "/tickets/chat-box/" . $this->ticket->ticket_number;
         }
         
         return [
