@@ -8,6 +8,8 @@ use App\Http\Resources\Payment\OrderResource;
 use App\Models\Payment\Order;
 use App\Models\Payment\Wallet;
 use App\Models\Payment\OrderNote;
+use App\Models\User\User;
+use App\Notifications\OrderRefunded;
 use App\Repositories\Payment\Interface\OrderRepositoryInterface;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
@@ -203,6 +205,17 @@ class OrderRepository implements OrderRepositoryInterface
             $note->save();
 
             DB::commit();
+
+            // Notify the customer (email + database). A mail hiccup must not fail an
+            // already-committed refund, so this is outside the transaction and guarded.
+            try {
+                $customer = User::find($order->user_id);
+                if ($customer) {
+                    $customer->notify(new OrderRefunded($order, $refundType, $refundAmount));
+                }
+            } catch (\Exception $e) {
+                \Log::error('Refund notification failed for order ' . $order->order_id . ': ' . $e->getMessage());
+            }
 
             return Helper::success('Order refunded successfully', Response::HTTP_OK);
         } catch (\Exception $e) {
