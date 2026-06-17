@@ -93,12 +93,16 @@ class TicketRepository implements TicketRepositoryInterface
         ]);
         
         
-        $user = User::find($ticket->order->user_id);
-        $user->notify(new TicketReplyNotification($ticket,'customer'));
+        $isAdmin = auth()->user()->user_level_id == 1;
 
-        $admins = User::where('user_level_id', 1)->get();
-        foreach ($admins as $admin) {
-            $admin->notify(new TicketReplyNotification($ticket,'admin'));
+        if ($isAdmin) {
+            $user = User::find($ticket->order->user_id);
+            $user->notify(new TicketReplyNotification($ticket, 'customer'));
+        } else {
+            $admins = User::where('user_level_id', 1)->get();
+            foreach ($admins as $admin) {
+                $admin->notify(new TicketReplyNotification($ticket, 'admin'));
+            }
         }
 
 
