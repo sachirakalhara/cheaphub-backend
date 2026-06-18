@@ -63,6 +63,8 @@ return [
 
     'low_stock_threshold' => env('LOW_STOCK_THRESHOLD', 5),
 
+    'pending_order_timeout_minutes' => env('PENDING_ORDER_TIMEOUT_MINUTES', 60),
+
     'asset_url' => env('ASSET_URL'),
 
     /*

@@ -138,7 +138,7 @@ class OrderRepository implements OrderRepositoryInterface
             return Helper::error('Order not found', Response::HTTP_NOT_FOUND);
         }
 
-        $validStatuses = ['pending', 'paid', 'failed'];
+        $validStatuses = ['pending', 'paid', 'failed', 'canceled'];
         if (!in_array($data->status, $validStatuses)) {
             return Helper::error('Invalid status provided', Response::HTTP_BAD_REQUEST);
         }
