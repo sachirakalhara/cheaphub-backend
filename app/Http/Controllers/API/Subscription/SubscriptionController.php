@@ -36,12 +36,17 @@ class SubscriptionController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $rules = [
             'contribution_product_id' => 'required',
             'name' => 'required|string',
-            'serial' => 'required',
-            'gateway_fee' => 'required'
-        ]);
+            'gateway_fee' => 'required',
+        ];
+        if (($request->delivery_type ?? 'serial_based') === 'serial_based') {
+            $rules['serial'] = 'required';
+        } else {
+            $rules['service_qty'] = 'required|integer|min:0';
+        }
+        $request->validate($rules);
         return $this->subscriptionRepository->store($request);
     }
 
@@ -66,11 +71,15 @@ class SubscriptionController extends Controller
      */
     public function update(Request $request)
     {
-        $request->validate([
+        $rules = [
             'name' => 'required|string',
-            'serial' => 'required',
-            'gateway_fee' => 'required'
-        ]);
+            'gateway_fee' => 'required',
+        ];
+        $subscription = Subscription::find($request->id);
+        if (!$subscription || $subscription->delivery_type !== 'service_based') {
+            $rules['serial'] = 'required';
+        }
+        $request->validate($rules);
         return $this->subscriptionRepository->update($request);
     }
 
