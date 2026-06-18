@@ -14,6 +14,7 @@ class Subscription extends Model
         'available_serial_count',
         'delivery_type',
         'service_qty',
+        'service_info',
         'gateway_fee'
     ];
 

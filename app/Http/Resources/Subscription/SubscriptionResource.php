@@ -24,6 +24,7 @@ class SubscriptionResource extends JsonResource
             'available_serial_count' => $this->available_serial_count,
             'delivery_type' => $this->delivery_type ?? 'serial_based',
             'service_qty' => $this->service_qty ?? 0,
+            'service_info' => $this->service_info,
             'gateway_fee' => $this->gateway_fee,
             'packages' => PublicPackageResource::collection($this->packages),
 

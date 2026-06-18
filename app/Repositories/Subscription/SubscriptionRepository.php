@@ -52,6 +52,7 @@ class SubscriptionRepository implements SubscriptionRepositoryInterface
             $subscription->serial = '';
             $subscription->available_serial_count = 0;
             $subscription->service_qty = $serviceQty;
+            $subscription->service_info = $request->service_info ?? '';
         } else {
             $subscription->serial = $request->serial;
             $subscription->available_serial_count = count(array_filter(explode("\n", $request->serial), 'trim'));
@@ -86,6 +87,10 @@ class SubscriptionRepository implements SubscriptionRepositoryInterface
                     return Helper::error('Available quantity cannot be negative', Response::HTTP_BAD_REQUEST);
                 }
                 $subscription->service_qty = $serviceQty;
+            }
+
+            if ($request->has('service_info')) {
+                $subscription->service_info = $request->service_info;
             }
         } else {
             $subscription->name = $request->name;
