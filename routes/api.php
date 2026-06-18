@@ -92,6 +92,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             Route::get('/total-customer-spend', [OrderController::class, 'totalCustomerWithSpend']);
             Route::post('/order/status-change', [OrderController::class, 'changeStatus']);
             Route::post('/order/refund', [OrderController::class, 'refund']);
+            Route::post('/order/deliver', [OrderController::class, 'deliverServiceItem']);
 
             Route::post('/order/add-note', [OrderNoteController::class, 'addNote']);
             Route::get('/order/notes/{order_id}', [OrderNoteController::class, 'getNotesByOrderID']);

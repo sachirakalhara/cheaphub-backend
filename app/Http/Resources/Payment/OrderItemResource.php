@@ -35,9 +35,12 @@ class OrderItemResource extends JsonResource
         $image = null;
         $user_purchase_serials = null;
         $available_replace_count = null;
+        $is_service_based = false;
         if ($package) {
             $subscription = Subscription::find($package->subscription_id);
             if ($subscription) {
+
+                $is_service_based = ($subscription->delivery_type ?? 'serial_based') === 'service_based';
 
                 $productReplacement = ProductReplacement::where('order_id', $this->order_id)
                     ->where('package_id', $package->id)
@@ -64,11 +67,20 @@ class OrderItemResource extends JsonResource
                     ->get();
         }
 
+        $delivery = $this->delivery;
+
         return [
             'id' => $this->id,
             'quantity' => $this->quantity,
             'user_purchase_serials' => $user_purchase_serials,
             'available_replace_count' => $available_replace_count,
+            'is_service_based' => $is_service_based,
+            'delivery' => $delivery ? [
+                'id' => $delivery->id,
+                'delivery_content' => $delivery->delivery_content,
+                'delivered_at' => $delivery->delivered_at,
+                'delivered_by' => optional($delivery->deliveredByUser)->display_name,
+            ] : null,
             'created_at' => $this->created_at,
             'bulk_product' =>[
                 'id' => optional($this->bulkProduct)->id,

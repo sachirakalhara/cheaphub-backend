@@ -11,6 +11,7 @@ interface OrderRepositoryInterface
     public function totalCustomerCountWithSpend();
     public function changeStatus($request);
     public function refund($request);
+    public function deliverServiceItem($request);
     public function walletHistory();
 
 }

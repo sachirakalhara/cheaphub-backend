@@ -78,8 +78,14 @@ class CartItemRepository implements CartItemRepositoryInterface
                 return response()->json(['message' => 'Quantity cannot be negative'], Response::HTTP_BAD_REQUEST);
             }
 
-            if ($package->subscription->available_serial_count < $totalQty) {
-                return response()->json(['message' => 'Not enough stock for the package'], Response::HTTP_BAD_REQUEST);
+            if (($package->subscription->delivery_type ?? 'serial_based') === 'service_based') {
+                if ($package->subscription->service_qty < $totalQty) {
+                    return response()->json(['message' => 'Not enough stock for the package'], Response::HTTP_BAD_REQUEST);
+                }
+            } else {
+                if ($package->subscription->available_serial_count < $totalQty) {
+                    return response()->json(['message' => 'Not enough stock for the package'], Response::HTTP_BAD_REQUEST);
+                }
             }
         }
 

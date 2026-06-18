@@ -72,8 +72,14 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                     return response()->json(['message' => 'Package not found'], Response::HTTP_NOT_FOUND);
                 }
 
-                if ($package->subscription->available_serial_count < $cartItemPackage->quantity) {
-                    return response()->json(['message' => 'Not enough stock for the package'], Response::HTTP_BAD_REQUEST);
+                if (($package->subscription->delivery_type ?? 'serial_based') === 'service_based') {
+                    if ($package->subscription->service_qty < $cartItemPackage->quantity) {
+                        return response()->json(['message' => 'Not enough stock for the package'], Response::HTTP_BAD_REQUEST);
+                    }
+                } else {
+                    if ($package->subscription->available_serial_count < $cartItemPackage->quantity) {
+                        return response()->json(['message' => 'Not enough stock for the package'], Response::HTTP_BAD_REQUEST);
+                    }
                 }
             }
 
@@ -363,7 +369,19 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                                 if ($package) {
                                     $subscription = Subscription::find($package->subscription_id);
 
-                                    if ($subscription) {
+                                    if ($subscription && ($subscription->delivery_type ?? 'serial_based') === 'service_based') {
+                                        // Service-based: deduct manual quantity only, no serials.
+                                        if ($orderItem->quantity > $subscription->service_qty) {
+                                            throw new \Exception('Not enough stock for the subscription');
+                                        }
+
+                                        $oldServiceQty = $subscription->service_qty;
+                                        $subscription->decrement('service_qty', $orderItem->quantity);
+
+                                        StockNotificationService::checkAndNotify(
+                                            $subscription->name, 'Subscription', $subscription->service_qty, $oldServiceQty, $subscription->id
+                                        );
+                                    } elseif ($subscription) {
                                         if ($orderItem->quantity > $subscription->available_serial_count) {
                                             throw new \Exception('Not enough stock for the subscription');
                                         }

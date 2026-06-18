@@ -22,6 +22,8 @@ class PublicSubscriptionResource extends JsonResource
             'name' => $this->name,
             // 'serial' => $this->serial,
             'available_serial_count' => $this->available_serial_count,
+            'delivery_type' => $this->delivery_type ?? 'serial_based',
+            'service_qty' => $this->service_qty ?? 0,
             'gateway_fee' => $this->gateway_fee,
             'packages' => PublicPackageResource::collection($this->packages),
 

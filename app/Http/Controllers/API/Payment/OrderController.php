@@ -70,6 +70,15 @@ class OrderController extends Controller
         return $this->orderRepository->refund($request);
     }
 
+    public function deliverServiceItem(Request $request)
+    {
+        $request->validate([
+            'order_item_id' => 'required',
+            'delivery_content' => 'required|string',
+        ]);
+        return $this->orderRepository->deliverServiceItem($request);
+    }
+
     /**
      * Store a newly created resource in storage.
      */

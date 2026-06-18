@@ -6,10 +6,15 @@ use App\Helpers\Helper;
 use App\Http\Resources\Payment\OrderCollection;
 use App\Http\Resources\Payment\OrderResource;
 use App\Models\Payment\Order;
+use App\Models\Payment\OrderItems;
+use App\Models\Payment\OrderItemDelivery;
 use App\Models\Payment\Wallet;
 use App\Models\Payment\OrderNote;
+use App\Models\Subscription\Subscription;
+use App\Models\Product\Contribution\ContributionProduct;
 use App\Models\User\User;
 use App\Notifications\OrderRefunded;
+use App\Notifications\OrderItemDelivered;
 use App\Repositories\Payment\Interface\OrderRepositoryInterface;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
@@ -138,7 +143,7 @@ class OrderRepository implements OrderRepositoryInterface
             return Helper::error('Order not found', Response::HTTP_NOT_FOUND);
         }
 
-        $validStatuses = ['pending', 'paid', 'failed', 'canceled'];
+        $validStatuses = ['pending', 'paid', 'failed', 'canceled', 'completed'];
         if (!in_array($data->status, $validStatuses)) {
             return Helper::error('Invalid status provided', Response::HTTP_BAD_REQUEST);
         }
@@ -222,6 +227,108 @@ class OrderRepository implements OrderRepositoryInterface
             DB::rollBack();
             return Helper::error('Refund failed: ' . $e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    /**
+     * Manually deliver a service-based subscription order item.
+     *
+     * Append-only: a delivery can be submitted once per order item and never edited
+     * or removed. After delivery, if every service-based item in the order has been
+     * delivered the order is marked 'completed'. Serial-based items are never affected.
+     */
+    public function deliverServiceItem($data)
+    {
+        $orderItemId = $data->order_item_id ?? null;
+        $content = $data->delivery_content ?? null;
+
+        if (!$orderItemId) {
+            return Helper::error('Order item is required', Response::HTTP_BAD_REQUEST);
+        }
+
+        if (!$content || trim($content) === '') {
+            return Helper::error('Delivery content is required', Response::HTTP_BAD_REQUEST);
+        }
+
+        $orderItem = OrderItems::find($orderItemId);
+        if (!$orderItem) {
+            return Helper::error('Order item not found', Response::HTTP_NOT_FOUND);
+        }
+
+        $order = Order::find($orderItem->order_id);
+        if (!$order) {
+            return Helper::error('Order not found', Response::HTTP_NOT_FOUND);
+        }
+
+        // Only service-based subscription items can be delivered manually.
+        if (!$orderItem->package_id) {
+            return Helper::error('This item is not a service-based product', Response::HTTP_BAD_REQUEST);
+        }
+
+        $package = $orderItem->package;
+        $subscription = $package ? Subscription::find($package->subscription_id) : null;
+
+        if (!$subscription || ($subscription->delivery_type ?? 'serial_based') !== 'service_based') {
+            return Helper::error('This item is not a service-based product', Response::HTTP_BAD_REQUEST);
+        }
+
+        // Append-only: reject if a delivery already exists for this item.
+        $existing = OrderItemDelivery::where('order_item_id', $orderItem->id)->first();
+        if ($existing) {
+            return Helper::error('This item has already been delivered', Response::HTTP_BAD_REQUEST);
+        }
+
+        DB::beginTransaction();
+        try {
+            OrderItemDelivery::create([
+                'order_id' => $order->id,
+                'order_item_id' => $orderItem->id,
+                'delivery_content' => $content,
+                'delivered_by' => Auth::id(),
+                'delivered_at' => now(),
+            ]);
+
+            // Mark the order completed only when ALL service-based items are delivered.
+            $serviceItemIds = [];
+            foreach ($order->orderItems as $item) {
+                if (!$item->package_id) {
+                    continue;
+                }
+                $itemSubscription = Subscription::find(optional($item->package)->subscription_id);
+                if ($itemSubscription && ($itemSubscription->delivery_type ?? 'serial_based') === 'service_based') {
+                    $serviceItemIds[] = $item->id;
+                }
+            }
+
+            $deliveredCount = OrderItemDelivery::whereIn('order_item_id', $serviceItemIds)->count();
+
+            if (!empty($serviceItemIds) && $deliveredCount >= count($serviceItemIds)) {
+                $order->payment_status = 'completed';
+                $order->save();
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return Helper::error('Delivery failed: ' . $e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        // Notify the customer (email + database). One email per item delivery.
+        // A mail hiccup must not undo a committed delivery, so it is guarded.
+        try {
+            $customer = User::find($order->user_id);
+            $contributionProduct = $subscription->contribution_product_id
+                ? ContributionProduct::find($subscription->contribution_product_id)
+                : null;
+            $productName = $contributionProduct ? $contributionProduct->name : $subscription->name;
+
+            if ($customer) {
+                $customer->notify(new OrderItemDelivered($order, $productName, $content));
+            }
+        } catch (\Exception $e) {
+            \Log::error('Delivery notification failed for order item ' . $orderItem->id . ': ' . $e->getMessage());
+        }
+
+        return Helper::success('Service delivered successfully', Response::HTTP_OK);
     }
 
     public function walletHistory($perPage = 10)

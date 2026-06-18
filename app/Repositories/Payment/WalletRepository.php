@@ -217,6 +217,23 @@ class WalletRepository implements WalletRepositoryInterface
         if ($package) {
             $subscription = Subscription::find($package->subscription_id);
 
+            // Service-based subscriptions deduct a manual quantity counter only.
+            // Serial fields are never touched and no serials are recorded.
+            if ($subscription && ($subscription->delivery_type ?? 'serial_based') === 'service_based') {
+                if ($orderItem->quantity > $subscription->service_qty) {
+                    throw new \Exception('Not enough stock for the subscription');
+                }
+
+                $oldQty = $subscription->service_qty;
+                $subscription->decrement('service_qty', $orderItem->quantity);
+
+                StockNotificationService::checkAndNotify(
+                    $subscription->name, 'Subscription', $subscription->service_qty, $oldQty, $subscription->id
+                );
+
+                return;
+            }
+
             if ($subscription && $orderItem->quantity > $subscription->available_serial_count) {
                 throw new \Exception('Not enough stock for the subscription');
             }

@@ -3,6 +3,7 @@
 namespace App\Models\Payment;
 
 use App\Models\Payment\Order;
+use App\Models\Payment\OrderItemDelivery;
 use App\Models\Product\Bulk\BulkProduct;
 use App\Models\Product\Contribution\ContributionProduct;
 use App\Models\Product\Contribution\RemovedContributionProductSerial;
@@ -35,5 +36,10 @@ class OrderItems extends Model
     {
         return $this->hasMany(RemovedContributionProductSerial::class);
 
+    }
+
+    public function delivery()
+    {
+        return $this->hasOne(OrderItemDelivery::class, 'order_item_id');
     }
 }
