@@ -111,6 +111,7 @@ class OrderItemResource extends JsonResource
                 'name' => $subscription->name,
                 'available_serial_count' => $subscription->available_serial_count,
                 'gateway_fee' => $subscription->gateway_fee,
+                'service_info' => $subscription->service_info,
 
             ] : null,
 
