@@ -91,7 +91,23 @@ class OrderRepository implements OrderRepositoryInterface
         }
 
         if ($request->filled('order_id')) {
-            $query->where('order_id', 'like', '%' . $request->order_id . '%');
+            $searchTerm = $request->order_id;
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('order_id', 'like', '%' . $searchTerm . '%')
+                  ->orWhereHas('orderItems', function ($q2) use ($searchTerm) {
+                      $q2->where(function ($q3) use ($searchTerm) {
+                          $q3->whereHas('bulkProduct', function ($q4) use ($searchTerm) {
+                              $q4->where('name', 'like', '%' . $searchTerm . '%');
+                          })->orWhereHas('package', function ($q4) use ($searchTerm) {
+                              $q4->whereHas('subscription', function ($q5) use ($searchTerm) {
+                                  $q5->whereHas('contributionProduct', function ($q6) use ($searchTerm) {
+                                      $q6->where('name', 'like', '%' . $searchTerm . '%');
+                                  });
+                              });
+                          });
+                      });
+                  });
+            });
         }
 
         if ($request->filled('payment_status')) {
