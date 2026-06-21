@@ -12,7 +12,7 @@ class NotificationController extends Controller
 
         return response()->json([
             'unread' => $user->unreadNotifications,
-            'all' => $user->notifications,
+            'all' => $user->notifications()->latest()->limit(10)->get(),
         ]);
     }
 
