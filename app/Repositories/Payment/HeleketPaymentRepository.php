@@ -83,6 +83,10 @@ class HeleketPaymentRepository implements HeleketPaymentRepositoryInterface
                     return response()->json(['message' => 'Package not found'], Response::HTTP_NOT_FOUND);
                 }
 
+                if ($package->subscription->is_manually_out_of_stock) {
+                    return response()->json(['message' => 'This product is currently out of stock'], Response::HTTP_BAD_REQUEST);
+                }
+
                 if (($package->subscription->delivery_type ?? 'serial_based') === 'service_based') {
                     if ($package->subscription->service_qty < $cartItemPackage->quantity) {
                         return response()->json(['message' => 'Not enough stock for the package'], Response::HTTP_BAD_REQUEST);
@@ -99,6 +103,10 @@ class HeleketPaymentRepository implements HeleketPaymentRepositoryInterface
 
                 if (!$bulkProduct) {
                     return response()->json(['message' => 'Bulk product not found'], Response::HTTP_NOT_FOUND);
+                }
+
+                if ($bulkProduct->is_manually_out_of_stock) {
+                    return response()->json(['message' => 'This product is currently out of stock'], Response::HTTP_BAD_REQUEST);
                 }
 
                 if ($bulkProduct->bulk_type == 'serial_based') {

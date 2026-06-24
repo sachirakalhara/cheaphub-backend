@@ -166,6 +166,10 @@ class WalletRepository implements WalletRepositoryInterface
 
         if ($bulkProduct) {
 
+            if ($bulkProduct->is_manually_out_of_stock) {
+                throw new \Exception('This product is currently out of stock');
+            }
+
             if($bulkProduct->bulk_type == 'serial_based') {
 
                 // Parse the serials into an array
@@ -216,6 +220,10 @@ class WalletRepository implements WalletRepositoryInterface
 
         if ($package) {
             $subscription = Subscription::find($package->subscription_id);
+
+            if ($subscription && $subscription->is_manually_out_of_stock) {
+                throw new \Exception('This product is currently out of stock');
+            }
 
             // Service-based subscriptions deduct a manual quantity counter only.
             // Serial fields are never touched and no serials are recorded.

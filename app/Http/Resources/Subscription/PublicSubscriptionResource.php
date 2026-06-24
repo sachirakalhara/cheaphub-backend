@@ -26,6 +26,7 @@ class PublicSubscriptionResource extends JsonResource
             'service_qty' => $this->service_qty ?? 0,
             'service_info' => $this->service_info,
             'gateway_fee' => $this->gateway_fee,
+            'is_manually_out_of_stock' => (bool) $this->is_manually_out_of_stock,
             'packages' => PublicPackageResource::collection($this->packages),
 
         ];

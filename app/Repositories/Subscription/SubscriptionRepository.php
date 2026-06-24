@@ -59,6 +59,8 @@ class SubscriptionRepository implements SubscriptionRepositoryInterface
             $subscription->service_qty = 0;
         }
 
+        $subscription->is_manually_out_of_stock = $request->has('is_manually_out_of_stock') ? (bool) $request->is_manually_out_of_stock : false;
+
         if ($subscription->save()) {
 
             activity('subscription')->causedBy($subscription)->performedOn($subscription)->log('created');
@@ -97,6 +99,10 @@ class SubscriptionRepository implements SubscriptionRepositoryInterface
             $subscription->serial = $request->serial;
             $subscription->available_serial_count = count(array_filter(explode("\n", $request->serial), 'trim'));
             $subscription->gateway_fee = $request->gateway_fee;
+        }
+
+        if ($request->has('is_manually_out_of_stock')) {
+            $subscription->is_manually_out_of_stock = (bool) $request->is_manually_out_of_stock;
         }
 
         if ($subscription->save()) {

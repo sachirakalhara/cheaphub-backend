@@ -15,7 +15,8 @@ class Subscription extends Model
         'delivery_type',
         'service_qty',
         'service_info',
-        'gateway_fee'
+        'gateway_fee',
+        'is_manually_out_of_stock'
     ];
 
 

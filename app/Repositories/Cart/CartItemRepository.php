@@ -41,6 +41,9 @@ class CartItemRepository implements CartItemRepositoryInterface
             if (!$bulkProduct) {
                 return response()->json(['message' => 'Bulk product not found'], Response::HTTP_NOT_FOUND);
             }
+            if ($bulkProduct->is_manually_out_of_stock) {
+                return response()->json(['message' => 'This product is currently out of stock'], Response::HTTP_BAD_REQUEST);
+            }
             if ($bulkProduct && $bulkProduct->bulk_type == 'serial_based') {
                 $totalQty = $cartItemBulkProductsQty + $qty - $removeQty;
                 if ($totalQty < 0) {
@@ -71,6 +74,9 @@ class CartItemRepository implements CartItemRepositoryInterface
             $package = Package::find($request->package_id);
             if (!$package) {
                 return response()->json(['message' => 'Package not found'], Response::HTTP_NOT_FOUND);
+            }
+            if ($package->subscription->is_manually_out_of_stock) {
+                return response()->json(['message' => 'This product is currently out of stock'], Response::HTTP_BAD_REQUEST);
             }
 
             $totalQty = $cartItemPackagesQty + $qty - $removeQty;

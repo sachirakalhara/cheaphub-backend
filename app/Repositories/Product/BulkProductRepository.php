@@ -112,6 +112,7 @@ class BulkProductRepository implements BulkProductRepositoryInterface
         $product->visibility = $request->visibility;
         $product->serial = $request->serial ?? null;
         $product->serial_count = $request->serial ? count(array_filter(explode("\n", $request->serial), 'trim')) : 0;
+        $product->is_manually_out_of_stock = $request->has('is_manually_out_of_stock') ? (bool) $request->is_manually_out_of_stock : false;
 
 
         if ($request->hasFile('image')) {
@@ -155,7 +156,11 @@ class BulkProductRepository implements BulkProductRepositoryInterface
             $product->serial = $request->serial;
             $product->serial_count = count(array_filter(explode("\n", $request->serial), 'trim'));
         }
-        
+
+        if ($request->has('is_manually_out_of_stock')) {
+            $product->is_manually_out_of_stock = (bool) $request->is_manually_out_of_stock;
+        }
+
         if ($request->hasFile('image')) {
             $image = $product->file('image');
             $disk = Storage::disk('s3');
