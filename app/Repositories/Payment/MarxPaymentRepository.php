@@ -233,7 +233,6 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
 
             $result = $response->json();
 
-            Log::info('Payment initiation response: ', $result);
             if ($response->successful() && isset($result['data']['payUrl']) && $result['status'] === 0 && $result['message'] === 'SUCCESS') {
 
                 $order->update([

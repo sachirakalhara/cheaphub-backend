@@ -20,8 +20,6 @@ class MailQueue extends Mailable
     public function __construct($details)
     {
         $this->details = $details;
-
-        // dd($details['user']->first_name);
     }
 
     /**
