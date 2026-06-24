@@ -35,6 +35,10 @@ class CartRepository implements CartRepositoryInterface
                 return response()->json(['message' => 'Coupon has expired'], Response::HTTP_BAD_REQUEST);
             }
 
+            if ($coupon && !$coupon->is_active) {
+                return response()->json(['message' => 'This coupon is not currently active'], Response::HTTP_BAD_REQUEST);
+            }
+
             if($cart->user_id == $user_id && $cart->coupon_code == $request->coupon_code) {
                 $message = 'The coupon code has already been applied';
             }
@@ -100,6 +104,10 @@ class CartRepository implements CartRepositoryInterface
 
             if ($coupon && $coupon->expiry_date < now()) {
                 return response()->json(['message' => 'Coupon has expired'], Response::HTTP_BAD_REQUEST);
+            }
+
+            if ($coupon && !$coupon->is_active) {
+                return response()->json(['message' => 'This coupon is not currently active'], Response::HTTP_BAD_REQUEST);
             }
         }
 

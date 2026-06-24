@@ -48,6 +48,20 @@ class CouponRepository implements CouponRepositoryInterface
         $coupon->max_discount_amount = $request->max_discount_amount;
         $coupon->expiry_date = $formattedDate;
         $coupon->coupon_code = $request->coupon_code;
+
+        if ($request->has('scheduled_start') && $request->scheduled_start) {
+            $coupon->scheduled_start = Carbon::parse($request->scheduled_start);
+            $coupon->is_active = false;
+        }
+        if ($request->has('scheduled_end') && $request->scheduled_end) {
+            $coupon->scheduled_end = Carbon::parse($request->scheduled_end);
+        }
+        if ($request->has('campaign_email_enabled')) {
+            $coupon->campaign_email_enabled = (bool) $request->campaign_email_enabled;
+            $coupon->campaign_audience = $request->campaign_audience;
+            $coupon->campaign_subject = $request->campaign_subject;
+        }
+
         if ($coupon->save()) {
             activity('coupon')->causedBy($coupon)->performedOn($coupon)->log('created');
             return new CouponResource($coupon);
@@ -55,7 +69,7 @@ class CouponRepository implements CouponRepositoryInterface
             return Helper::error(Response::$statusTexts[Response::HTTP_NO_CONTENT], Response::HTTP_NO_CONTENT);
         }
     }
-    
+
     public function update($request)
     {
         $formattedDate = Carbon::createFromFormat('d-m-Y', $request->expiry_date)->format('Y-m-d');
@@ -64,6 +78,22 @@ class CouponRepository implements CouponRepositoryInterface
         $coupon->discount_percentage = $request->discount_percentage;
         $coupon->max_discount_amount = $request->max_discount_amount;
         $coupon->expiry_date = $formattedDate;
+
+        if ($request->has('is_active')) {
+            $coupon->is_active = (bool) $request->is_active;
+        }
+        if ($request->has('scheduled_start')) {
+            $coupon->scheduled_start = $request->scheduled_start ? Carbon::parse($request->scheduled_start) : null;
+        }
+        if ($request->has('scheduled_end')) {
+            $coupon->scheduled_end = $request->scheduled_end ? Carbon::parse($request->scheduled_end) : null;
+        }
+        if ($request->has('campaign_email_enabled')) {
+            $coupon->campaign_email_enabled = (bool) $request->campaign_email_enabled;
+            $coupon->campaign_audience = $request->campaign_audience;
+            $coupon->campaign_subject = $request->campaign_subject;
+        }
+
         if ($coupon->save()) {
             activity('coupon')->causedBy($coupon)->performedOn($coupon)->log('updated');
             return new CouponResource($coupon);
@@ -87,24 +117,4 @@ class CouponRepository implements CouponRepositoryInterface
             return Helper::error('Failed to delete coupon', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-
-    //check Cart coltroler cartDetails
-    // public function checkCoupon($data)
-    // {
-    //     if (empty($data->coupon_code)) {
-    //         return Helper::error('Coupon code is required', Response::HTTP_BAD_REQUEST);
-    //     }
-
-    //     $coupon = Coupon::where('coupon_code', $data->coupon_code)
-    //             ->where('product_type', $data->product_type)
-    //             ->where('expiry_date', '>=', Carbon::now()->format('Y-m-d'))
-    //             ->first();
-
-    //     if ($coupon) {
-    //         return new CouponResource($coupon);
-    //     } else {
-    //         return Helper::error('Invalid or expired coupon', Response::HTTP_NOT_FOUND);
-    //     }
-    // }
-
 }
