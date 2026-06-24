@@ -6,9 +6,12 @@ use App\Helpers\Helper;
 use App\Http\Resources\Coupon\CouponCollection;
 use App\Http\Resources\Coupon\CouponResource;
 use App\Models\Coupon\Coupon;
+use App\Models\User\User;
+use App\Notifications\CouponCampaignNotification;
 use App\Repositories\Coupon\Interface\CouponRepositoryInterface;
 use Carbon\Carbon;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
 
 class CouponRepository implements CouponRepositoryInterface
 {
@@ -64,10 +67,40 @@ class CouponRepository implements CouponRepositoryInterface
 
         if ($coupon->save()) {
             activity('coupon')->causedBy($coupon)->performedOn($coupon)->log('created');
+
+            if ($coupon->campaign_email_enabled && !$coupon->scheduled_start) {
+                $this->sendCampaignEmails($coupon, false);
+                $coupon->update(['campaign_activation_sent' => true]);
+                Log::info("Immediate activation email campaign sent for coupon #{$coupon->id} ({$coupon->coupon_code}).");
+            }
+
             return new CouponResource($coupon);
         } else {
             return Helper::error(Response::$statusTexts[Response::HTTP_NO_CONTENT], Response::HTTP_NO_CONTENT);
         }
+    }
+
+    private function sendCampaignEmails(Coupon $coupon, bool $isReminder): void
+    {
+        $query = User::whereDoesntHave('roles', function ($q) {
+            $q->where('name', 'super_admin');
+        })->where('active', 1);
+
+        if ($coupon->campaign_audience === 'purchased_customers') {
+            $query->whereHas('order', function ($q) {
+                $q->whereIn('payment_status', ['paid', 'completed']);
+            });
+        }
+
+        $query->chunk(50, function ($customers) use ($coupon, $isReminder) {
+            foreach ($customers as $customer) {
+                try {
+                    $customer->notify(new CouponCampaignNotification($coupon, $isReminder));
+                } catch (\Exception $e) {
+                    Log::error("Failed to send coupon email to user #{$customer->id} for coupon #{$coupon->id}: {$e->getMessage()}");
+                }
+            }
+        });
     }
 
     public function update($request)
