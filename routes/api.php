@@ -21,6 +21,7 @@ use App\Http\Controllers\API\Payment\WalletController;
 use App\Http\Controllers\API\Product\Contribution\ProductReplacementController;
 use App\Http\Controllers\API\Review\ReviewController;
 use App\Http\Controllers\API\Ticket\TicketController;
+use App\Http\Controllers\API\AnnouncementController;
 use App\Models\Product\Contribution\ProductReplacement;
 
 Route::post('/v1/register', [AuthController::class, 'register']);
@@ -120,7 +121,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             Route::delete('/package/delete/{package_id}', [PackageController::class, 'delete']);
             Route::put('/package/update', [PackageController::class, 'update']);
 
-            
+
             Route::post('/category/create', [CategoryController::class, 'store']);
             Route::post('/category/update', [CategoryController::class, 'update']);
             Route::delete('/category/{id}', [CategoryController::class, 'delete']);
@@ -128,6 +129,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             Route::post('/tag/create', [TagController::class, 'store']);
             Route::put('/tag/update', [TagController::class, 'update']);
             Route::delete('/tag/{id}', [TagController::class, 'delete']);
+
+            Route::post('/announcement/send', [AnnouncementController::class, 'send']);
+            Route::get('/announcement/recipient-count', [AnnouncementController::class, 'recipientCount']);
 
         });
 
