@@ -91,10 +91,10 @@ class OrderRepository implements OrderRepositoryInterface
         $query = Order::query()->with(['orderItems.bulkProduct', 'orderItems.package']);
 
         $user = auth()->user();
-        if ($user->hasRole('super_admin') && $request->filled('user_id')) {
-            $query->where('user_id', $request->user_id);
-        } else {
+        if (!$user->hasRole('super_admin')) {
             $query->where('user_id', $user->id);
+        } elseif ($request->filled('user_id')) {
+            $query->where('user_id', $request->user_id);
         }
 
         if ($request->filled('order_id')) {
