@@ -26,11 +26,16 @@ class OrderRepository implements OrderRepositoryInterface
     public function findById($id)
     {
         $order = Order::find($id);
-        if ($order) {
-            return new OrderResource($order);
-        } else {
+        if (!$order) {
             return Helper::error('Order not found', Response::HTTP_NOT_FOUND);
         }
+
+        $user = auth()->user();
+        if (!$user->hasRole('super_admin') && $order->user_id !== $user->id) {
+            return Helper::error('Unauthorized', Response::HTTP_FORBIDDEN);
+        }
+
+        return new OrderResource($order);
     }
 
     
@@ -84,10 +89,12 @@ class OrderRepository implements OrderRepositoryInterface
     public function filter($request)
     {
         $query = Order::query()->with(['orderItems.bulkProduct', 'orderItems.package']);
-        // $query->where('is_wallet',  false );
 
-        if ($request->filled('user_id')) {
-            $query->where('user_id',  $request->user_id );
+        $user = auth()->user();
+        if ($user->hasRole('super_admin') && $request->filled('user_id')) {
+            $query->where('user_id', $request->user_id);
+        } else {
+            $query->where('user_id', $user->id);
         }
 
         if ($request->filled('order_id')) {

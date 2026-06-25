@@ -18,16 +18,16 @@ class TicketRepository implements TicketRepositoryInterface
 
         $query = Ticket::query();
         $user = auth()->user();
-        $role = $user->getRoleNames();
+        $isAdmin = $user->hasRole('super_admin');
+
+        if (!$isAdmin) {
+            $query->where('customer_id', $user->id);
+        } elseif ($request->filled('user_id')) {
+            $query->where('customer_id', $request->user_id);
+        }
+
         if ($request->filled('ticket_number')) {
             $query->where('ticket_number', 'like', '%' . $request->ticket_number . '%');
-        }
-
-        if($role  == 'super-admin'){
-
-        }
-        if ($request->filled('user_id')) {
-            $query->where('customer_id',  $request->user_id );
         }
         
         if ($request->filled('status')) {
@@ -52,10 +52,17 @@ class TicketRepository implements TicketRepositoryInterface
     {
         $user = auth()->user();
 
-        if (!Order::where('id', $data->order_id)->exists()) {
+        $order = Order::find($data->order_id);
+        if (!$order) {
             return response()->json([
                 'message' => 'Invalid order ID.'
             ], 400);
+        }
+
+        if ($order->user_id !== $user->id) {
+            return response()->json([
+                'message' => 'Unauthorized'
+            ], 403);
         }
 
         $ticket = Ticket::create([
@@ -87,13 +94,17 @@ class TicketRepository implements TicketRepositoryInterface
     {
         $ticket = Ticket::findOrFail($data->id);
 
+        $user = auth()->user();
+        $isAdmin = $user->user_level_id == 1;
+
+        if (!$isAdmin && $ticket->customer_id !== $user->id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
         $comment = $ticket->comments()->create([
-            'user_id' => auth()->id(),
+            'user_id' => $user->id,
             'message' => $data->message,
         ]);
-        
-        
-        $isAdmin = auth()->user()->user_level_id == 1;
 
         if ($isAdmin) {
             $user = User::find($ticket->order->user_id);
@@ -114,6 +125,13 @@ class TicketRepository implements TicketRepositoryInterface
     public function statusChange($data)
     {
         $ticket = Ticket::findOrFail($data->id);
+
+        $user = auth()->user();
+        $isAdmin = $user->user_level_id == 1;
+
+        if (!$isAdmin && $ticket->customer_id !== $user->id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
 
         $ticket->status = $data->status;
         $ticket->save();

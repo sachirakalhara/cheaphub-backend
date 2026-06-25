@@ -69,6 +69,13 @@ class ProductReplacementRepository implements ProductReplacementRepositoryInterf
             ], Response::HTTP_NOT_FOUND);
         }
 
+        if ($order->user_id !== $userId) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Unauthorized',
+            ], Response::HTTP_FORBIDDEN);
+        }
+
         $expiryDate = Carbon::parse($order->created_at)->addMonths((int) $package->expiry_duration);
         if (now()->greaterThan($expiryDate)) {
             return response()->json([
