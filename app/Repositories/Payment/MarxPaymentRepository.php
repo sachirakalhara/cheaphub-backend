@@ -154,6 +154,11 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             }
         }
 
+        // Snapshot of the cart, captured before the order consumes it. If Marx
+        // initiation fails below, the cart has already been deleted — without
+        // restoring it the customer is stranded on "Cart is empty" on every retry.
+        $cartSnapshot = null;
+
         DB::beginTransaction();
         try {
             // Lock the cart row so a concurrent request from the same user blocks
@@ -183,6 +188,17 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
 
             if (!$data['is_wallet'] || $data['is_wallet'] === 0) {
                 if ($cart) {
+                    $cartSnapshot = [
+                        'coupon_code' => $cart->coupon_code,
+                        'items' => $cart->cartItems->map(function ($ci) {
+                            return [
+                                'bulk_product_id' => $ci->bulk_product_id,
+                                'package_id' => $ci->package_id,
+                                'quantity' => $ci->quantity,
+                            ];
+                        })->toArray(),
+                    ];
+
                     foreach ($cart->cartItems as $cartItem) {
                         OrderItems::create([
                             'order_id' => $order->id,
@@ -268,6 +284,11 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                 'marx_response' => $result,
             ]);
 
+            // Give the customer their cart back so they can retry.
+            if ($cartSnapshot) {
+                $this->restoreCart($user->id, $cartSnapshot);
+            }
+
             return response()->json([
                 'status' => 'error',
                 'message' => 'Payment initiation failed.',
@@ -275,11 +296,43 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             ], 400);
         } catch (\Exception $e) {
             Log::error('Payment initiation error for order ' . ($order->order_id ?? 'unknown') . ': ' . $e->getMessage());
+
+            // Give the customer their cart back so they can retry.
+            if ($cartSnapshot) {
+                $this->restoreCart($user->id, $cartSnapshot);
+            }
+
             return response()->json([
                 'status' => 'error',
                 'message' => 'An error occurred while processing the payment.',
                 'error' => $e->getMessage(),
             ], 500);
+        }
+    }
+
+    /**
+     * Recreate the user's cart from a snapshot taken before the order consumed it.
+     * Called when Marx initiation fails so the customer can retry instead of being
+     * stranded on "Cart is empty". No-op if the user has already started a new cart.
+     */
+    private function restoreCart($userId, array $snapshot)
+    {
+        if (Cart::where('user_id', $userId)->exists()) {
+            return;
+        }
+
+        $cart = Cart::create([
+            'user_id'     => $userId,
+            'coupon_code' => $snapshot['coupon_code'] ?? null,
+        ]);
+
+        foreach ($snapshot['items'] as $item) {
+            CartItem::create([
+                'cart_id'         => $cart->id,
+                'bulk_product_id' => $item['bulk_product_id'],
+                'package_id'      => $item['package_id'],
+                'quantity'        => $item['quantity'],
+            ]);
         }
     }
 
