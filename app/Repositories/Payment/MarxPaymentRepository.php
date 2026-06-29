@@ -208,7 +208,11 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
         }
 
         $gateway_fee = $amount * $gateway_fee / 100;
-        $amount = $amount + $gateway_fee;
+        // Marx accepts at most 2 decimal places. The gateway-fee multiplication
+        // can produce 3+ decimals (e.g. 20.97 * 1.045 = 21.91365), which Marx
+        // rejects at initiation — the intermittent "payment initiation failed"
+        // with nothing landing on the Marx dashboard. Round to 2dp.
+        $amount = round($amount + $gateway_fee, 2);
         $marxArgs = [
             'merchantRID' => $order->order_id,
             'amount' => floatval($amount),
