@@ -249,13 +249,28 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             }
 
             $order->update(['payment_status' => 'failed']);
+
+            // Capture exactly why Marx refused the initiation. Without this the
+            // rejection reason (unsupported currency, bad paymentMethod, amount
+            // format, merchant config, etc.) is lost and the order just shows
+            // "failed" with nothing on the Marx dashboard. Secret key lives in
+            // the request headers, not in $marxArgs, so this logs no credentials.
+            Log::warning('Marx payment initiation rejected', [
+                'order_id'      => $order->order_id,
+                'http_status'   => $response->status(),
+                'currency'      => $marxArgs['currency'] ?? null,
+                'paymentMethod' => $marxArgs['paymentMethod'] ?? null,
+                'amount'        => $marxArgs['amount'] ?? null,
+                'marx_response' => $result,
+            ]);
+
             return response()->json([
                 'status' => 'error',
                 'message' => 'Payment initiation failed.',
                 'details' => $result,
             ], 400);
         } catch (\Exception $e) {
-            Log::error('Payment initiation error: ' . $e->getMessage());
+            Log::error('Payment initiation error for order ' . ($order->order_id ?? 'unknown') . ': ' . $e->getMessage());
             return response()->json([
                 'status' => 'error',
                 'message' => 'An error occurred while processing the payment.',
