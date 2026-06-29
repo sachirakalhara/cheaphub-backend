@@ -229,13 +229,28 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
         // rejects at initiation — the intermittent "payment initiation failed"
         // with nothing landing on the Marx dashboard. Round to 2dp.
         $amount = round($amount + $gateway_fee, 2);
+        // Marx requires a Sri Lankan mobile in the form +94XXXXXXXXX. International
+        // customers' numbers (e.g. a UK "07821173288") fail Marx's regex and the
+        // whole payment is rejected. Use the customer's number when it already
+        // matches, normalise a local SL "0XXXXXXXXX" to +94, otherwise fall back
+        // to a compliant placeholder (this field is only Marx's record — card OTP
+        // goes to the card issuer's number, not here).
+        $customerMobile = trim($data['tel'] ?? '');
+        if (preg_match('/^\+94\d{9}$/', $customerMobile)) {
+            // already valid — keep as-is
+        } elseif (preg_match('/^0\d{9}$/', $customerMobile)) {
+            $customerMobile = '+94' . substr($customerMobile, 1);
+        } else {
+            $customerMobile = '+94763737145';
+        }
+
         $marxArgs = [
             'merchantRID' => $order->order_id,
             'amount' => floatval($amount),
             'returnUrl' => "https://cheaphub.io/marxpay",
             'validTimeLimit' => 30,
             'customerMail' => $data['email'] ?? '',
-            'customerMobile' => $data['tel'] ?? '',
+            'customerMobile' => $customerMobile,
             'mode' => "WEB",
             'currency' => $data['currency'],
             'orderSummary' => $data['description'] ?? '',
