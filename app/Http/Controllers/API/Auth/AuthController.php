@@ -95,7 +95,7 @@ class AuthController extends Controller
         $user = $request->user();
         if (!$user->active) {
             return response()->json([
-                'message' => 'User blocked',
+                'message' => 'Your account has been disabled. Please contact support.',
                 'error' => 'user_blocked',
                 'status_code' => 401
             ], 401);

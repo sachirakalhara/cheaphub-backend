@@ -45,6 +45,16 @@ class UserController extends Controller
         return $this->userRepository->getUserByID($id);
     }
 
+    public function disable($id)
+    {
+        return $this->userRepository->setDisabled($id, true);
+    }
+
+    public function enable($id)
+    {
+        return $this->userRepository->setDisabled($id, false);
+    }
+
     public function getUserInfoByID($id)
     {
         return $this->userRepository->getUserInfoByID($id);

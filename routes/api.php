@@ -133,6 +133,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             Route::post('/announcement/send', [AnnouncementController::class, 'send']);
             Route::get('/announcement/recipient-count', [AnnouncementController::class, 'recipientCount']);
 
+            Route::post('/customer/{id}/disable', [UserController::class, 'disable']);
+            Route::post('/customer/{id}/enable', [UserController::class, 'enable']);
+
         });
 
         Route::group(['prefix' => 'customer'], function () {

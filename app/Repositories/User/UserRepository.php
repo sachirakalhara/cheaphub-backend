@@ -64,6 +64,32 @@ class UserRepository implements UserRepositoryInterface
     }
 
     
+    public function setDisabled($user_id, $disabled)
+    {
+        $user = User::find($user_id);
+        if (!$user) {
+            return Helper::error('User not found', Response::HTTP_NOT_FOUND);
+        }
+
+        if ($user->hasRole('super_admin')) {
+            return Helper::error('Admin accounts cannot be disabled', Response::HTTP_CONFLICT);
+        }
+
+        $user->active = !$disabled;
+        $user->disabled_at = $disabled ? now() : null;
+
+        if ($user->save()) {
+            activity('user')->causedBy(auth()->user())->performedOn($user)
+                ->log($disabled ? 'disabled' : 'enabled');
+            return Helper::success(
+                $disabled ? 'Customer account disabled' : 'Customer account enabled',
+                Response::HTTP_OK
+            );
+        }
+
+        return Helper::error('Failed to update customer status', Response::HTTP_INTERNAL_SERVER_ERROR);
+    }
+
     public function update($request)
     {
         $user = User::find($request->id);

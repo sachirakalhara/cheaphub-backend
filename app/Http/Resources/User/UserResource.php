@@ -34,6 +34,8 @@ class UserResource extends JsonResource
             'contact_number'=> $this->contact_no,
             'profile_photo' => $profile_photo,
             'user_level'=>$this->userLevel->scope,
+            'is_disabled' => !$this->active,
+            'disabled_at' => $this->disabled_at,
             'wallet' => $this->wallet ? $this->wallet->balance : '0.00',
             'user_spend' => $user_spend,
             'total_spend' => $total_spend,

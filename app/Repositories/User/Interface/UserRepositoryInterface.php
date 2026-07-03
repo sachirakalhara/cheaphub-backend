@@ -8,5 +8,6 @@ interface UserRepositoryInterface
     public function update($request);
     public function getUserByID($id);
     public function getUserInfoByID($id);
+    public function setDisabled($user_id, $disabled);
     
 }
