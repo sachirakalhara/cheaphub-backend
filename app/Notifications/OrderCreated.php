@@ -27,12 +27,17 @@ class OrderCreated extends Notification
     {
         $url = rtrim(config('app.client_url'), '/') . '/order-details/' . $this->order->id;
 
-        return (new MailMessage)
+        $mail = (new MailMessage)
             ->subject('Payment Confirmed - Order #' . $this->order->order_id)
             ->greeting('Hi ' . $notifiable->display_name . ',')
             ->line('Your payment for order **#' . $this->order->order_id . '** has been confirmed.')
-            ->line('**Amount Paid:** $' . number_format($this->order->amount_paid, 2))
-            ->action('View Order', $url)
+            ->line('**Amount Paid:** $' . number_format($this->order->amount_paid, 2));
+
+        if ($this->order->cashback_amount > 0) {
+            $mail->line('**Cashback earned:** $' . number_format($this->order->cashback_amount, 2) . ' has been added to your CheapHub wallet.');
+        }
+
+        return $mail->action('View Order', $url)
             ->line('Your order details and serials are available on your dashboard.');
     }
 

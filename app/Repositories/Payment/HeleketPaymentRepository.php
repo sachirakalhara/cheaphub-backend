@@ -443,6 +443,10 @@ class HeleketPaymentRepository implements HeleketPaymentRepositoryInterface
             ], Response::HTTP_BAD_REQUEST);
         }
 
+        // Product purchases earn wallet cashback. Wallet top-up orders never
+        // reach this point (their branch returns earlier), so no guard needed.
+        \App\Services\WalletCashbackService::creditForOrder($order);
+
         $user = User::find($order->user_id);
         if ($user) {
             $user->notify(new OrderCreated($order));

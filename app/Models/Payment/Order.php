@@ -21,6 +21,7 @@ class Order extends Model
         'transaction_id',
         'user_id',
         'amount_paid',
+        'cashback_amount',
         'is_wallet',
         'order_id',
         'discount',

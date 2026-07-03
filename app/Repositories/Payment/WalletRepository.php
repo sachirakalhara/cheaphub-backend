@@ -149,6 +149,10 @@ class WalletRepository implements WalletRepositoryInterface
 
             DB::commit();
 
+            // A wallet-funded purchase is still a product purchase (is_wallet
+            // here means "paid WITH wallet", not a top-up) — it earns cashback.
+            \App\Services\WalletCashbackService::creditForOrder($order);
+
             $user = User::find($order->user_id);
             $user->notify(new OrderCreated($order));
 

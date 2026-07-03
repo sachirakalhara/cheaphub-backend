@@ -526,6 +526,12 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                     ], Response::HTTP_BAD_REQUEST);
                 }
 
+                // Product purchases earn wallet cashback; wallet TOP-UPs
+                // (is_wallet=true in this flow) never do.
+                if (!$order->is_wallet) {
+                    \App\Services\WalletCashbackService::creditForOrder($order);
+                }
+
                 $user = User::find($order->user_id);
                 $user->notify(new OrderCreated($order));
 
