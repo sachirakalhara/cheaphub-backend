@@ -6,8 +6,6 @@ use App\Helpers\Helper;
 use App\Http\Resources\Coupon\CouponCollection;
 use App\Http\Resources\Coupon\CouponResource;
 use App\Models\Coupon\Coupon;
-use App\Models\User\User;
-use App\Notifications\CouponCampaignNotification;
 use App\Repositories\Coupon\Interface\CouponRepositoryInterface;
 use Carbon\Carbon;
 use Illuminate\Http\Response;
@@ -62,6 +60,7 @@ class CouponRepository implements CouponRepositoryInterface
         if ($request->has('campaign_email_enabled')) {
             $coupon->campaign_email_enabled = (bool) $request->campaign_email_enabled;
             $coupon->campaign_audience = $request->campaign_audience;
+            $coupon->campaign_inactive_days = $request->campaign_inactive_days ?: null;
             $coupon->campaign_subject = $request->campaign_subject;
         }
 
@@ -82,25 +81,7 @@ class CouponRepository implements CouponRepositoryInterface
 
     private function sendCampaignEmails(Coupon $coupon, bool $isReminder): void
     {
-        $query = User::whereDoesntHave('roles', function ($q) {
-            $q->where('name', 'super_admin');
-        })->where('active', 1);
-
-        if ($coupon->campaign_audience === 'purchased_customers') {
-            $query->whereHas('order', function ($q) {
-                $q->whereIn('payment_status', ['paid', 'completed']);
-            });
-        }
-
-        $query->chunk(50, function ($customers) use ($coupon, $isReminder) {
-            foreach ($customers as $customer) {
-                try {
-                    $customer->notify(new CouponCampaignNotification($coupon, $isReminder));
-                } catch (\Exception $e) {
-                    Log::error("Failed to send coupon email to user #{$customer->id} for coupon #{$coupon->id}: {$e->getMessage()}");
-                }
-            }
-        });
+        \App\Services\CouponCampaignService::send($coupon, $isReminder);
     }
 
     public function update($request)
@@ -124,6 +105,7 @@ class CouponRepository implements CouponRepositoryInterface
         if ($request->has('campaign_email_enabled')) {
             $coupon->campaign_email_enabled = (bool) $request->campaign_email_enabled;
             $coupon->campaign_audience = $request->campaign_audience;
+            $coupon->campaign_inactive_days = $request->campaign_inactive_days ?: null;
             $coupon->campaign_subject = $request->campaign_subject;
         }
 

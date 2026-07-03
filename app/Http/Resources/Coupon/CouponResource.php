@@ -22,6 +22,7 @@ class CouponResource extends JsonResource
             'scheduled_end' => $this->scheduled_end ? $this->scheduled_end->format('Y-m-d H:i') : null,
             'campaign_email_enabled' => $this->campaign_email_enabled,
             'campaign_audience' => $this->campaign_audience,
+            'campaign_inactive_days' => $this->campaign_inactive_days,
             'campaign_subject' => $this->campaign_subject,
             'campaign_activation_sent' => $this->campaign_activation_sent,
             'campaign_reminder_sent' => $this->campaign_reminder_sent,

@@ -21,6 +21,7 @@ class Coupon extends Model
         'scheduled_end',
         'campaign_email_enabled',
         'campaign_audience',
+        'campaign_inactive_days',
         'campaign_subject',
         'campaign_activation_sent',
         'campaign_reminder_sent',
@@ -32,6 +33,7 @@ class Coupon extends Model
         'scheduled_end' => 'datetime',
         'is_active' => 'boolean',
         'campaign_email_enabled' => 'boolean',
+        'campaign_inactive_days' => 'integer',
         'campaign_activation_sent' => 'boolean',
         'campaign_reminder_sent' => 'boolean',
     ];
