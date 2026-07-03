@@ -136,6 +136,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             Route::post('/customer/{id}/disable', [UserController::class, 'disable']);
             Route::post('/customer/{id}/enable', [UserController::class, 'enable']);
 
+            Route::get('/settings', [\App\Http\Controllers\API\SettingController::class, 'index']);
+            Route::put('/settings', [\App\Http\Controllers\API\SettingController::class, 'update']);
+
         });
 
         Route::group(['prefix' => 'customer'], function () {

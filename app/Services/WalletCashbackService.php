@@ -22,7 +22,12 @@ class WalletCashbackService
     public static function creditForOrder(Order $order): void
     {
         try {
-            $percent = (float) config('app.cashback_percent', 0);
+            // Admin-tunable via the settings table (Store Settings page);
+            // the env CASHBACK_PERCENT is only the fallback default.
+            $percent = (float) \App\Models\Setting::getValue(
+                'cashback_percent',
+                config('app.cashback_percent', 0)
+            );
             if ($percent <= 0) {
                 return;
             }
