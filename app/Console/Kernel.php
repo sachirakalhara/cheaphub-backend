@@ -14,6 +14,7 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('app:cancel-pending-orders')->everyFiveMinutes();
         $schedule->command('app:process-coupon-schedules')->everyFiveMinutes();
+        $schedule->command('app:send-abandoned-cart-emails')->hourly();
     }
 
     /**

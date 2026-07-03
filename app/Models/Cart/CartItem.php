@@ -13,6 +13,10 @@ class CartItem extends Model
 
     protected $fillable = ['cart_id', 'bulk_product_id','package_id', 'quantity'];
 
+    // Bump the parent cart's updated_at whenever items change, so
+    // "cart idle since X" (abandoned-cart detection) reflects real activity.
+    protected $touches = ['cart'];
+
     public function bulkProduct()
     {
         return $this->belongsTo(BulkProduct::class);

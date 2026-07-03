@@ -65,6 +65,10 @@ return [
 
     'pending_order_timeout_minutes' => env('PENDING_ORDER_TIMEOUT_MINUTES', 60),
 
+    'abandoned_cart_hours' => env('ABANDONED_CART_HOURS', 24),
+
+    'cashback_percent' => env('CASHBACK_PERCENT', 0),
+
     'asset_url' => env('ASSET_URL'),
 
     /*
