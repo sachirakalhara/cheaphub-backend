@@ -47,7 +47,7 @@ class AbandonedCartNotification extends Notification
             }
         }
 
-        $mail->line('Complete your order now — your items are reserved in your cart and ready for instant delivery.')
+        $mail->line('Your items are still saved in your cart — complete your order whenever you\'re ready.')
             ->action('Complete Your Order', $storeUrl)
             ->line('If you had any trouble checking out, just reply to this email — we\'re happy to help!');
 
