@@ -108,7 +108,7 @@ class BulkProductRepository implements BulkProductRepositoryInterface
         $product->payment_method = $request->payment_method;
         $product->minimum_quantity = $request->minimum_quantity ?? 0;
         $product->maximum_quantity = $request->maximum_quantity ?? 0;
-        $product->service_info = $request->service_info;
+        $product->service_info = $this->sanitizeServiceInfo($request->service_info);
         $product->visibility = $request->visibility;
         $product->serial = $request->serial ?? null;
         $product->serial_count = $request->serial ? count(array_filter(explode("\n", $request->serial), 'trim')) : 0;
@@ -147,7 +147,7 @@ class BulkProductRepository implements BulkProductRepositoryInterface
         $product->gateway_fee = $request->gateway_fee;
         $product->tag_id = $request->tag_id;
         $product->payment_method = $request->payment_method;
-        $product->service_info = $request->service_info;
+        $product->service_info = $this->sanitizeServiceInfo($request->service_info);
         $product->visibility = $request->visibility;
 
         if($product->bulk_type == 'serial_based'){
@@ -192,6 +192,24 @@ class BulkProductRepository implements BulkProductRepositoryInterface
         } else {
             return Helper::error(Response::$statusTexts[Response::HTTP_NO_CONTENT], Response::HTTP_NO_CONTENT);
         }
+    }
+
+    /**
+     * FormData in the admin panel serializes a missing value as the literal
+     * string "null"/"undefined" — never store those as service info.
+     */
+    private function sanitizeServiceInfo($value)
+    {
+        if (!is_string($value)) {
+            return null;
+        }
+
+        $trimmed = trim($value);
+        if ($trimmed === '' || strcasecmp($trimmed, 'null') === 0 || strcasecmp($trimmed, 'undefined') === 0) {
+            return null;
+        }
+
+        return $value;
     }
 
 }
