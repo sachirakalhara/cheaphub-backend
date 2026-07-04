@@ -53,8 +53,11 @@ class OrderItemResource extends JsonResource
 
                 foreach ($user_purchase_serials as $serial) {
                     $replacementSerial = optional($serial->removedProductReplacementSerials->last())->product_replacement_serial ?? null;
+                    // Keep the originally issued serial available (admin replacement
+                    // history needs it) before `serial` is overwritten with the
+                    // currently active replacement below.
+                    $serial->original_serial = $serial->serial;
                     $serial->serial = $replacementSerial ? $replacementSerial->serial : $serial->serial;
-                        null;
                 }
 
                 $contributionProduct = ContributionProduct::find($subscription->contribution_product_id);
