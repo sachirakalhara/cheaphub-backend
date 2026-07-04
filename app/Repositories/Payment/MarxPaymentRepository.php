@@ -259,8 +259,8 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
         ];
 
         try {
-            $local_user_secret = 'OTYwZTVkYmEtMGFiZi00OGQ0LTk5ZDctNGM1YWY2NjhkNWUwXzkxMjY=';
-            $marx_sandbox_url = 'https://payment.v4.api.marx.lk/api/v4/ipg/orders';
+            $local_user_secret = config('marx.merchant_key');
+            $marx_sandbox_url = config('marx.api_url');
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
                 'merchant-api-key' => $local_user_secret,
@@ -363,8 +363,8 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                     'message' => 'Missing required parameters.',
                 ], Response::HTTP_BAD_REQUEST);
             }
-            $production_url = 'https://payment.v4.api.marx.lk/api/v4/ipg/orders';
-            $local_user_secret = 'OTYwZTVkYmEtMGFiZi00OGQ0LTk5ZDctNGM1YWY2NjhkNWUwXzkxMjY=';
+            $production_url = config('marx.api_url');
+            $local_user_secret = config('marx.merchant_key');
 
             $check_url = "{$production_url}/{$tr}";
             $response = Http::withHeaders([
