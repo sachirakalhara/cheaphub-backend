@@ -21,8 +21,13 @@ class UserResource extends JsonResource
     {
         $disk = Storage::disk('s3');
         $profile_photo = $this->profile_photo ? $disk->url($this->profile_photo) : null;
+        // Per-user lifetime spend (shown as the "Purchases ($)" column).
         $user_spend = Order::where('user_id', $this->id)->where('is_wallet', false)->where('payment_status', 'paid')->sum('amount_paid');
-        $total_spend = Order::where('is_wallet', false)->where('payment_status', 'paid')->sum('amount_paid');
+
+        // NOTE: the store-wide aggregates (total spend, customer count) are NOT
+        // computed here — they were unused and, per row, loaded the entire users
+        // table and re-summed all orders. The admin header uses the dedicated
+        // super-admin/total-customer-spend endpoint instead.
 
         return [
             'id'=>$this->id,
@@ -38,13 +43,8 @@ class UserResource extends JsonResource
             'disabled_at' => $this->disabled_at,
             'wallet' => $this->wallet ? $this->wallet->balance : '0.00',
             'user_spend' => $user_spend,
-            'total_spend' => $total_spend,
-            'total_customer' => $this->get()->count(),
             'order_history' => $this->order,
             'roles' => $this->getRoleNames()
-
-
-
         ];
     }
 }
