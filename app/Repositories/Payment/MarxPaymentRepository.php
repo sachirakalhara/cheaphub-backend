@@ -247,7 +247,10 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
         $marxArgs = [
             'merchantRID' => $order->order_id,
             'amount' => floatval($amount),
-            'returnUrl' => "https://cheaphub.io/marxpay",
+            // Environment-aware so dev payments return to dev and prod to prod.
+            // Was hardcoded to prod, which made every dev card payment fail
+            // reconciliation (Marx redirected to prod, whose DB lacked the order).
+            'returnUrl' => rtrim(config('app.client_url'), '/') . '/marxpay',
             'validTimeLimit' => 30,
             'customerMail' => $data['email'] ?? '',
             'customerMobile' => $customerMobile,
