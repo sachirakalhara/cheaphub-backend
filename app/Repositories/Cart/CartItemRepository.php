@@ -41,6 +41,11 @@ class CartItemRepository implements CartItemRepositoryInterface
             if (!$bulkProduct) {
                 return response()->json(['message' => 'Bulk product not found'], Response::HTTP_NOT_FOUND);
             }
+            // onHold products are not purchasable, even by direct API call.
+            // ('unlisted' stays purchasable — that's the reseller direct-link feature.)
+            if ($bulkProduct->visibility === 'onHold') {
+                return response()->json(['message' => 'This product is currently unavailable'], Response::HTTP_BAD_REQUEST);
+            }
             if ($bulkProduct->is_manually_out_of_stock) {
                 return response()->json(['message' => 'This product is currently out of stock'], Response::HTTP_BAD_REQUEST);
             }
@@ -74,6 +79,9 @@ class CartItemRepository implements CartItemRepositoryInterface
             $package = Package::find($request->package_id);
             if (!$package) {
                 return response()->json(['message' => 'Package not found'], Response::HTTP_NOT_FOUND);
+            }
+            if (optional($package->subscription->contributionProduct)->visibility === 'onHold') {
+                return response()->json(['message' => 'This product is currently unavailable'], Response::HTTP_BAD_REQUEST);
             }
             if ($package->subscription->is_manually_out_of_stock) {
                 return response()->json(['message' => 'This product is currently out of stock'], Response::HTTP_BAD_REQUEST);

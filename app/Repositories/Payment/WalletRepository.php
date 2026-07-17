@@ -170,6 +170,10 @@ class WalletRepository implements WalletRepositoryInterface
 
         if ($bulkProduct) {
 
+            if ($bulkProduct->visibility === 'onHold') {
+                throw new \Exception('This product is currently unavailable');
+            }
+
             if ($bulkProduct->is_manually_out_of_stock) {
                 throw new \Exception('This product is currently out of stock');
             }
@@ -224,6 +228,10 @@ class WalletRepository implements WalletRepositoryInterface
 
         if ($package) {
             $subscription = Subscription::find($package->subscription_id);
+
+            if ($subscription && optional($subscription->contributionProduct)->visibility === 'onHold') {
+                throw new \Exception('This product is currently unavailable');
+            }
 
             if ($subscription && $subscription->is_manually_out_of_stock) {
                 throw new \Exception('This product is currently out of stock');
