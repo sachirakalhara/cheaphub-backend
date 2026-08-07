@@ -132,6 +132,13 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
                     return response()->json(['message' => 'Coupon has expired'], Response::HTTP_BAD_REQUEST);
                 }
 
+                // The cart validated this when the code was applied, but a
+                // scheduled campaign can end (cron flips is_active) while the
+                // code still sits in a long-lived cart. Re-check at payment.
+                if (!$coupon->is_active) {
+                    return response()->json(['message' => 'This coupon is not currently active'], Response::HTTP_BAD_REQUEST);
+                }
+
                 $packagesTotalPrice = $cart->cartItems->whereNotNull('package_id')->sum(function ($item) {
                     $package = Package::find($item->package_id);
                     return $package ? $package->price * $item->quantity : 0;

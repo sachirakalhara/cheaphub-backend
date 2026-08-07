@@ -71,6 +71,13 @@ class WalletRepository implements WalletRepositoryInterface
                 return response()->json(['message' => 'Coupon has expired'], Response::HTTP_BAD_REQUEST);
             }
 
+            // The cart validated this when the code was applied, but a
+            // scheduled campaign can end (cron flips is_active) while the
+            // code still sits in a long-lived cart. Re-check at payment.
+            if (!$coupon->is_active) {
+                return response()->json(['message' => 'This coupon is not currently active'], Response::HTTP_BAD_REQUEST);
+            }
+
             // Calculate the total price for packages and bulk products
             $packagesTotalPrice = $cart->cartItems->whereNotNull('package_id')->sum(function ($item) {
                 $package = Package::find($item->package_id);
