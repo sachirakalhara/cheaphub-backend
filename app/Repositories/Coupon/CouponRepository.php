@@ -50,6 +50,12 @@ class CouponRepository implements CouponRepositoryInterface
         $coupon->expiry_date = $formattedDate;
         $coupon->coupon_code = $request->coupon_code;
 
+        // Set before the scheduling block below, so a scheduled start still wins
+        // and leaves the coupon inactive until the cron activates it.
+        if ($request->has('is_active')) {
+            $coupon->is_active = (bool) $request->is_active;
+        }
+
         if ($request->has('scheduled_start') && $request->scheduled_start) {
             $coupon->scheduled_start = Carbon::parse($request->scheduled_start);
             $coupon->is_active = false;
@@ -67,7 +73,9 @@ class CouponRepository implements CouponRepositoryInterface
         if ($coupon->save()) {
             activity('coupon')->causedBy($coupon)->performedOn($coupon)->log('created');
 
-            if ($coupon->campaign_email_enabled && !$coupon->scheduled_start) {
+            // Don't email a campaign for a coupon that is switched off — the
+            // recipients would get a code that cannot be redeemed.
+            if ($coupon->campaign_email_enabled && !$coupon->scheduled_start && $coupon->is_active) {
                 $this->sendCampaignEmails($coupon, false);
                 $coupon->update(['campaign_activation_sent' => true]);
                 Log::info("Immediate activation email campaign sent for coupon #{$coupon->id} ({$coupon->coupon_code}).");
@@ -107,6 +115,15 @@ class CouponRepository implements CouponRepositoryInterface
             $coupon->campaign_audience = $request->campaign_audience;
             $coupon->campaign_inactive_days = $request->campaign_inactive_days ?: null;
             $coupon->campaign_subject = $request->campaign_subject;
+        }
+
+        // A manual switch-off has to stick. ProcessCouponSchedules re-activates
+        // any inactive coupon whose scheduled_start has passed, so an already
+        // fired start date would silently undo the admin within 5 minutes —
+        // clear it, it has served its purpose. A start date still in the future
+        // is a genuine pending schedule and is left alone.
+        if (!$coupon->is_active && $coupon->scheduled_start && $coupon->scheduled_start->isPast()) {
+            $coupon->scheduled_start = null;
         }
 
         if ($coupon->save()) {
