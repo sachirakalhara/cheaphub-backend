@@ -67,7 +67,7 @@ class WalletRepository implements WalletRepositoryInterface
                 return response()->json(['message' => 'Invalid coupon code'], Response::HTTP_BAD_REQUEST);
             }
 
-            if ($coupon->expiry_date < now()) {
+            if ($coupon->isExpired()) {
                 return response()->json(['message' => 'Coupon has expired'], Response::HTTP_BAD_REQUEST);
             }
 

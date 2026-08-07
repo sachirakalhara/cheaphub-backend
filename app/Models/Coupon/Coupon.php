@@ -43,4 +43,24 @@ class Coupon extends Model
         return Carbon::parse($value)->format('d-m-Y');
     }
 
+    /**
+     * Whether the coupon is past its expiry date.
+     *
+     * Uses the raw DB value on purpose: the accessor above returns a d-m-Y
+     * display string, so comparing $coupon->expiry_date against a date does a
+     * byte-wise string comparison and gets the wrong answer. Valid through the
+     * whole of the expiry day, matching app:delete-expired-coupons, which only
+     * removes a coupon once that day has passed.
+     */
+    public function isExpired(): bool
+    {
+        $raw = $this->getRawOriginal('expiry_date');
+
+        if (empty($raw)) {
+            return false;
+        }
+
+        return Carbon::parse($raw)->endOfDay()->isPast();
+    }
+
 }
