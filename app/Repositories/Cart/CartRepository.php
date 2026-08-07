@@ -102,12 +102,16 @@ class CartRepository implements CartRepositoryInterface
         if ($cart->coupon_code) {
             $coupon = Coupon::where('coupon_code', $cart->coupon_code)->first();
 
-            if ($coupon && $coupon->isExpired()) {
-                return response()->json(['message' => 'Coupon has expired'], Response::HTTP_BAD_REQUEST);
-            }
-
-            if ($coupon && !$coupon->is_active) {
-                return response()->json(['message' => 'This coupon is not currently active'], Response::HTTP_BAD_REQUEST);
+            // A coupon stored on a cart can go stale while the cart sits there:
+            // it expires, its campaign ends (the cron clears is_active), or it
+            // gets deleted. That must never make the cart itself unreachable —
+            // previously this returned an error instead of the cart, leaving the
+            // customer unable to see their items, remove the coupon or check out.
+            // Drop the dead coupon and hand back the cart.
+            if (!$coupon || $coupon->isExpired() || !$coupon->is_active) {
+                $cart->update(['coupon_code' => null]);
+                $coupon = null;
+                $message = 'Your coupon is no longer valid and has been removed from your cart.';
             }
         }
 
