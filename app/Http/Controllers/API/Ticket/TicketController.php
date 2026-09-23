@@ -41,12 +41,12 @@ class TicketController extends Controller
         // be bypassed.
         $request->validate([
             'message' => 'required_without:attachment|nullable|string',
-            'attachment' => 'nullable|file|image|mimes:jpg,jpeg,png,webp,gif|max:5120',
+            'attachment' => 'nullable|file|image|mimes:jpg,jpeg,png,webp,gif|max:2048',
         ], [
             'message.required_without' => 'Please enter a message or attach an image.',
-            'attachment.image' => 'Please select an image under 5MB (jpg, png, webp, gif)',
-            'attachment.mimes' => 'Please select an image under 5MB (jpg, png, webp, gif)',
-            'attachment.max' => 'Please select an image under 5MB (jpg, png, webp, gif)',
+            'attachment.image' => 'Please select an image under 2MB (jpg, png, webp, gif)',
+            'attachment.mimes' => 'Please select an image under 2MB (jpg, png, webp, gif)',
+            'attachment.max' => 'Please select an image under 2MB (jpg, png, webp, gif)',
             'attachment.uploaded' => 'Failed to upload image. Please try again.',
         ]);
 
