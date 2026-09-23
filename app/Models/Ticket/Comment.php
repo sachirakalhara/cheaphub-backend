@@ -10,7 +10,7 @@ class Comment extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['ticket_id', 'user_id', 'message'];
+    protected $fillable = ['ticket_id', 'user_id', 'message', 'attachment_url', 'attachment_type', 'attachment_size'];
 
     public function ticket()
     {

@@ -36,8 +36,18 @@ class TicketController extends Controller
 
     public function addComment(Request $request)
     {
+        // A message needs text, an image, or both. The image is checked on the
+        // server too (type by file content, size), since client-side checks can
+        // be bypassed.
         $request->validate([
-            'message' => 'required|string',
+            'message' => 'required_without:attachment|nullable|string',
+            'attachment' => 'nullable|file|image|mimes:jpg,jpeg,png,webp,gif|max:5120',
+        ], [
+            'message.required_without' => 'Please enter a message or attach an image.',
+            'attachment.image' => 'Please select an image under 5MB (jpg, png, webp, gif)',
+            'attachment.mimes' => 'Please select an image under 5MB (jpg, png, webp, gif)',
+            'attachment.max' => 'Please select an image under 5MB (jpg, png, webp, gif)',
+            'attachment.uploaded' => 'Failed to upload image. Please try again.',
         ]);
 
         return $this->ticketRepository->addComment($request);
