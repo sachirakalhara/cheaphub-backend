@@ -11,6 +11,7 @@ use Illuminate\Http\Response;
 use App\Models\User\User;
 use App\Notifications\TicketReplyNotification;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class TicketRepository implements TicketRepositoryInterface
 {
@@ -109,9 +110,12 @@ class TicketRepository implements TicketRepositoryInterface
         if ($data->hasFile('attachment')) {
             $file = $data->file('attachment');
             $disk = Storage::disk('s3');
-            // Extension guessed from the file's content (already validated as an
-            // allowed image), not the client-supplied filename.
-            $path = 'ticket/attachment/' . uniqid() . '.' . $file->extension();
+            // Random, unguessable name: support screenshots can show payment or
+            // account details, and uniqid() (used for public product images) is
+            // just a sequential timestamp. Extension is guessed from the file's
+            // content (already validated as an allowed image), not the
+            // client-supplied filename.
+            $path = 'ticket/attachment/' . Str::random(40) . '.' . $file->extension();
 
             // The s3 disk is configured with 'throw' => false, so a failure
             // comes back as false rather than an exception.
