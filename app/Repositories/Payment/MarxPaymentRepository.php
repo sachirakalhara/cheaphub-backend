@@ -39,6 +39,14 @@ class MarxPaymentRepository implements MarxPaymentRepositoryInterface
             return response()->json(['message' => 'Invalid amount'], Response::HTTP_BAD_REQUEST);
         }
 
+        // Wallet top-ups have a minimum amount. Product purchases are not affected.
+        $minTopup = (float) config('app.min_topup_amount', 3.50);
+        if (($data['is_wallet'] ?? false) && round((float) $amount, 2) < $minTopup) {
+            return response()->json([
+                'message' => 'Minimum top-up amount is $' . number_format($minTopup, 2),
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
         $cart = Cart::with('cartItems')->where('user_id', $user->id)->first();
 
         // A product purchase MUST have a non-empty cart. Without this guard a

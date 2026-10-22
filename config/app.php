@@ -69,6 +69,9 @@ return [
 
     'cashback_percent' => env('CASHBACK_PERCENT', 0),
 
+    // Smallest wallet top-up a customer can make (USD).
+    'min_topup_amount' => env('MIN_TOPUP_AMOUNT', 3.50),
+
     'asset_url' => env('ASSET_URL'),
 
     /*
