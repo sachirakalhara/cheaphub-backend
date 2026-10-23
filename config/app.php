@@ -72,6 +72,9 @@ return [
     // Smallest wallet top-up a customer can make (USD).
     'min_topup_amount' => env('MIN_TOPUP_AMOUNT', 3.50),
 
+    // Public storefront address used for product links in the sitemap.
+    'storefront_url' => env('STOREFRONT_URL', 'https://cheaphub.io'),
+
     'asset_url' => env('ASSET_URL'),
 
     /*

@@ -22,6 +22,7 @@ use App\Http\Controllers\API\Product\Contribution\ProductReplacementController;
 use App\Http\Controllers\API\Review\ReviewController;
 use App\Http\Controllers\API\Ticket\TicketController;
 use App\Http\Controllers\API\AnnouncementController;
+use App\Http\Controllers\API\SitemapController;
 use App\Models\Product\Contribution\ProductReplacement;
 
 Route::post('/v1/register', [AuthController::class, 'register']);
@@ -63,6 +64,9 @@ Route::post('/v1/contribution/product/get-all', [ContributionProductController::
 // Route::get('/v1/contribution/slug-contribution-product/{slug_name}', [ContributionProductController::class, 'findBySlug'])->name('api.slug-contribution-product.slug');
 Route::get('/v1/contribution/product/{id}', [ContributionProductController::class, 'findById']);
 Route::post('/v1/contribution/product/filter', [ContributionProductController::class, 'filter']);
+
+// Public product sitemap, referenced from cheaphub.io/robots.txt
+Route::get('/v1/sitemap-products.xml', [SitemapController::class, 'products']);
 
 
 
