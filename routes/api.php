@@ -25,12 +25,12 @@ use App\Http\Controllers\API\AnnouncementController;
 use App\Http\Controllers\API\SitemapController;
 use App\Models\Product\Contribution\ProductReplacement;
 
-Route::post('/v1/register', [AuthController::class, 'register'])->middleware('throttle:register');
-Route::post('/v1/login', [AuthController::class, 'login'])->middleware('throttle:login');
+Route::post('/v1/register', [AuthController::class, 'register']);
+Route::post('/v1/login', [AuthController::class, 'login']);
 Route::get('/v1/confirm-email/{user_id}/{key}', [AuthController::class, 'confirmMail']);
 
-Route::post('/v1/forgot-password', [AuthController::class, 'forgotPassword'])->middleware('throttle:forgot-password');
-Route::post('/v1/reset-password', [AuthController::class, 'password_reset'])->middleware('throttle:reset-password')->name('reset.password');
+Route::post('/v1/forgot-password', [AuthController::class, 'forgotPassword']);
+Route::post('/v1/reset-password', [AuthController::class, 'password_reset'])->name('reset.password');
 
 // Heleket crypto webhook — public (server-to-server, signature-verified)
 Route::post('/v1/heleket/webhook', [HeleketPaymentController::class, 'handleWebhook']);
