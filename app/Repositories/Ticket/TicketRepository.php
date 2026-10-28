@@ -36,10 +36,12 @@ class TicketRepository implements TicketRepositoryInterface
             $query->where('status',  $request->status );
         }
 
+        // order.items.package (duration only) lets the admin ticket list show
+        // whether the linked subscription is Active or Expired.
         if ($request->input('all', false)) {
-            $order_list = $query->with(['order', 'order.items', 'customer', 'comments.user'])->orderBy('created_at', 'desc')->get();
+            $order_list = $query->with(['order', 'order.items', 'order.items.package:id,expiry_duration', 'customer', 'comments.user'])->orderBy('created_at', 'desc')->get();
         } else {
-            $order_list = $query->with(['order', 'order.items', 'customer', 'comments.user'])->orderBy('created_at', 'desc')->paginate(10);
+            $order_list = $query->with(['order', 'order.items', 'order.items.package:id,expiry_duration', 'customer', 'comments.user'])->orderBy('created_at', 'desc')->paginate(10);
         }
 
         if ($order_list->isNotEmpty()) {
