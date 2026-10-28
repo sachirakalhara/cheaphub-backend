@@ -56,6 +56,7 @@ E-commerce (digital accounts/subscriptions). Owner Sachira, Sri Lanka. Prod http
 - Order details and customer profile load from URL (`/order/<order_id>?id=<id>`, `/customer/<name>?id=<id>`) as well as router state → can open in new tab/refresh.
 - Ticket sidebar: Order Number / Customer Name open in new tab, email mailto, bulk price uses `bulk_product.price`. Ticket list: Order Number column; status/page/search kept in URL (history.replace).
 - Chat avatars: admin = CheapHub logo, customer = initials.
+- Ticket subscription status (a32adb4 admin, f8dddc6 backend): `utility/orderSubscriptionStatus.js` mirrors customer `utils.ts checkOrderValidStatus` + `orderCard.tsx getStatusBadge` — **change both together**. `chat/LinkedOrderStatus.js` box in sidebar + mobile; list badge uses `order.items.package:id,expiry_duration` eager load in TicketRepository::all.
 - Ticket sidebar description still shows raw HTML for some products — **user said leave it**.
 
 ## Coupons
